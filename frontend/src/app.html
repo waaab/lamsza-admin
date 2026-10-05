@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="hu">
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>Szekely Gugel - Erdélyi magyar startlap és kereső</title>
+	<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+	<meta name="description"
+		content="Szekely Gugel - gyors kereses, idojares, hirek es gyorslinkek Szekelyfoldon es Erdelyben. Na lamsza, kicsibaratom!" />
+	<script>
+		(function () {
+			var t = localStorage.getItem('theme');
+			if (t === 'dark' || t === 'light') {
+				document.documentElement.setAttribute('data-theme', t);
+			}
+			// 'system' or missing: leave data-theme unset → CSS media query handles it
+		})();
+	</script>
+	%sveltekit.head%
+</head>
+
+<body data-sveltekit-preload-data="hover">
+	<div style="display: contents">%sveltekit.body%</div>
+</body>
+
+</html>

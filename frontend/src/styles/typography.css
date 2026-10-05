@@ -1,0 +1,83 @@
+/* Shared typography tokens and utilities (public + admin) */
+:root {
+  --font-sans: system-ui, -apple-system, sans-serif;
+  --font-serif: Georgia, "Times New Roman", serif;
+  --font-mono: ui-monospace, "Cascadia Code", "Source Code Pro", monospace;
+
+  /* Type scale */
+  --text-2xs: 0.625rem;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-md: 1.125rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.5rem;
+  --text-2xl: 2rem;
+  --text-display-sm: 1.8rem;
+  --text-display: 3rem;
+  --text-display-xl: 5rem;
+  --text-hero: clamp(2rem, 8vw, 5rem);
+  --text-page-title-narrow: clamp(1.35rem, 5vw, 1.75rem);
+
+  --leading-tight: 1.25;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.6;
+}
+
+/* Utilities */
+.text-2xs { font-size: var(--text-2xs); }
+.text-xs { font-size: var(--text-xs); }
+.text-sm { font-size: var(--text-sm); }
+.text-base { font-size: var(--text-base); }
+.text-md { font-size: var(--text-md); }
+.text-lg { font-size: var(--text-lg); }
+.text-xl { font-size: var(--text-xl); }
+.text-2xl { font-size: var(--text-2xl); }
+
+.font-sans { font-family: var(--font-sans); }
+.font-serif { font-family: var(--font-serif); }
+.font-mono { font-family: var(--font-mono); }
+
+.input-mono {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+}
+
+/* Markdown / prose */
+.markdown-content :global(h1) {
+  font-size: var(--text-2xl);
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.markdown-content :global(h2) {
+  font-size: var(--text-xl);
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.markdown-content :global(h3) {
+  font-size: var(--text-lg);
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.markdown-content :global(p),
+.markdown-content :global(li) {
+  font-size: var(--text-base);
+}
+
+.markdown-content :global(p) {
+  margin: 0.5rem 0;
+}
+
+.markdown-content :global(ul),
+.markdown-content :global(ol) {
+  margin: 0.5rem 0;
+  padding-left: 1.5rem;
+}
+
+.markdown-content :global(a) {
+  color: var(--link-color, #2563eb);
+  text-decoration: underline;
+}

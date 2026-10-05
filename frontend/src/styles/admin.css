@@ -1,0 +1,776 @@
+@import "./typography.css";
+@import "./component-typography.css";
+
+/* Admin Dashboard Layout */
+:global(.admin-container) {
+    width: 100%;
+    max-width: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+/* Full-viewport column: percentage heights need html/body to participate */
+:global(html:has(.admin-layout)),
+:global(body:has(.admin-layout)) {
+    height: 100%;
+    min-height: 100dvh;
+}
+
+:global(body:has(.admin-layout)) {
+    margin: 0;
+    overflow: hidden;
+}
+
+/* Viewport-locked shell: do not rely on height:100% chains (they often collapse to content height). */
+.admin-layout {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    min-height: 100vh;
+    min-height: 100dvh;
+    max-height: 100vh;
+    max-height: 100dvh;
+    overflow: hidden;
+}
+
+.admin-sidebar {
+    width: 80px;
+    background: var(--bg-body);
+    border-right: 1px solid var(--border-color);
+    flex: 0 0 80px;
+    align-self: stretch;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    /* No height:% here - stretch from .admin-layout gives a definite column height */
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    transition: background 0.25s ease, border-color 0.25s ease;
+}
+
+/* Fill the rail; space-between spreads icons across full available height */
+.admin-sidebar-inner {
+    box-sizing: border-box;
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0;
+    padding: 0.5rem 0;
+}
+
+.admin-sidebar-inner > .admin-sidebar-btn,
+.admin-sidebar-inner > .admin-sidebar-sep {
+    flex-shrink: 0;
+}
+
+.admin-sidebar-sep {
+    flex-shrink: 0;
+    width: 44px;
+    max-width: calc(100% - 1rem);
+    height: 1px;
+    margin: 0;
+    padding: 0;
+    border: none;
+    background: var(--border-color);
+    opacity: 0.95;
+}
+
+.admin-sidebar-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 8px;
+    transition: background 0.2s ease, color 0.2s ease;
+    color: var(--text-muted);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.admin-sidebar-btn:hover {
+    background: var(--border-color);
+}
+
+.admin-sidebar-btn.active {
+    background: var(--entry-category-bg);
+}
+
+.admin-sidebar-btn svg {
+    width: 28px;
+    height: 28px;
+    stroke-width: 2;
+    stroke: currentColor;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* Quote icon (mondasok): single „ uses <text>, not stroke */
+.admin-sidebar-btn svg.app-icon-quote,
+.admin-welcome-card svg.app-icon-quote {
+    stroke: none;
+    fill: none;
+}
+
+.admin-sidebar-btn svg.app-icon-quote text,
+.admin-welcome-card svg.app-icon-quote text {
+    fill: currentColor;
+    stroke: none;
+}
+
+/* Venue icon: filled dot (same as original sidebar markup) */
+.admin-sidebar-btn svg circle[fill="currentColor"],
+.admin-welcome-card svg circle[fill="currentColor"] {
+    fill: currentColor;
+    stroke: none;
+}
+
+/* Stadium pennants (venues) */
+.admin-sidebar-btn svg polygon.app-icon-solid,
+.admin-welcome-card svg polygon.app-icon-solid {
+    fill: currentColor;
+    stroke: none;
+}
+
+/* Welcome dashboard: same icon styling as sidebar, larger size */
+.admin-welcome-card svg {
+    width: 56px;
+    height: 56px;
+    stroke-width: 2;
+    stroke: currentColor;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.admin-main {
+    flex: 1;
+    min-width: 0;
+    min-height: 0;
+    padding: 1rem;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Open public site in new tab */
+.admin-sidebar-btn--external {
+    text-decoration: none;
+    color: var(--text-muted);
+}
+
+.admin-welcome {
+    width: 100%;
+}
+
+.admin-welcome-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+    gap: 1.25rem;
+}
+
+.admin-welcome-card {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    min-height: 9.5rem;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    background: var(--card-bg, var(--bg-body));
+    cursor: pointer;
+    color: var(--text-muted);
+    text-align: left;
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.15s ease;
+}
+
+.admin-welcome-card-body {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem 1rem 0.65rem;
+    min-height: 5.5rem;
+}
+
+.admin-welcome-card-footer {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.55rem 0.75rem 0.65rem;
+    border-top: 1px solid var(--border-color);
+    font-size: var(--text-xs);
+    line-height: 1.2;
+    background: color-mix(in srgb, var(--entry-category-bg, rgba(127, 127, 127, 0.08)) 65%, transparent);
+}
+
+.admin-welcome-card-footer-left {
+    flex-shrink: 0;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-primary);
+}
+
+.admin-welcome-card-footer-right {
+    color: var(--text-muted);
+    font-weight: 500;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: right;
+}
+
+.admin-welcome-card:hover {
+    background: var(--entry-category-bg);
+    color: var(--text-primary);
+    border-color: var(--primary, #5c6bc0);
+    transform: translateY(-2px);
+}
+
+.admin-welcome-card:focus-visible {
+    outline: 2px solid var(--primary, #5c6bc0);
+    outline-offset: 2px;
+}
+
+.admin-welcome-card.active {
+    background: var(--entry-category-bg);
+    color: var(--text-primary);
+    border-color: var(--primary, #5c6bc0);
+}
+
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 1rem;
+    transition: border-color 0.25s ease;
+}
+
+.admin-header-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.admin-page-title {
+    margin: 0 0 0.5rem;
+    font-size: var(--text-xl);
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--text-primary);
+    letter-spacing: -0.02em;
+}
+
+.admin-page-greeting {
+    margin: 0;
+    max-width: 52rem;
+    font-size: var(--text-base);
+    line-height: 1.5;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+.admin-header .btn {
+    flex-shrink: 0;
+    align-self: flex-start;
+}
+
+/* Login specific styles */
+.admin-login-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+}
+
+.admin-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    transition: border-color 0.25s ease;
+}
+
+.admin-form input,
+.admin-form select,
+.admin-form textarea {
+    padding: 0.8rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: var(--text-base);
+    font-family: inherit;
+    background: var(--card-bg);
+    color: var(--text-primary);
+    transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+}
+
+.admin-form label {
+    font-weight: 500;
+    margin-bottom: -0.5rem;
+}
+
+.admin-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+    max-width: 100%;
+}
+
+.admin-table-wrapper .admin-table {
+    margin-top: 0;
+}
+
+.admin-table {
+    width: 100%;
+    min-width: 720px;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    font-size: var(--text-base);
+}
+
+.admin-table.admin-table--compact {
+    font-size: var(--text-sm);
+}
+
+.admin-table th,
+.admin-table td {
+    padding: 0.65rem 0.75rem;
+    border: 1px solid var(--border-color);
+    text-align: left;
+    color: var(--text-primary);
+    vertical-align: top;
+}
+
+.admin-table tr:nth-child(odd) {
+    background: var(--card-bg);
+}
+
+.admin-table tr:hover {
+    background: var(--entry-category-bg);
+    color: var(--text-primary);
+}
+
+
+.admin-table th {
+    background: var(--bg-body);
+    font-weight: bold;
+    transition: background 0.25s ease;
+    white-space: nowrap;
+}
+
+/* Never use display:flex on <td> - it breaks table grid and causes bogus “inner borders”. */
+.admin-table th.admin-table-col--action,
+.admin-table td.admin-table-col--action {
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap;
+    width: 1%;
+}
+
+.admin-table td.admin-table-col--action--muted {
+    color: var(--text-muted);
+    font-size: var(--text-base);
+}
+
+/* Single-button action cells (no class needed on every row) */
+.admin-table tbody td:has(> .btn-update:only-child),
+.admin-table tbody td:has(> .btn-delete:only-child) {
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap;
+    width: 1%;
+}
+
+.btn-delete {
+    background: var(--btn-danger-bg);
+    color: white;
+    border: none;
+    padding: 0.4rem 0.85rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    transition: background 0.2s ease;
+}
+
+.btn-delete:hover {
+    background: var(--btn-danger-hover);
+}
+
+.admin-submit-btn {
+    background: var(--btn-submit-bg);
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: var(--text-base);
+    font-weight: bold;
+    transition: background 0.2s ease;
+}
+
+.admin-submit-btn:hover {
+    background: var(--btn-submit-hover);
+}
+
+/* Secondary / edit - outline, matches table + modal “Szerkesztés” across admin */
+.btn-update {
+    display: inline-block;
+    box-sizing: border-box;
+    background: transparent;
+    color: var(--primary, #5c6bc0);
+    border: 1px solid var(--primary, #5c6bc0);
+    padding: 0.4rem 0.85rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
+}
+
+.btn-update:hover:not(:disabled) {
+    background: var(--primary, #5c6bc0);
+    color: #fff;
+}
+
+.btn-update:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.admin-req {
+    color: #b45309;
+    font-weight: 700;
+}
+
+.admin-form-hint {
+    padding: 0.75rem 1rem;
+    font-size: var(--text-base);
+    line-height: 1.45;
+    color: var(--text-muted);
+    border: 1px dashed var(--border-color);
+    border-radius: 6px;
+}
+
+.admin-container .info-box + .info-box {
+    margin-top: 0.75rem;
+}
+
+.admin-subsection {
+    margin: 1rem 0 2rem;
+}
+
+.admin-subsection > h3 {
+    margin: 0 0 0.35rem;
+    font-size: var(--text-lg);
+}
+
+.admin-subsection > p {
+    margin: 0 0 0.85rem;
+    color: var(--text-muted);
+    line-height: 1.45;
+}
+
+.admin-cache-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.5rem;
+}
+
+.admin-cache-list li {
+    display: grid;
+    gap: 0.15rem;
+    padding: 0.75rem 0.9rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--card-bg, var(--bg-body));
+}
+
+.admin-cache-name {
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.admin-cache-detail {
+    color: var(--text-muted);
+    line-height: 1.4;
+}
+
+.admin-row-warn {
+    background: #fffbeb;
+}
+
+.admin-schedule-details {
+    margin-top: 1rem;
+    padding: 1rem;
+    border: 1px dashed var(--border-color);
+    border-radius: 8px;
+    background: var(--bg-body);
+}
+
+.admin-schedule-details summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.admin-schedule-hint {
+    margin-top: 0.75rem;
+}
+
+.schedule-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0.75rem 0 1rem;
+}
+
+.schedule-day-block {
+    margin-bottom: 1.25rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.schedule-day-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.schedule-day-head .schedule-inline {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    font-size: var(--text-sm);
+}
+
+.schedule-notes {
+    flex: 1;
+    min-width: 12rem;
+}
+
+.schedule-act-table {
+    font-size: var(--text-sm);
+    margin-bottom: 0.5rem;
+}
+
+.schedule-act-table input[type="text"],
+.schedule-act-table select.schedule-act-type {
+    width: 100%;
+    min-width: 0;
+}
+
+.schedule-act-table select.schedule-act-type,
+.schedule-act-table select.schedule-act-venue {
+    max-width: 11rem;
+    font-size: inherit;
+}
+
+.schedule-act-table select.schedule-act-venue {
+    max-width: 12rem;
+}
+
+.schedule-save-btn {
+    margin-top: 0.5rem;
+}
+
+.btn-xs {
+    padding: 0.15rem 0.4rem;
+    font-size: var(--text-sm);
+}
+
+/* Collapsible “create new” blocks + table search toolbars */
+.admin-create-panel {
+    margin: 1rem 0;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--entry-category-bg);
+    overflow: hidden;
+    user-select: none;
+}
+
+.admin-create-panel > .admin-create-summary {
+    list-style: none;
+}
+
+.admin-create-panel > .admin-create-summary::-webkit-details-marker {
+    display: none;
+}
+
+.admin-create-summary {
+    cursor: pointer;
+    padding: 0.75rem 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    background: var(--entry-category-bg);
+    border-bottom: 1px solid transparent;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.admin-create-summary :global(.admin-plus-icon) {
+    flex-shrink: 0;
+    opacity: 0.72;
+    color: var(--text-muted, #666);
+}
+
+.admin-create-panel[open] > .admin-create-summary {
+    border-bottom-color: var(--border-color);
+}
+
+.admin-create-panel .admin-create-form {
+    margin: 0;
+    border: none;
+    border-radius: 0;
+}
+
+.admin-table-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.admin-pagination {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin: 0.5rem 0;
+    padding: 0 0.65rem;
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    border: 1px dashed var(--border-color);
+    border-radius: 6px;
+}
+
+.admin-pagination-info strong {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.admin-pagination-nav {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.admin-search-label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    width: 100%;
+}
+
+.admin-search-heading {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.admin-search-input {
+    min-width: 12rem;
+    max-width: 22rem;
+    padding: 0.5rem 0.65rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: var(--text-base);
+    background: var(--card-bg);
+    color: var(--text-primary);
+}
+
+.admin-subsection-title {
+    margin: 1.5rem 0 0.75rem;
+    font-size: var(--text-md);
+    color: var(--text-primary);
+}
+
+/* List cell previews - 20 chars max in JS (contentPreview / urlPreview); full text in title */
+.admin-table-cell-preview {
+    max-width: 9rem;
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.admin-table__mono {
+    font-size: var(--text-sm);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.admin-event-image-block {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    margin-bottom: 0.35rem;
+}
+
+.admin-sublabel {
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    margin-top: 0.25rem;
+}
+
+.admin-event-image-preview {
+    max-width: 100%;
+    max-height: 140px;
+    width: auto;
+    object-fit: contain;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+}
+
+.admin-event-thumb-cell {
+    width: 3.25rem;
+    vertical-align: middle;
+}
+
+.admin-event-thumb-cell img {
+    display: block;
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+}
+
+.admin-thumb-empty {
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+}

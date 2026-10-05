@@ -1,0 +1,363 @@
+/* Component typography - font sizes live here, not in Svelte <style> blocks */
+
+/* Directory listing cards */
+.entry-listing__title {
+  font-size: var(--text-md);
+}
+.entry-listing__initials {
+  font-size: var(--text-lg);
+}
+.entry-listing__place,
+.entry-listing__count,
+.entry-listing__review,
+.entry-listing__pills li,
+.entry-listing__type,
+.entry-listing__more {
+  font-size: var(--text-sm);
+}
+.entry-listing__score {
+  font-size: var(--text-sm);
+}
+
+.entry-profile__meta,
+.entry-profile__count,
+.entry-profile__about,
+.entry-profile__services li,
+.entry-profile__address,
+.entry-profile__contact-row,
+.entry-profile__empty,
+.entry-profile__photo--empty,
+.entry-profile__review-text,
+.entry-profile__claim,
+.entry-profile__open,
+.entry-profile__today,
+.entry-profile__recommend-label,
+.entry-profile__hours,
+.entry-profile__suggest {
+  font-size: var(--text-sm);
+}
+.entry-profile__photo-label {
+  font-size: var(--text-sm);
+}
+.entry-profile__hours-title {
+  font-size: var(--text-sm);
+}
+.entry-profile__section-title {
+  font-size: var(--text-md);
+}
+.entry-profile__score {
+  font-size: var(--text-sm);
+}
+.entry-profile__initials {
+  font-size: var(--text-xl);
+}
+
+/* Shared directory / index placeholders */
+.entry-placeholder-cat,
+.entry-placeholder-loc {
+  font-size: var(--text-xs);
+  color: var(--text-faint);
+}
+
+.entry-placeholder-title {
+  font-size: var(--text-base);
+  color: var(--text-faint);
+  margin-top: 0.5rem;
+}
+
+.index-stats-item-value {
+  font-size: var(--text-2xl);
+}
+
+.aside-title {
+  font-size: var(--text-lg);
+}
+
+/* Entry detail (bejegyzes) */
+.entry-url-row {
+  font-size: var(--text-md);
+}
+
+.contact-title,
+.details-title {
+  font-size: var(--text-lg);
+}
+
+/* County / news ticker on county page */
+.county-news .news-title {
+  font-weight: 500;
+  font-size: var(--text-base);
+}
+
+.county-news .news-meta {
+  font-size: var(--text-sm);
+  color: var(--text-faint);
+  margin-top: 0.2rem;
+}
+
+.cw-name {
+  font-size: var(--text-base);
+}
+
+.cw-temp {
+  font-size: var(--text-md);
+}
+
+.cw-temp-min,
+.cw-desc {
+  font-size: var(--text-xs);
+}
+
+.cw-icon {
+  font-size: var(--text-xl);
+}
+
+/* Venue page */
+.venue-sub,
+.venue-meta-item {
+  font-size: var(--text-base);
+}
+
+.venue-meta-label {
+  font-size: var(--text-xs);
+}
+
+.venue-section-title {
+  font-size: var(--text-md);
+}
+
+.venue-events-hint {
+  font-size: var(--text-sm);
+}
+
+.venue-events-link {
+  font-size: var(--text-base);
+}
+
+.venue-events-meta {
+  font-size: var(--text-sm);
+}
+
+.venue-events-type {
+  font-size: var(--text-xs);
+}
+
+/* Events list page */
+.events-fb-menu-search {
+  font-size: var(--text-sm);
+}
+
+.events-fb-menu-row {
+  font-size: var(--text-base);
+}
+
+.events-fb-menu-row-sub {
+  font-size: var(--text-xs);
+}
+
+.events-calendar-year-btn {
+  font-size: var(--text-base);
+}
+
+.entry-fields__row dt {
+  font-size: var(--text-sm);
+}
+
+.entry-fields__row dd {
+  font-size: var(--text-base);
+}
+
+.admin-date-today-badge {
+  font-size: var(--text-2xs);
+}
+
+.events-calendar-year-label,
+.events-calendar-year-static {
+  font-size: var(--text-base);
+}
+
+.events-calendar-cell-label {
+  font-size: var(--text-xs);
+}
+
+.events-sidebar-months-empty,
+.event-card-lede {
+  font-size: var(--text-sm);
+}
+
+.events-day-weekday {
+  font-size: var(--text-2xs);
+}
+
+.event-card-media-type,
+.event-card-media-subtype {
+  font-size: var(--text-2xs);
+}
+
+.event-card-footer__row {
+  font-size: var(--text-sm);
+}
+
+.event-card-footer__lede {
+  font-size: var(--text-sm);
+}
+
+.event-calendar-chip-month {
+  font-size: var(--text-2xs);
+}
+
+.event-calendar-chip-day {
+  font-size: var(--text-lg);
+}
+
+.event-card-title {
+  font-size: var(--text-base);
+}
+
+.event-meta {
+  font-size: var(--text-base);
+}
+
+/* Event detail page */
+.back-link {
+  font-size: var(--text-base);
+}
+
+.event-detail-body {
+  font-size: var(--text-base);
+}
+
+.event-schedule-title {
+  font-size: var(--text-md);
+}
+
+.schedule-day-title {
+  font-size: var(--text-base);
+}
+
+.schedule-day-notes,
+.schedule-activity-desc {
+  font-size: var(--text-base);
+}
+
+.schedule-type-pill,
+.schedule-activity-venue--meta,
+.schedule-activity-now-badge {
+  font-size: var(--text-2xs);
+}
+
+.schedule-activity-time {
+  font-size: var(--text-sm);
+}
+
+@media (max-width: 560px) {
+  .event-detail .page-title {
+    font-size: var(--text-page-title-narrow);
+  }
+}
+
+/* Events widget */
+.event-widget .event-card-date,
+.event-widget .event-card-meta {
+  font-size: var(--text-xs);
+}
+
+.event-widget .event-card-title {
+  font-size: var(--text-base);
+}
+
+.event-ticker-title {
+  font-size: var(--text-md);
+}
+
+.event-ticker-meta {
+  font-size: var(--text-base);
+}
+
+.event-type-badge--clear {
+  font-size: var(--text-2xs);
+}
+
+.badge-separator {
+  font-size: var(--text-sm);
+}
+
+.event-type-inline,
+.event-subtype-inline {
+  font-size: var(--text-2xs);
+}
+
+/* DateTime widget */
+.datetime-digital {
+  font-size: var(--text-display-sm);
+}
+
+.datetime-text {
+  font-size: var(--text-base);
+}
+
+/* Event status badge */
+.event-date-badge {
+  font-size: var(--text-2xs);
+}
+
+/* News widget (homepage / county - not list cards) */
+.news-widget .news-meta {
+  font-size: var(--text-sm);
+}
+
+.weather-detail {
+  font-size: var(--text-xs);
+}
+
+/* FAQ disclaimer markdown in accordion */
+.faq-item-body :global(.markdown-content p),
+.faq-item-body :global(.markdown-content ul),
+.faq-item-body :global(.markdown-content ol) {
+  font-size: var(--text-sm);
+}
+
+/* Search discover panel */
+.discover-section-title {
+  font-size: var(--text-base);
+}
+
+/* Admin page extras (admin.css covers most shell typography) */
+.admin-modal .badge {
+  font-size: var(--text-xs);
+}
+
+.admin-dialog p {
+  font-size: var(--text-base);
+}
+
+.admin-region-heading {
+  font-size: var(--text-md);
+}
+
+.admin-subtab-heading {
+  font-size: var(--text-base);
+}
+
+.admin-region-edit-grid label,
+.admin-region-edit-full,
+.admin-faq-pair-fields label {
+  font-size: var(--text-sm);
+}
+
+.admin-region-edit-full textarea {
+  font-family: var(--font-mono);
+  font-size: var(--text-base);
+}
+
+.admin-faq-toolbar-label {
+  font-size: var(--text-base);
+}
+
+.org-suggestions li button {
+  font-size: var(--text-base);
+}
+
+.org-sug-meta {
+  font-size: var(--text-sm);
+}

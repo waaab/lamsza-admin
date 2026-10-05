@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" role="img" aria-hidden="true">
+  <defs>
+    <linearGradient id="evph-bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e8eaef"/>
+      <stop offset="1" stop-color="#dce0e8"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="180" fill="currentColor"/>
+  <!-- Same calendar glyph as AppIcon name="events" / public toolbar (scaled & centered) -->
+  <g transform="translate(136 54)" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M8 2v4"/>
+    <path d="M16 2v4"/>
+    <rect width="36" height="36" x="3" y="4" rx="6"/>
+    <path d="M3 10h36"/>
+  </g>
+</svg>
