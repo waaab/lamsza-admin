@@ -55,7 +55,7 @@ call `lamsza` on `:3001` — do not copy the handler back. `main.go` routes 42 `
 functions and none is unrouted; keep it that way:
 
 ```bash
-cd ~/projects/lamsza-admin/backend && go build ./... && go test ./...
+cd ~/projects/lamsza-network/lamsza-admin/backend && go build ./... && go test ./...
 ```
 
 ## Write audit log
@@ -153,8 +153,8 @@ alternatives are in `lamsza/docs/network/SHARED_FRONTEND_MODULES.md`.
 Set absolute paths so both processes read/write the same files:
 
 ```
-ENTRY_IMAGES_DIR=/home/attila/projects/lamsza/backend/data/entry-images
-EVENT_IMAGES_DIR=/home/attila/projects/lamsza/backend/data/event-images
+ENTRY_IMAGES_DIR=/home/attila/projects/lamsza-network/lamsza/backend/data/entry-images
+EVENT_IMAGES_DIR=/home/attila/projects/lamsza-network/lamsza/backend/data/event-images
 ```
 
 After cutover, only this admin API accepts admin upload endpoints; main Lámsza continues to **serve** public media from the same directories.

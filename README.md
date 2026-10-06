@@ -23,7 +23,7 @@ lamsza-admin/
 
 ## Prerequisites
 
-- Main Lámsza Postgres running (`cd ~/projects/lamsza && docker compose up -d`)
+- Main Lámsza Postgres running (`cd ~/projects/lamsza-network/lamsza && docker compose up -d`)
 - Schema migrations are applied by the **main** Lámsza backend — run that at least once
 - Google OAuth authorized JS origins include `http://localhost:5173`
 

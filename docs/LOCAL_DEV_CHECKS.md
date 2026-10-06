@@ -13,7 +13,7 @@ restore) live in `lamsza/docs/LOCAL_DEV_CHECKS.md`. That file stays the definiti
 ## The one command
 
 ```bash
-cd ~/projects/lamsza-admin && npm test
+cd ~/projects/lamsza-network/lamsza-admin && npm test
 ```
 
 It runs both suites and stops at the first failure:
