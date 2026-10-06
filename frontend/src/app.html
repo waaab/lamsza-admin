@@ -8,15 +8,13 @@
 	<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 	<meta name="description"
 		content="Szekely Gugel - gyors kereses, idojares, hirek es gyorslinkek Szekelyfoldon es Erdelyben. Na lamsza, kicsibaratom!" />
-	<script>
-		(function () {
-			var t = localStorage.getItem('theme');
-			if (t === 'dark' || t === 'light') {
-				document.documentElement.setAttribute('data-theme', t);
-			}
-			// 'system' or missing: leave data-theme unset → CSS media query handles it
-		})();
-	</script>
+	<!--
+		Keep this as an external file, not an inline block: the
+		Content-Security-Policy in svelte.config.js allows scripts from this
+		origin only. It must stay synchronous and before the body so the theme is
+		set before the first paint.
+	-->
+	<script src="%sveltekit.assets%/theme-init.js"></script>
 	%sveltekit.head%
 </head>
 
