@@ -4,6 +4,9 @@
 	"scripts": {
 		"dev": "npm run dev --prefix frontend",
 		"build": "npm run build --prefix frontend",
+		"test": "npm run test:frontend && npm run test:backend",
+		"test:frontend": "npm run test --prefix frontend",
+		"test:backend": "cd backend && go test ./...",
 		"restart": "./scripts/restart_all.sh"
 	}
 }

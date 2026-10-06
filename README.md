@@ -39,6 +39,17 @@ npm run restart        # or: cd backend && go run .  &  cd frontend && npm run d
 
 Open http://localhost:5173/
 
+## Tests
+
+```bash
+npm test               # frontend (node:test) + backend (go test)
+npm run test:frontend
+npm run test:backend
+```
+
+See [`docs/LOCAL_DEV_CHECKS.md`](docs/LOCAL_DEV_CHECKS.md) for what is covered and what a
+complete local pass looks like.
+
 ## Shared resources
 
 | Resource | Owner now |
