@@ -71,76 +71,10 @@ type IDTokenVerifier func(idToken, audience string) (GoogleIdentity, error)
 // VerifyIDToken is the Google ID-token checker. Tests replace this.
 var VerifyIDToken IDTokenVerifier = VerifyGoogleIDToken
 
-func Migrate() {
-	_, err := db.DB.Exec(`
-		CREATE TABLE IF NOT EXISTS users (
-			id SERIAL PRIMARY KEY,
-			google_sub VARCHAR(255) NOT NULL UNIQUE,
-			email VARCHAR(255) NOT NULL UNIQUE,
-			name VARCHAR(255) NOT NULL DEFAULT '',
-			given_name VARCHAR(255) NOT NULL DEFAULT '',
-			family_name VARCHAR(255) NOT NULL DEFAULT '',
-			picture TEXT NOT NULL DEFAULT '',
-			locale VARCHAR(35) NOT NULL DEFAULT '',
-			theme VARCHAR(16),
-			quicklink_slots INTEGER,
-			prefs_imported_at TIMESTAMP,
-			last_login_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-		)
-	`)
-	if err != nil {
-		log.Printf("users table: %v", err)
-		return
-	}
-	for _, q := range []string{
-		`ALTER TABLE users ADD COLUMN IF NOT EXISTS given_name VARCHAR(255) NOT NULL DEFAULT ''`,
-		`ALTER TABLE users ADD COLUMN IF NOT EXISTS family_name VARCHAR(255) NOT NULL DEFAULT ''`,
-		`ALTER TABLE users ADD COLUMN IF NOT EXISTS picture TEXT NOT NULL DEFAULT ''`,
-		`ALTER TABLE users ADD COLUMN IF NOT EXISTS locale VARCHAR(35) NOT NULL DEFAULT ''`,
-		`ALTER TABLE users ADD COLUMN IF NOT EXISTS theme VARCHAR(16)`,
-		`ALTER TABLE users ADD COLUMN IF NOT EXISTS quicklink_slots INTEGER`,
-		`ALTER TABLE users ADD COLUMN IF NOT EXISTS prefs_imported_at TIMESTAMP`,
-		`ALTER TABLE users ADD COLUMN IF NOT EXISTS preferred_settlement_id INTEGER`,
-		`ALTER TABLE users ADD COLUMN IF NOT EXISTS display_name VARCHAR(24) NOT NULL DEFAULT ''`,
-	} {
-		if _, err := db.DB.Exec(q); err != nil {
-			log.Printf("users column migrate: %v", err)
-		}
-	}
-	if _, err := db.DB.Exec(`
-		DO $$ BEGIN
-			ALTER TABLE users
-				ADD CONSTRAINT users_preferred_settlement_fk
-				FOREIGN KEY (preferred_settlement_id) REFERENCES settlements(id) ON DELETE SET NULL;
-		EXCEPTION
-			WHEN duplicate_object THEN NULL;
-		END $$
-	`); err != nil {
-		log.Printf("users preferred settlement fk: %v", err)
-	}
-	_, err = db.DB.Exec(`
-		CREATE TABLE IF NOT EXISTS sessions (
-			token_hash CHAR(64) PRIMARY KEY,
-			user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-			expires_at TIMESTAMP NOT NULL,
-			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-		)
-	`)
-	if err != nil {
-		log.Printf("sessions table: %v", err)
-		return
-	}
-	_, err = db.DB.Exec(`CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions(user_id)`)
-	if err != nil {
-		log.Printf("sessions user index: %v", err)
-	}
-	_, err = db.DB.Exec(`CREATE INDEX IF NOT EXISTS idx_sessions_expires ON sessions(expires_at)`)
-	if err != nil {
-		log.Printf("sessions expires index: %v", err)
-	}
-	log.Println("Users and sessions tables ready")
-}
+// Schema note: the users and sessions tables are owned by the main lamsza
+// backend, which creates them on its own startup path. The admin process
+// shares that database and must not run DDL, so the Migrate() helper that
+// used to live here was deleted rather than left as a loaded gun.
 
 func IsAdmin(email string) bool {
 	want := strings.ToLower(strings.TrimSpace(email))

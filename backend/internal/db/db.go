@@ -10,6 +10,17 @@ import (
 
 var DB *sql.DB
 
+// InitDB opens the shared Postgres connection and nothing else.
+//
+// The admin process must never run DDL: it shares one database with the main
+// lamsza backend, and that backend owns the schema. Opening the pool here used
+// to be followed by a `DROP TABLE locations_legacy`, which let an admin restart
+// change a schema it does not own. The main backend still drops that table on
+// its own boot path, and `lamsza/backend/migrations/drop_locations_legacy.sql`
+// is the explicit, opt-in form of the same statement.
+//
+// `boot_ddl_test.go` fails if any DDL is reachable from this process's startup
+// path again.
 func InitDB() {
 	connStr := config.AppConfig.DatabaseURL
 
@@ -24,25 +35,4 @@ func InitDB() {
 	}
 
 	log.Println("Database connection established")
-	dropLocationsLegacy()
-}
-
-func dropLocationsLegacy() {
-	var exists bool
-	if err := DB.QueryRow(`
-		SELECT EXISTS (
-			SELECT 1 FROM information_schema.tables
-			WHERE table_schema = 'public' AND table_name = 'locations_legacy'
-		)`).Scan(&exists); err != nil {
-		log.Printf("locations_legacy check: %v", err)
-		return
-	}
-	if !exists {
-		return
-	}
-	if _, err := DB.Exec(`DROP TABLE locations_legacy`); err != nil {
-		log.Printf("drop locations_legacy: %v", err)
-		return
-	}
-	log.Println("Dropped leftover table locations_legacy")
 }
