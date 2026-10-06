@@ -35,6 +35,30 @@ After cutover, only this admin API accepts admin upload endpoints; main Lámsza 
 - Google Sign-In + httpOnly session cookie (host-only on localhost via Vite proxy).
 - Admin gate: `ADMIN_GOOGLE_EMAILS`.
 
+## Cross-origin calls (CORS)
+
+`backend/internal/middleware/middleware.go` answers a cross-origin call only when the `Origin`
+header matches the allowlist exactly, and it sends `Access-Control-Allow-Credentials` only then.
+
+Never echo the request `Origin` back. All four sites sit under one registrable domain, so the
+session cookie is same-site for every sibling and `SameSite=Lax` does not hold it back: a
+reflected `Origin` plus `Allow-Credentials` let *any* page read the signed-in reply of an admin
+who happened to visit it. On this API that is every route, so it is enough to take the account
+over.
+
+The allowlist doubles as the CSRF guard. A page cannot forge the `Origin` header, so a POST, PUT,
+PATCH or DELETE that carries an `Origin` we do not know is refused with `403`. Clients outside a
+browser (curl, the deployment scripts) send no `Origin` and are unaffected.
+
+`CORS_ALLOWED_ORIGINS` is a comma-separated list of exact origins, for example
+`https://admin.lamsza.com`. It **replaces** the built-in list, so set it in production to drop
+the development hosts. The built-in list covers the four `*.lamsza.com` sites plus the
+`*.lamsza.test` and `localhost` development hosts. Behaviour is covered in
+`backend/internal/middleware/middleware_test.go`.
+
+The admin frontend reaches this API same-origin — through the Vite dev proxy locally, through
+Nginx in production — so there is no expected cross-origin caller today.
+
 ## Production (Phase 2)
 
 `admin.lamsza.com` / nginx / `admin.service` on `:8083` is **not** part of this delivery. Wire-up later when that environment is ready.
