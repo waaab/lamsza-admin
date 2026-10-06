@@ -58,6 +58,87 @@ functions and none is unrouted; keep it that way:
 cd ~/projects/lamsza-admin/backend && go build ./... && go test ./...
 ```
 
+## Write audit log
+
+Every mutating call on `/api/admin/*` lands one row in `admin_audit_log`: who, when, which
+resource, which action, the request payload, and the before/after of the row it touched.
+Added on BOG-48 — this repo is the only writer of the directory the public site reads, and
+there was no way at all to answer "who deleted this entry".
+
+Query it at `GET /api/admin/audit-log`, filtered by `resource`, `resource_id`, `actor_email`
+or `action` (`limit` defaults to 100, max 500).
+
+### Coverage is wiring, not discipline
+
+There are thirty-odd mutating admin routes across twelve packages, so per-handler
+instrumentation would be instrumentation missing from the route somebody adds next month.
+Instead `main.go` registers **every** admin route through one `admin(route, handler)` helper
+that applies `audit.Wrap`, and:
+
+- `audit.Wrap` **panics at startup** on a route with no resource declared in
+  `internal/audit/resources.go`. A route nobody decided the audit shape for does not boot.
+- `backend/audit_routes_test.go` re-parses `main.go` on every `go test` run (the way
+  `boot_ddl_test.go` does for DDL) and fails if an `/api/admin/` path is registered by a bare
+  `mux.HandleFunc`, if a registered route has no declared resource, or if the registry
+  declares a route `main.go` no longer registers.
+
+So **register admin routes with `admin(path, handler)`** — never `mux.HandleFunc` directly.
+Adding a route means adding its entry to `resources.go`; the build tells you if you forget.
+
+### Append-only from the app
+
+The only statements this app runs against the table are `INSERT` and `SELECT`. No admin route
+updates or deletes a record, and the read route refuses anything but `GET`.
+`internal/audit/append_only_test.go` scans the backend source and fails on any `UPDATE`,
+`DELETE`, `TRUNCATE`, `DROP` or `ALTER` against `admin_audit_log`.
+
+That is the half that lives in the code. The other half — a database role with `INSERT` and
+`SELECT` but no `UPDATE`/`DELETE` on this table — belongs to the production database and is
+the owner's to set, not an agent's.
+
+### Retention and size
+
+**No automatic retention: rows live until someone prunes them.** Nothing in the app deletes
+from this table, by design — see above.
+
+The app bounds the *row*, not the table. `payload`, `before_state`, `after_state` and `diff`
+are each capped at 16 KiB; an oversized value is replaced whole with
+`{"_truncated":true,…}` rather than cut, because a truncated JSON value is not valid JSONB.
+Request bodies over 512 KiB are not buffered at all, and non-JSON bodies (image uploads)
+never are — those records carry a marker with the content type and length instead.
+
+A heavy admin day is a few thousand rows of a few KiB, so this grows by **megabytes a year,
+not gigabytes**. Pruning is a deliberate operator action against the database when it is ever
+worth it:
+
+```sql
+DELETE FROM admin_audit_log WHERE occurred_at < NOW() - INTERVAL '2 years';
+```
+
+### What it does not capture
+
+`Tables` is empty for routes where no single row holds the resource's state — a composite
+write (an event's whole schedule, an entry's category links), a key/value map
+(`site_settings`), an upload, or a cache bump. **Those records carry the actor, action and
+request payload, but no before/after.** Closing that gap means teaching the handlers to
+report their own snapshots; it was not worth it for BOG-48.
+
+Credential-shaped keys (`password`, `secret`, `token`, `api_key`, `client_secret`, …) are
+replaced with `[redacted]` in both payloads and row snapshots — the trail is read by more
+people than the secrets are shared with, and a settings write is exactly where a key would
+otherwise land.
+
+A failed audit write never fails the request: the record is written after the handler has
+already committed, so refusing the response would hide a completed change behind a 500. A
+dropped record is instead logged with a greppable `AUDIT WRITE FAILED:` prefix.
+
+### The table is created by `lamsza`
+
+`admin_audit_log` is DDL, and this process runs none (see above). The main `lamsza` backend
+creates it on boot in `internal/auth.migrateAdminAuditLog()`, with the explicit form and the
+same retention note in `lamsza/backend/migrations/admin_audit_log.sql`. Nothing in the
+`lamsza` repo reads or writes the table — only `lamsza-admin/backend/internal/audit` does.
+
 ## Shared frontend modules
 
 17 frontend files are identical to `lamsza`'s. **`lamsza` owns them**; this repo carries a

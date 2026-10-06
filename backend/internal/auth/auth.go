@@ -190,6 +190,17 @@ func UserFromContext(ctx context.Context) *User {
 	return u
 }
 
+// WithUser puts the signed-in admin on a context the way RequireAdmin does.
+//
+// The context key is unexported so nothing outside this package can forge an
+// identity by writing to the request context. That also makes the signed-in
+// case untestable from another package, which is a problem for the audit trail
+// (BOG-48) — its whole job is recording *who*. This is the one sanctioned way
+// in, and it takes an *auth.User, so a caller still has to have a real user.
+func WithUser(ctx context.Context, u *User) context.Context {
+	return context.WithValue(ctx, userContextKey, u)
+}
+
 func UserFromRequest(r *http.Request) (*User, error) {
 	c, err := r.Cookie(SessionCookieName)
 	if err != nil || c == nil || c.Value == "" {
