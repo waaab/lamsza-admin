@@ -66,12 +66,3 @@ export function apiCall(path, options = {}) {
     const url = path.startsWith("http") ? path : `${getApiBase()}${path}`;
     return fetch(url, { credentials: "include", ...options });
 }
-
-/**
- * Proxy fetch for external resources to bypass CORS
- * @param {string} targetUrl - The external URL to proxy
- * @returns {Promise<any>}
- */
-export function proxyFetch(targetUrl) {
-    return apiFetch(`/api/proxy?url=${encodeURIComponent(targetUrl)}`);
-}
