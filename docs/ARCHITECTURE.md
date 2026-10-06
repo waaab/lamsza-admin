@@ -82,4 +82,56 @@ Nginx in production — so there is no expected cross-origin caller today.
 
 ## Production (Phase 2)
 
-`admin.lamsza.com` / nginx / `admin.service` on `:8083` is **not** part of this delivery. Wire-up later when that environment is ready.
+`admin.lamsza.com` / nginx / `admin.service` on `:8083` is **not** part of this
+delivery. Wire-up later when that environment is ready.
+
+### Keep it out of the search engines
+
+Admin is a private back office with no public page. Two independent controls,
+because each one covers what the other cannot:
+
+1. `frontend/static/robots.txt` is `Disallow: /`. That asks a well-behaved
+   crawler not to fetch. It does **not** remove a URL someone else has already
+   linked, and a crawler that ignores it is not breaking any rule.
+2. `X-Robots-Tag: noindex, nofollow` on every response. This one is an
+   instruction about *indexing*, so it keeps a URL out of the results even when
+   the crawler got there by a link rather than through `robots.txt`.
+
+The vhost must send the header on the whole host — not just on HTML — because
+`dist/` is static files and admin has no application layer to add it:
+
+```nginx
+server {
+    listen 443 ssl http2;
+    server_name admin.lamsza.com;
+
+    # Private back office: nothing here belongs in a search index.
+    # `always` matters — without it nginx drops the header on 4xx/5xx, and an
+    # error page is exactly the kind of URL that gets indexed by accident.
+    add_header X-Robots-Tag "noindex, nofollow, noarchive" always;
+
+    root /var/www/admin/public;      # the built dist/
+    index app.html;
+
+    location / {
+        try_files $uri $uri/ /app.html;    # SPA fallback
+    }
+
+    location /api/ {
+        proxy_pass http://127.0.0.1:8083;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+
+> Any `add_header` inside a `location` block **replaces** the whole inherited
+> set for that location rather than adding to it. If a `location` needs its own
+> `add_header`, repeat `X-Robots-Tag` there too.
+
+Also set, at cutover: `CORS_ALLOWED_ORIGINS=https://admin.lamsza.com` (see
+above), and add `https://admin.lamsza.com` to the Google OAuth client's
+authorized JavaScript origins — it is listed in
+`lamsza/docs/PRODUCTION_SERVER_SETUP.md` §3.3, but the Google Console change
+itself is part of the cutover task.
