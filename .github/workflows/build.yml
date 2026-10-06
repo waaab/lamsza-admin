@@ -12,6 +12,19 @@ jobs:
         working-directory: frontend
     steps:
       - uses: actions/checkout@v4
+
+      # The receiver below has no other gate, and it is the one script whose
+      # failure is self-concealing: if ci-status-issue.sh breaks, the only symptom
+      # is the ci-status job going red on `main`, and the thing that reports a red
+      # `main` is that same script. So it is tested inside a job somebody watches.
+      # It lives in `frontend` rather than `backend` to keep the step identical
+      # across the four repos; `working-directory` because this job otherwise runs
+      # from frontend/ and the test is at the repo root. Hermetic: fakes `gh`, no
+      # network, needs only jq, which is on the runner image.
+      - name: Test the CI status receiver
+        working-directory: .
+        run: bash .github/ci-status-issue.test.sh
+
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
