@@ -289,6 +289,40 @@
     font-style: italic;
 }
 
+.admin-header-actions {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 0.35rem;
+    align-self: flex-start;
+}
+
+.admin-header-icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    padding: 0;
+    border-radius: 6px;
+    text-decoration: none;
+    color: var(--text-primary);
+    background: var(--card-bg, transparent);
+    border: 1px solid var(--border-color);
+}
+
+.admin-header-icon-btn:hover {
+    background: var(--entry-category-bg, rgba(255, 255, 255, 0.06));
+}
+
+/* The switcher shows all three admin UIs, including this one. Without this the
+   current app is indistinguishable from a link that leaves the page. */
+.admin-header-icon-btn[aria-current="page"] {
+    color: var(--szekely-red);
+    border-color: var(--szekely-red);
+    cursor: default;
+}
+
 .admin-header .btn {
     flex-shrink: 0;
     align-self: flex-start;
