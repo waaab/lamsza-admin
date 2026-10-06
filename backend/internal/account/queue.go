@@ -53,20 +53,6 @@ type queueResponse struct {
 	Websites    []queueWebsite     `json:"websites"`
 }
 
-func QueueCount() (int, error) {
-	var count int
-	err := db.DB.QueryRow(`
-		SELECT
-		  (SELECT COUNT(*) FROM entries WHERE published = false) +
-		  (SELECT COUNT(*) FROM entry_members WHERE status = 'pending' AND role = 'member') +
-		  (SELECT COUNT(*) FROM entry_members WHERE status = 'pending' AND role = 'owner') +
-		  (SELECT COUNT(*) FROM entry_suggestions WHERE status = 'open') +
-		  (SELECT COUNT(*) FROM attraction_suggestions WHERE status = 'open') +
-		  (SELECT COUNT(*) FROM websites WHERE status = 'pending')
-	`).Scan(&count)
-	return count, err
-}
-
 func HandleListingQueue(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)

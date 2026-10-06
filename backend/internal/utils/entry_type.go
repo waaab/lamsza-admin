@@ -18,8 +18,3 @@ func CanonicalEntryType(raw string) string {
 		return ""
 	}
 }
-
-// DefaultEntryType is used when admin creates/updates an entry with an empty type.
-func DefaultEntryType() string {
-	return ""
-}

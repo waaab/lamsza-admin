@@ -3,25 +3,9 @@ package handlers
 import (
 	"backend/internal/db"
 	"backend/internal/utils"
-	"database/sql"
 	"fmt"
-	"log"
 	"strings"
 )
-
-// MigrateEntryTypes is a legacy migrator. It no-ops once directory_catalog_v2 is set.
-func MigrateEntryTypes() {
-	var flag string
-	err := db.DB.QueryRow(`SELECT value FROM site_settings WHERE key = $1`, directoryCatalogV2Key).Scan(&flag)
-	if err != nil && err != sql.ErrNoRows {
-		log.Printf("MigrateEntryTypes (flag check): %v", err)
-		return
-	}
-	if err == nil && flag == "1" {
-		log.Println("skipped: directory_catalog_v2")
-		return
-	}
-}
 
 // resolveEntryTypeID maps a client type name to a catalog row.
 func resolveEntryTypeID(typeName string) (int, string, error) {

@@ -7,24 +7,9 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"strings"
 )
-
-// MigrateEntryCategories is a legacy migrator. It no-ops once directory_catalog_v2 is set.
-func MigrateEntryCategories() {
-	var flag string
-	err := db.DB.QueryRow(`SELECT value FROM site_settings WHERE key = $1`, directoryCatalogV2Key).Scan(&flag)
-	if err != nil && err != sql.ErrNoRows {
-		log.Printf("MigrateEntryCategories (flag check): %v", err)
-		return
-	}
-	if err == nil && flag == "1" {
-		log.Println("skipped: directory_catalog_v2")
-		return
-	}
-}
 
 func resolveEntryCategoryID(id *int, name string) (int, string, error) {
 	if id != nil && *id > 0 {

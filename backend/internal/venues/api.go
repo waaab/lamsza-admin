@@ -147,18 +147,18 @@ func listVenues(w http.ResponseWriter, settlementIDStr string) {
 }
 
 type venuePayload struct {
-	SettlementID    int     `json:"settlement_id"`
-	Name            string  `json:"name"`
-	NameRO          string  `json:"name_ro"`
-	NameDE          string  `json:"name_de"`
-	Slug            string  `json:"slug"`
-	Kind            string  `json:"kind"`
-	Address         string  `json:"address"`
-	Notes           string  `json:"notes"`
+	SettlementID    int      `json:"settlement_id"`
+	Name            string   `json:"name"`
+	NameRO          string   `json:"name_ro"`
+	NameDE          string   `json:"name_de"`
+	Slug            string   `json:"slug"`
+	Kind            string   `json:"kind"`
+	Address         string   `json:"address"`
+	Notes           string   `json:"notes"`
 	Latitude        *float64 `json:"latitude"`
 	Longitude       *float64 `json:"longitude"`
-	SeatingCapacity *int    `json:"seating_capacity"`
-	Description     string  `json:"description"`
+	SeatingCapacity *int     `json:"seating_capacity"`
+	Description     string   `json:"description"`
 }
 
 func normalizeKind(k string) string {

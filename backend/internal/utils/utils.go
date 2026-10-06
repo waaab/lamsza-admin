@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"fmt"
 	"strings"
 	"unicode"
 )
@@ -29,8 +28,4 @@ func Slugify(s string) string {
 		}
 	}
 	return strings.Trim(res.String(), "-")
-}
-
-func JavaToPg(i int) string {
-	return fmt.Sprintf("%d", i)
 }

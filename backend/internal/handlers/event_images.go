@@ -26,11 +26,6 @@ func EventImagesDir() string {
 	return d
 }
 
-// EnsureEventImagesDir creates the upload directory if missing.
-func EnsureEventImagesDir() error {
-	return os.MkdirAll(EventImagesDir(), 0o755)
-}
-
 // HandleEventImageUpload POST multipart/form-data field "file", optional "event_id" to replace a previous upload for that event.
 func HandleEventImageUpload(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {

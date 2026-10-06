@@ -131,18 +131,18 @@ func RequireAdmin(next http.HandlerFunc) http.HandlerFunc {
 }
 
 type adminUser struct {
-	ID             int       `json:"id"`
-	Email          string    `json:"email"`
-	Name           string    `json:"name"`
-	GivenName      string    `json:"given_name"`
-	FamilyName     string    `json:"family_name"`
-	DisplayName    string    `json:"display_name"`
-	Locale         string    `json:"locale"`
-	Settlement     string    `json:"settlement"`
-	CreatedAt      time.Time `json:"created_at"`
-	LastLoginAt    time.Time `json:"last_login_at"`
-	WebsiteBanned  bool      `json:"website_banned"`
-	IsAdmin        bool      `json:"is_admin"`
+	ID            int       `json:"id"`
+	Email         string    `json:"email"`
+	Name          string    `json:"name"`
+	GivenName     string    `json:"given_name"`
+	FamilyName    string    `json:"family_name"`
+	DisplayName   string    `json:"display_name"`
+	Locale        string    `json:"locale"`
+	Settlement    string    `json:"settlement"`
+	CreatedAt     time.Time `json:"created_at"`
+	LastLoginAt   time.Time `json:"last_login_at"`
+	WebsiteBanned bool      `json:"website_banned"`
+	IsAdmin       bool      `json:"is_admin"`
 }
 
 // HandleAdminUsers lists registered accounts for the admin users table.

@@ -10,7 +10,6 @@ import (
 	"net/http"
 	"regexp"
 	"sort"
-	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -76,15 +75,6 @@ var (
 	loadFeedItems = fetchAllFeedItems
 )
 
-func resetNewsCacheForTest() {
-	newsMu.Lock()
-	defer newsMu.Unlock()
-	newsItemsCached = nil
-	newsCachedAt = time.Time{}
-	newsInflight = false
-	newsWaiters = nil
-}
-
 func fetchAllFeedItems() []newsItem {
 	rows, err := db.DB.Query("SELECT id, title, feed_url, COALESCE(bg_color, '#ffebd6') FROM news_feeds ORDER BY LOWER(title) ASC, id ASC")
 	if err != nil {
@@ -122,87 +112,6 @@ func fetchAllFeedItems() []newsItem {
 		return allItems[i].PubDate > allItems[j].PubDate
 	})
 	return allItems
-}
-
-func refreshNews() {
-	defer func() {
-		newsMu.Lock()
-		newsInflight = false
-		waiters := newsWaiters
-		newsWaiters = nil
-		newsMu.Unlock()
-		for _, ch := range waiters {
-			close(ch)
-		}
-	}()
-	items := loadFeedItems()
-	newsMu.Lock()
-	newsItemsCached = items
-	newsCachedAt = time.Now()
-	newsMu.Unlock()
-}
-
-// ensureNews returns headlines for the news page, refreshing from the feeds when
-// the cache is cold or older than newsCacheTTL. Search does not call this.
-func ensureNews() []newsItem {
-	newsMu.Lock()
-	fresh := !newsCachedAt.IsZero() && time.Since(newsCachedAt) < newsCacheTTL
-	if fresh {
-		items := append([]newsItem(nil), newsItemsCached...)
-		newsMu.Unlock()
-		return items
-	}
-	if newsInflight {
-		done := make(chan struct{})
-		newsWaiters = append(newsWaiters, done)
-		newsMu.Unlock()
-		<-done
-		newsMu.Lock()
-		items := append([]newsItem(nil), newsItemsCached...)
-		newsMu.Unlock()
-		return items
-	}
-	newsInflight = true
-	newsMu.Unlock()
-	refreshNews()
-	newsMu.Lock()
-	items := append([]newsItem(nil), newsItemsCached...)
-	newsMu.Unlock()
-	return items
-}
-
-func cachedNewsItems() []newsItem {
-	newsMu.Lock()
-	defer newsMu.Unlock()
-	if newsCachedAt.IsZero() {
-		return nil
-	}
-	return append([]newsItem(nil), newsItemsCached...)
-}
-
-func limitedNews(items []newsItem, limit int) []NewsItem {
-	if limit > 0 && len(items) > limit {
-		items = items[:limit]
-	}
-	result := make([]NewsItem, 0, len(items))
-	for _, it := range items {
-		result = append(result, NewsItem{
-			Title: it.Title, Link: it.Link, PubDate: it.PubDate,
-			Source: it.Source, BgColor: it.BgColor, Image: it.Image,
-		})
-	}
-	return result
-}
-
-// FetchNewsItems returns aggregated headlines, waiting for feeds only when the cache is cold.
-func FetchNewsItems(limit int) []NewsItem {
-	return limitedNews(ensureNews(), limit)
-}
-
-// PeekNewsItems returns headlines already stored for the news page.
-// Search uses this and does not fetch RSS.
-func PeekNewsItems(limit int) []NewsItem {
-	return limitedNews(cachedNewsItems(), limit)
 }
 
 func parsePubDate(s string) int64 {
@@ -275,52 +184,6 @@ func fetchAndParseFeed(feed models.NewsFeed, maxItems int) []newsItem {
 		})
 	}
 	return result
-}
-
-// HandleNews fetches all RSS feeds from the DB, parses them server-side,
-// and returns a unified JSON array of news items sorted by date.
-func HandleNews(w http.ResponseWriter, r *http.Request) {
-	limitStr := r.URL.Query().Get("limit")
-	limit := 20
-	if n, err := strconv.Atoi(limitStr); err == nil && n > 0 {
-		limit = n
-	}
-
-	items := ensureNews()
-	if len(items) > limit {
-		items = items[:limit]
-	}
-	if items == nil {
-		items = []newsItem{}
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(items)
-}
-
-func HandlePublicNewsFeeds(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-	rows, err := db.DB.Query("SELECT id, title, COALESCE(bg_color, '#ffebd6') FROM news_feeds ORDER BY LOWER(title) ASC, id ASC")
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-		return
-	}
-	defer rows.Close()
-	var res []models.NewsFeed
-	for rows.Next() {
-		var nf models.NewsFeed
-		if err := rows.Scan(&nf.ID, &nf.Title, &nf.BgColor); err == nil {
-			res = append(res, nf)
-		}
-	}
-	if res == nil {
-		res = []models.NewsFeed{}
-	}
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(res)
 }
 
 func HandleAdminNewsFeeds(w http.ResponseWriter, r *http.Request) {

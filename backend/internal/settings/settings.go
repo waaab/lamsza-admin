@@ -4,50 +4,11 @@ import (
 	"backend/internal/config"
 	"backend/internal/db"
 	"encoding/json"
-	"log"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
 )
-
-// MigrateSiteSettings creates site_settings table and seeds default values if missing.
-// Call once after db.InitDB() so the user does not need to run SQL manually.
-func MigrateSiteSettings() {
-	_, err := db.DB.Exec(`
-		CREATE TABLE IF NOT EXISTS site_settings (
-			key VARCHAR(100) PRIMARY KEY,
-			value TEXT NOT NULL,
-			updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-		)
-	`)
-	if err != nil {
-		log.Printf("site_settings create: %v", err)
-		return
-	}
-	_, err = db.DB.Exec(`
-		INSERT INTO site_settings (key, value) VALUES
-		  ('weather_cache_ttl_minutes', '15'),
-		  ('weather_cache_version', '1'),
-		  ('quick_links_version', '1'),
-		  ('weather_icon_style', 'emoji'),
-		  ('weather_active_users_estimate', '10000'),
-		  ('weather_provider_default', 'open_meteo'),
-		  ('weather_provider_open_meteo_enabled', 'true'),
-		  ('weather_provider_weatherapi_enabled', 'true'),
-		  ('weather_provider_openweathermap_enabled', 'true'),
-		  ('my_location_slug', 'csikszereda'),
-		  ('social_facebook_url', 'https://www.facebook.com/szekelygugel'),
-		  ('social_twitter_url', ''),
-		  ('social_instagram_url', '')
-		ON CONFLICT (key) DO NOTHING
-	`)
-	if err != nil {
-		log.Printf("site_settings seed: %v", err)
-		return
-	}
-	log.Println("Site settings table ready")
-}
 
 // PublicConfig is returned by GET /api/config/public (no auth)
 type PublicConfig struct {
@@ -158,18 +119,6 @@ func GetSetting(key, defaultVal string) (string, error) {
 
 func getSetting(key, defaultVal string) (string, error) {
 	return GetSetting(key, defaultVal)
-}
-
-func getSettingInt(key string, defaultVal int) (int, error) {
-	s, err := getSetting(key, strconv.Itoa(defaultVal))
-	if err != nil {
-		return defaultVal, err
-	}
-	v, err := strconv.Atoi(s)
-	if err != nil {
-		return defaultVal, err
-	}
-	return v, nil
 }
 
 // HandleAdminSettings: GET returns all settings, PUT accepts JSON body { "key": "value", ... }
