@@ -19,8 +19,28 @@ import (
 	"time"
 )
 
+// The admin session is deliberately not the public one (BOG-45).
+//
+// Before this, both apps used the cookie name `lamsza_session` and the
+// `sessions` table, so a token the public site handed to any signed-in visitor
+// was accepted by every route on this API. The two apps are separate
+// deployments; the trust boundary was not.
+//
+// Two things keep them apart, and each covers what the other cannot:
+//
+//   - A different cookie name. Browsers scope cookies by host and ignore the
+//     port, so on localhost a cookie set by lamsza on :3001/:5174 is sent to
+//     this API on :3000 regardless. A different name means no collision.
+//   - A different table. The name alone is only presentation — anyone can put
+//     any token in any cookie. The store is the real boundary: an admin token
+//     hash exists only in `admin_sessions`, a public one only in `sessions`,
+//     so neither API can accept the other's token even when it is handed over
+//     deliberately.
+//
+// `admin_sessions` is created by the main lamsza backend, which owns this
+// shared schema — this process runs no DDL (see docs/ARCHITECTURE.md).
 const (
-	SessionCookieName = "lamsza_session"
+	SessionCookieName = "lamsza_admin_session"
 	sessionTTL        = 30 * 24 * time.Hour
 )
 
@@ -71,10 +91,16 @@ type IDTokenVerifier func(idToken, audience string) (GoogleIdentity, error)
 // VerifyIDToken is the Google ID-token checker. Tests replace this.
 var VerifyIDToken IDTokenVerifier = VerifyGoogleIDToken
 
-// Schema note: the users and sessions tables are owned by the main lamsza
-// backend, which creates them on its own startup path. The admin process
-// shares that database and must not run DDL, so the Migrate() helper that
-// used to live here was deleted rather than left as a loaded gun.
+// Schema note: the users, sessions and admin_sessions tables are owned by the
+// main lamsza backend, which creates them on its own startup path. The admin
+// process shares that database and must not run DDL, so the Migrate() helper
+// that used to live here was deleted rather than left as a loaded gun.
+//
+// That includes `admin_sessions`, the table this package reads and writes:
+// `lamsza/backend/internal/auth/auth.go` creates it, and
+// `lamsza/backend/migrations/admin_sessions.sql` is the explicit form. Do not
+// add a CREATE TABLE here when a fresh database is missing it — run the main
+// backend, or that migration.
 
 func IsAdmin(email string) bool {
 	want := strings.ToLower(strings.TrimSpace(email))
@@ -173,7 +199,7 @@ func UserFromRequest(r *http.Request) (*User, error) {
 	var u User
 	err = db.DB.QueryRow(`
 		SELECT u.id, u.email, u.name
-		FROM sessions s
+		FROM admin_sessions s
 		JOIN users u ON u.id = s.user_id
 		WHERE s.token_hash = $1 AND s.expires_at > NOW()
 	`, hash).Scan(&u.ID, &u.Email, &u.Name)
@@ -214,6 +240,16 @@ func HandleGoogleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Only an allowlisted account gets an admin session. Every route on this API
+	// is behind RequireAdmin, so a session for anyone else bought nothing — but
+	// it did put a public-grade row in `admin_sessions`, which is the one thing
+	// a separate session store must never hold. A row here now means an admin is
+	// signed in, and that is what makes the table worth separating.
+	if !IsAdmin(ident.Email) {
+		http.Error(w, "Ehhez a fiókhoz nincs admin jogosultság.", http.StatusForbidden)
+		return
+	}
+
 	profile := ApplyGoogleProfile(UserProfile{}, ident)
 
 	var userID int
@@ -242,7 +278,7 @@ func HandleGoogleLogin(w http.ResponseWriter, r *http.Request) {
 	}
 	expires := time.Now().Add(sessionTTL)
 	_, err = db.DB.Exec(
-		`INSERT INTO sessions (token_hash, user_id, expires_at) VALUES ($1, $2, $3)`,
+		`INSERT INTO admin_sessions (token_hash, user_id, expires_at) VALUES ($1, $2, $3)`,
 		hashToken(token), userID, expires,
 	)
 	if err != nil {
@@ -364,7 +400,7 @@ func HandleLogout(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if c, err := r.Cookie(SessionCookieName); err == nil && c != nil && c.Value != "" {
-		_, _ = db.DB.Exec(`DELETE FROM sessions WHERE token_hash = $1`, hashToken(c.Value))
+		_, _ = db.DB.Exec(`DELETE FROM admin_sessions WHERE token_hash = $1`, hashToken(c.Value))
 	}
 	expired := time.Unix(0, 0)
 	http.SetCookie(w, sessionCookie(r, "", expired))
