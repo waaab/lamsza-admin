@@ -36,3 +36,38 @@ jobs:
           cache-dependency-path: backend/go.sum
       - run: go test -count=1 ./...
       - run: go build -o /tmp/lamsza-admin .
+
+  # The receiver. A red CI is only a gate if it reaches a person, and nothing on
+  # the dev machine can read Actions: no `gh` CLI, git auth is SSH-key only, the
+  # unauthenticated api.github.com limit for that IP is spent, and two of the four
+  # repos are private. So the signal is pushed from in here, into one GitHub issue
+  # that closes itself when main goes green. Decided on BOG-54; see R7 in lamsza's
+  # docs/network/WAYS_OF_WORKING.md.
+  #
+  # Pushes to `main` only: a pull request shows its own checks, and a feature
+  # branch being red mid-work is normal and must not notify anyone. `always()` so
+  # it still runs after a failed job, and the third clause keeps a cancelled or
+  # skipped run from being reported as a failure.
+  ci-status:
+    needs: [frontend, backend]
+    if: >-
+      always()
+      && github.event_name == 'push'
+      && github.ref == 'refs/heads/main'
+      && (needs.frontend.result == 'failure' || needs.backend.result == 'failure'
+      || (needs.frontend.result == 'success' && needs.backend.result == 'success'))
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Open, update or close the "CI is red on main" issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          CI_FRONTEND: ${{ needs.frontend.result }}
+          CI_BACKEND: ${{ needs.backend.result }}
+          CI_SHA: ${{ github.sha }}
+          CI_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: bash .github/ci-status-issue.sh
