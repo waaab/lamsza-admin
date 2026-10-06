@@ -1,4 +1,4 @@
-name: Build
+name: Build and Test
 
 on:
   push:
@@ -18,6 +18,9 @@ jobs:
           cache: npm
           cache-dependency-path: frontend/package-lock.json
       - run: npm ci
+      # Tests before the build: a failing assertion is a faster, clearer signal
+      # than whatever the build does with the same broken code.
+      - run: npm test
       - run: npm run build
 
   backend:
@@ -30,4 +33,6 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: "1.25.x"
+          cache-dependency-path: backend/go.sum
+      - run: go test -count=1 ./...
       - run: go build -o /tmp/lamsza-admin .
