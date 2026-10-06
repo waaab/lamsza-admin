@@ -57,15 +57,6 @@ func HandleSetCountySeat(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-// HandlePublicLocations serves the place list used by public pages. Writes stay on /api/admin/locations.
-func HandlePublicLocations(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-	HandleAdminLocations(w, r)
-}
-
 func HandleAdminLocations(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "GET":

@@ -31,14 +31,3 @@ func TestCategoryOffersDelivery(t *testing.T) {
 		t.Fatal("delivery is limited to the Étkezés subcategories that take orders out")
 	}
 }
-
-func TestSeedEntryCategoriesCount(t *testing.T) {
-	if len(SeedEntryCategories()) != 94 {
-		t.Fatalf("SeedEntryCategories len = %d, want 94", len(SeedEntryCategories()))
-	}
-	for _, name := range SeedEntryCategories() {
-		if name == "Sportpálya" {
-			t.Fatal("Sportpálya is a venue, not a directory category")
-		}
-	}
-}

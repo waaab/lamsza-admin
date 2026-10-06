@@ -32,11 +32,6 @@ func EntryImagesDir() string {
 	return d
 }
 
-// EnsureEntryImagesDir creates the upload directory if missing.
-func EnsureEntryImagesDir() error {
-	return os.MkdirAll(EntryImagesDir(), 0o755)
-}
-
 // HandleEntryImageUpload POST multipart/form-data field "file", optional "entry_id" for filename prefix.
 func HandleEntryImageUpload(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {

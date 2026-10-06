@@ -6,38 +6,11 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"strings"
 
 	"backend/internal/utils"
 )
-
-// MigrateSettlementLocationTypes creates catalog + seeds default settlement types (idempotent).
-func MigrateSettlementLocationTypes() {
-	_, err := db.DB.Exec(`
-CREATE TABLE IF NOT EXISTS settlement_location_types (
-	id SERIAL PRIMARY KEY,
-	slug VARCHAR(64) NOT NULL UNIQUE,
-	label_hu TEXT NOT NULL,
-	sort_order INT NOT NULL DEFAULT 0
-)`)
-	if err != nil {
-		log.Printf("MigrateSettlementLocationTypes (create): %v", err)
-		return
-	}
-	_, err = db.DB.Exec(`
-INSERT INTO settlement_location_types (slug, label_hu, sort_order) VALUES
-	('municípium', 'Municípium', 0),
-	('város', 'Város', 1),
-	('község', 'Község', 2),
-	('falu', 'Falu', 3),
-	('megye', 'Megye', 4)
-ON CONFLICT (slug) DO NOTHING`)
-	if err != nil {
-		log.Printf("MigrateSettlementLocationTypes (seed): %v", err)
-	}
-}
 
 func fetchAllSettlementLocationTypes() ([]models.SettlementLocationType, error) {
 	rows, err := db.DB.Query(`
@@ -59,21 +32,6 @@ func fetchAllSettlementLocationTypes() ([]models.SettlementLocationType, error) 
 		out = []models.SettlementLocationType{}
 	}
 	return out, nil
-}
-
-// HandlePublicSettlementLocationTypes GET /api/settlement_location_types
-func HandlePublicSettlementLocationTypes(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-	list, err := fetchAllSettlementLocationTypes()
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(list)
 }
 
 // HandleAdminSettlementLocationTypes CRUD /api/admin/settlement_location_types
