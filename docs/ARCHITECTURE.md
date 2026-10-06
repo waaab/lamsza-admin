@@ -35,10 +35,37 @@ every `go test` run — `main()` plus every package `init()`, followed across pa
 fails if any reachable function contains a DDL statement or is a `Migrate*` helper. It needs
 no database, so it runs in the normal `npm test`.
 
-The admin repo still carries other uncalled `Migrate*` helpers copied from the main repo.
-They are dead code and the guard keeps them off the boot path; deleting them is tracked
-separately. **Do not wire one into `main()`** — if a schema change is needed, it belongs in
-the main `lamsza` repo.
+Those uncalled `Migrate*` helpers copied from the main repo are **gone** as of BOG-42, with
+the rest of the code this backend never routed. **Do not wire a migration into `main()`** —
+if a schema change is needed, it belongs in the main `lamsza` repo. `boot_ddl_test.go` still
+holds the rule.
+
+## No public read surface
+
+This backend was forked from `lamsza/backend` and kept the whole public half: 31 `Handle*`
+functions `main.go` never routed, and 186 functions behind them, against the same database
+with no owner. BOG-42 deleted all of it — the entries read paths, the weather providers,
+events, the news fetch and cache, mondasok, quick links, pages, favorites, history, links,
+account prefs, the listing claim/catalog/members surface, website submit and lookup,
+attractions, and `internal/webdomain` and `internal/account/prefs.go` entirely.
+(`internal/search` went earlier, on BOG-40.)
+
+**This repo is the write side only.** If the admin UI needs something the public app serves,
+call `lamsza` on `:3001` — do not copy the handler back. `main.go` routes 42 `Handle*`
+functions and none is unrouted; keep it that way:
+
+```bash
+cd ~/projects/lamsza-admin/backend && go build ./... && go test ./...
+```
+
+## Shared frontend modules
+
+17 frontend files are identical to `lamsza`'s. **`lamsza` owns them**; this repo carries a
+generated copy under `frontend/src/lib`, plus `frontend/shared-frontend-modules.json`.
+Never edit one here — edit it in `lamsza`, run `lamsza/scripts/sync-shared-frontend.sh`, and
+commit both repos. `frontend/tests/sharedFrontendModules.test.js` hashes the copies against
+the manifest on every `npm test`, so an edit made here goes red. The rule and the rejected
+alternatives are in `lamsza/docs/network/SHARED_FRONTEND_MODULES.md`.
 
 ## Shared media
 
