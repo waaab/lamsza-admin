@@ -16,8 +16,29 @@ Admin UI + API for the **main Lámsza** portal only. Szótár and Játszótér k
 ## Shared database (current)
 
 - Admin uses the same `DATABASE_URL` / Postgres as main Lámsza.
-- **Schema migrations are owned by the main `lamsza` backend.** This admin process does not run migrate helpers on startup.
+- **Schema migrations are owned by the main `lamsza` backend. This admin process runs no DDL
+  at all** — no `CREATE TABLE`, no `ALTER TABLE`, no `DROP`. Its startup path is
+  `config.Load()` then `db.InitDB()`, and `db.InitDB()` only opens the connection pool.
 - A future DB split is planned; not implemented here.
+
+### Why, and how it is held
+
+Both processes share one database, so an admin restart that touched the schema would change
+a schema it does not own. Until BOG-39 it did: `db.InitDB()` ran
+`DROP TABLE locations_legacy`, and `internal/auth` carried a `Migrate()` that created
+`users` and `sessions` and added a foreign key to `users`. Both are deleted. The main
+backend still owns those statements — it creates `users`/`sessions` on its own boot path,
+and `lamsza/backend/migrations/drop_locations_legacy.sql` is the explicit form of the drop.
+
+`backend/boot_ddl_test.go` holds the rule. It re-derives the startup path from the source on
+every `go test` run — `main()` plus every package `init()`, followed across packages — and
+fails if any reachable function contains a DDL statement or is a `Migrate*` helper. It needs
+no database, so it runs in the normal `npm test`.
+
+The admin repo still carries other uncalled `Migrate*` helpers copied from the main repo.
+They are dead code and the guard keeps them off the boot path; deleting them is tracked
+separately. **Do not wire one into `main()`** — if a schema change is needed, it belongs in
+the main `lamsza` repo.
 
 ## Shared media
 
