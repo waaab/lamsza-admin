@@ -20,7 +20,7 @@ It runs both suites and stops at the first failure:
 
 | Step | Script | What it runs |
 |---|---|---|
-| 1 | `npm run test:frontend` | `node --test 'tests/*.test.js'` in `frontend/` |
+| 1 | `npm run test:frontend` | `node --test "tests/**/*.test.js"` in `frontend/` |
 | 2 | `npm run test:backend` | `go test ./...` in `backend/` |
 
 Run one side on its own with `npm run test:frontend` or `npm run test:backend`.
@@ -28,8 +28,8 @@ Run one side on its own with `npm run test:frontend` or `npm run test:backend`.
 No `npm install` is needed for the tests. The frontend suite uses only `node:test` and
 `node:assert`, and imports the modules under `frontend/src/lib/` directly.
 
-> Use the glob `'tests/*.test.js'`, quoted. `node --test tests/` (directory form) crashes
-> with `MODULE_NOT_FOUND` on Node 24.
+> Keep the glob quoted — `"tests/**/*.test.js"`, the same string szotar and jatszoter use.
+> `node --test tests/` (the directory form) crashes with `MODULE_NOT_FOUND` on Node 24.
 
 **Status 2026-10-06** — Node v24.11.1, Go 1.25.7:
 
