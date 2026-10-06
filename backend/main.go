@@ -10,6 +10,7 @@ import (
 	"backend/internal/db"
 	"backend/internal/events"
 	"backend/internal/handlers"
+	"backend/internal/health"
 	"backend/internal/links"
 	"backend/internal/middleware"
 	"backend/internal/mondasok"
@@ -30,6 +31,8 @@ func main() {
 	admin := func(h http.HandlerFunc) http.HandlerFunc {
 		return middleware.ApplyCORS(auth.RequireAdmin(h))
 	}
+
+	mux.HandleFunc("/api/health", middleware.ApplyCORS(health.HandleHealth))
 
 	mux.HandleFunc("/api/auth/google", middleware.ApplyCORS(auth.HandleGoogleLogin))
 	mux.HandleFunc("/api/auth/me", middleware.ApplyCORS(auth.HandleMe))
@@ -58,6 +61,10 @@ func main() {
 	mux.HandleFunc("/api/admin/historical_seats", admin(handlers.HandleAdminHistoricalSeats))
 	mux.HandleFunc("/api/admin/attractions", admin(handlers.HandleAdminAttractions))
 
+	// Public reads used by the admin SPA (same paths as main Lámsza)
+	mux.HandleFunc("/api/counties", middleware.ApplyCORS(handlers.HandleCounties))
+	mux.HandleFunc("/api/historical_seats", middleware.ApplyCORS(handlers.HandleHistoricalSeats))
+
 	mux.HandleFunc("/api/config/public", middleware.ApplyCORS(settings.HandlePublicConfig))
 	mux.HandleFunc("/api/admin/settings", admin(settings.HandleAdminSettings))
 	mux.HandleFunc("/api/admin/settings/clear-weather-cache", admin(settings.ClearWeatherCache))
@@ -71,6 +78,8 @@ func main() {
 	}
 
 	if config.AppConfig.Features.Events {
+		mux.HandleFunc("/api/venues", middleware.ApplyCORS(venues.HandlePublic))
+		mux.HandleFunc("/api/venue_types", middleware.ApplyCORS(venues.HandlePublicVenueTypes))
 		mux.HandleFunc("/api/admin/events", admin(events.HandleAdminEvents))
 		mux.HandleFunc("/api/admin/events/schedule", admin(events.HandleAdminEventSchedule))
 		mux.HandleFunc("/api/admin/catalog_event_types", admin(events.HandleAdminCatalogEventTypes))
