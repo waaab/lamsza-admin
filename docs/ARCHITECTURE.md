@@ -55,6 +55,41 @@ After cutover, only this admin API accepts admin upload endpoints; main Lámsza 
 
 - Google Sign-In + httpOnly session cookie (host-only on localhost via Vite proxy).
 - Admin gate: `ADMIN_GOOGLE_EMAILS`.
+- `/api/auth/google` refuses an account that is not on that list with `403`. Every route
+  here is behind `RequireAdmin` anyway, so such a session bought nothing — but it put a
+  public-grade row in the admin session table, which is the one thing a separate store
+  must not hold. A row there now means an admin is signed in.
+
+### The admin session is not the public session
+
+| | public (`lamsza`, `:3001`) | admin (this app, `:3000`) |
+|---|---|---|
+| cookie | `lamsza_session` | `lamsza_admin_session` |
+| table | `sessions` | `admin_sessions` |
+
+Until BOG-45 both were the same cookie name and the same table, so a token the public site
+handed to any signed-in visitor was accepted by every route on this API. Two things keep
+them apart, and each covers what the other cannot:
+
+- **A different cookie name.** Browsers scope cookies by host and *ignore the port*, so on
+  localhost a cookie set by lamsza on `:3001`/`:5174` is sent to this API on `:3000` no
+  matter what. A different name means the browser never offers it.
+- **A different table.** The name alone is only presentation — anyone can put any token in
+  any cookie. The store is the real boundary: an admin token hash exists only in
+  `admin_sessions`, a public one only in `sessions`, so neither API can accept the other's
+  token even when it is handed over deliberately.
+
+`users` stays shared. Identity is shared across the network; only the *session* is not.
+
+`admin_sessions` is created by the main `lamsza` backend — this process runs no DDL (see
+above). The statements live in `lamsza/backend/internal/auth/auth.go` and, in explicit
+form, `lamsza/backend/migrations/admin_sessions.sql`. On a fresh database, run the main
+backend or that migration; do **not** add a `CREATE TABLE` here.
+
+Held by `backend/internal/auth/session_boundary_test.go` on this side and
+`lamsza/backend/admin_session_boundary_test.go` on the other. The two DB-backed tests here
+skip when the shared Postgres is not reachable; the cookie-name check and the static check
+that this package never queries `sessions` need no database and run in CI.
 
 ## Cross-origin calls (CORS)
 
