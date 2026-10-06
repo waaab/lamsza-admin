@@ -38,12 +38,81 @@ failed=""
 [ "$CI_FRONTEND" = "failure" ] && failed="frontend"
 [ "$CI_BACKEND" = "failure" ] && failed="${failed:+$failed, }backend"
 
+# Every GitHub call below needs the `issues` scope, and the workflow asking for it
+# is not sufficient. Settings -> Actions -> General -> Workflow permissions is a
+# per-repo ceiling on GITHUB_TOKEN: while it is set to "Read repository contents
+# and packages permissions", the issue scope is dropped however the job's
+# `permissions:` block is written, and every write here returns 403.
+#
+# That is the worst failure this script has, because it is silent in the only
+# channel that matters. The receiver stops reporting a red `main`, and the one
+# symptom is the `ci-status` job going red — which is a thing only this script
+# reports. Nothing on the dev machine can read Actions to notice (no gh, SSH-only
+# git auth, no API budget, two private repos), so the diagnosis has to be written
+# where a person landing on the run will see it without digging: the step log and
+# the run summary page.
+explain_failure() {
+  local cmd="$1" out="$2" diag
+
+  if printf '%s' "$out" | grep -qiE 'HTTP 403|Resource not accessible|not accessible by integration'; then
+    diag="### The CI receiver is switched off by a repo setting
+
+A red \`main\` currently reaches nobody in \`${GH_REPO:-this repo}\`.
+
+\`gh $cmd\` was refused. This job does ask for \`issues: write\`, but
+*Settings → Actions → General → Workflow permissions* caps what
+\`GITHUB_TOKEN\` can be granted. While that is set to *Read repository contents
+and packages permissions*, the issue scope is dropped and this script cannot
+open, comment on or close the status issue.
+
+**Fix:** set it to *Read and write permissions*. No repo content needs to
+change. Decided on BOG-54; see R7 in lamsza's \`docs/network/WAYS_OF_WORKING.md\`."
+  else
+    diag="### The CI receiver failed
+
+A red \`main\` may currently reach nobody in \`${GH_REPO:-this repo}\`.
+
+\`gh $cmd\` failed for a reason this script does not recognise:
+
+\`\`\`
+$out
+\`\`\`
+
+Until it works, the local gate in \`docs/LOCAL_DEV_CHECKS.md\` is the only gate.
+Run \`bash .github/ci-status-issue.test.sh\` after any fix."
+  fi
+
+  printf '%s\n' "$diag" >&2
+  # Best effort: on a real runner this renders on the run's summary page, which is
+  # the first thing anyone opens. Absent locally and in the unit test.
+  if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then
+    printf '%s\n' "$diag" >>"$GITHUB_STEP_SUMMARY" || true
+  fi
+}
+
+# Runs gh, passing its stdout through on success. On failure it explains itself
+# and returns gh's status, which `set -e` turns into a red job — deliberately, so
+# a broken receiver is never mistaken for a quiet one.
+gh_or_explain() {
+  local out rc=0
+  out=$(gh "$@" 2>&1) || rc=$?
+  if [ "$rc" -ne 0 ]; then
+    # Just "issue list", not the whole jq filter — the subcommand is what tells
+    # you which call was refused, and the filter buries it.
+    explain_failure "${1:-} ${2:-}" "$out"
+    return "$rc"
+  fi
+  # Trailing newline keeps the uncaptured calls' log output on its own line; `$( )`
+  # strips it again for the two callers that capture.
+  printf '%s\n' "$out"
+}
+
 # Exact-title match over open issues rather than `gh issue list --search`: the
 # search index lags by seconds to minutes, and this runs immediately after the
 # push that broke the build, so a search would miss the issue it just opened and
 # file a duplicate on every subsequent red push. These repos have nowhere near
 # 100 open issues.
-number=$(gh issue list --state open --limit 100 --json number,title \
+number=$(gh_or_explain issue list --state open --limit 100 --json number,title \
   --jq "[.[] | select(.title == \"$TITLE\")] | first | .number // empty")
 
 short="${CI_SHA:0:8}"
@@ -64,10 +133,10 @@ locally — CI is the weaker of the two gates.
 This issue closes itself on the next green run of \`main\`."
 
   if [ -n "$number" ]; then
-    gh issue comment "$number" --body "$body"
+    gh_or_explain issue comment "$number" --body "$body"
     echo "still red: commented on #$number"
   else
-    url=$(gh issue create --title "$TITLE" --body "$body")
+    url=$(gh_or_explain issue create --title "$TITLE" --body "$body")
     echo "went red: opened $url"
   fi
   exit 0
@@ -80,6 +149,6 @@ if [ -z "$number" ]; then
   exit 0
 fi
 
-gh issue close "$number" \
+gh_or_explain issue close "$number" \
   --comment "Green again on \`main\` at \`$short\`. Run: $CI_RUN_URL"
 echo "recovered: closed #$number"

@@ -24,6 +24,12 @@ cat >"$tmp/bin/gh" <<'FAKE'
 #!/usr/bin/env bash
 set -euo pipefail
 printf '%s\n' "$*" >>"$FAKE_GH_LOG"
+# FAKE_GH_FAIL_ON names a subcommand (list/create/comment/close) that should fail
+# the way the real gh does: message on stderr, non-zero exit.
+if [ -n "${FAKE_GH_FAIL_ON:-}" ] && [ "${2:-}" = "$FAKE_GH_FAIL_ON" ]; then
+  printf '%s\n' "${FAKE_GH_FAIL_MSG:-boom}" >&2
+  exit 1
+fi
 if [ "${1:-}" = "issue" ] && [ "${2:-}" = "list" ]; then
   filter='.'
   while [ $# -gt 0 ]; do
@@ -99,6 +105,47 @@ refute_call() {
   pass=$((pass + 1))
 }
 
+# $1 name, $2 fixture json, $3 subcommand to fail, $4 gh's stderr, $5 frontend,
+# $6 backend, $7 substring the diagnosis must contain.
+# The script must exit non-zero here: a receiver that cannot write must leave the
+# job red, never look quiet. The diagnosis must also reach $GITHUB_STEP_SUMMARY,
+# because that is the only channel a person sees without opening the step log.
+run_broken_case() {
+  local name="$1" fixture="$2" fail_on="$3" msg="$4" fe="$5" be="$6" want="$7"
+  export FAKE_GH_LOG="$tmp/log" FAKE_GH_ISSUES="$tmp/issues.json"
+  : >"$FAKE_GH_LOG"
+  printf '%s' "$fixture" >"$FAKE_GH_ISSUES"
+  local summary="$tmp/step-summary.md"
+  : >"$summary"
+
+  local out rc=0
+  out=$(FAKE_GH_FAIL_ON="$fail_on" FAKE_GH_FAIL_MSG="$msg" \
+    CI_FRONTEND="$fe" CI_BACKEND="$be" CI_SHA="0123456789abcdef" \
+    CI_RUN_URL="https://example.invalid/run/1" \
+    GITHUB_STEP_SUMMARY="$summary" \
+    GH_TOKEN=fake GH_REPO=waaab/fake bash "$script" 2>&1) || rc=$?
+
+  if [ "$rc" -eq 0 ]; then
+    echo "FAIL $name: script exited 0; a receiver that cannot write must stay red"
+    fail=$((fail + 1))
+    return
+  fi
+  if ! printf '%s' "$out" | grep -qF "$want"; then
+    echo "FAIL $name: expected the diagnosis to say '$want', got:"
+    printf '%s\n' "$out" | sed 's/^/      /'
+    fail=$((fail + 1))
+    return
+  fi
+  if ! grep -qF "$want" "$summary"; then
+    echo "FAIL $name: diagnosis missing from \$GITHUB_STEP_SUMMARY; it held:"
+    sed 's/^/      /' "$summary"
+    fail=$((fail + 1))
+    return
+  fi
+  echo "ok   $name"
+  pass=$((pass + 1))
+}
+
 NONE='[]'
 OPEN='[{"number":7,"title":"CI is red on main"}]'
 # Two decoys that a substring or search-index match would wrongly latch onto.
@@ -134,6 +181,21 @@ echo "— neither —"
 # on this, but the script must not depend on that gate being right.
 refute_call "a cancelled run does not open an issue" \
   "$NONE" cancelled success "issue create"
+
+echo "— the receiver itself is broken —"
+GH403='gh: Resource not accessible by integration (HTTP 403)'
+run_broken_case "a 403 on the read names the repo setting to change" \
+  "$NONE" list "$GH403" failure success "Workflow permissions"
+# Fixture matters per branch: `create` is only reached with no issue open, and
+# `comment`/`close` only with one open. The wrong fixture silently tests nothing.
+run_broken_case "a 403 opening the issue names the repo setting to change" \
+  "$NONE" create "$GH403" failure success "Read and write permissions"
+run_broken_case "a 403 commenting on the open issue is explained too" \
+  "$OPEN" comment "$GH403" failure success "switched off by a repo setting"
+run_broken_case "a 403 closing the issue when main goes green is explained too" \
+  "$OPEN" close "$GH403" success success "Workflow permissions"
+run_broken_case "an unrecognised failure is reported verbatim, not guessed at" \
+  "$NONE" list "could not resolve host: api.github.com" failure success "could not resolve host"
 
 echo
 echo "$pass passed, $fail failed"
