@@ -1,3 +1,6 @@
-# allow crawling everything by default
+# admin.lamsza.com is a private back office. Nothing here is public.
+# Nginx also sends `X-Robots-Tag: noindex, nofollow` (see docs/ARCHITECTURE.md,
+# "Production (Phase 2)"), because robots.txt only asks politely and does not
+# keep an already-known URL out of an index.
 User-agent: *
-Disallow:
+Disallow: /

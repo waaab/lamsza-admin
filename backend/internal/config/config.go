@@ -13,21 +13,22 @@ type Config struct {
 	WeatherAPIComKey  string
 	GoogleClientID    string
 	AdminGoogleEmails []string
-	SzotarOrigin      string
 	// AllowedOrigins lists the exact browser origins that may read this API
 	// cross-origin. Never reflect an unknown Origin back: with
 	// Access-Control-Allow-Credentials that hands any site the signed-in reply.
 	AllowedOrigins []string
-	// DataAPI serves mondások, events, news, and the other content routes.
-	// Auth and /api/config/public stay up when this is false.
-	DataAPI  bool
+	// Every flag here gates a route group in main.go. Do not add one that
+	// nothing reads: `.env` then advertises a switch the operator can flip with
+	// no effect, which is worse than no switch at all. `SzotarOrigin`,
+	// `DataAPI` and `Features.Search` were exactly that — read by nothing in
+	// this process — and were removed on BOG-40 together with the dead
+	// `internal/search` package that `SzotarOrigin` was extracted with.
 	Features struct {
 		Weather    bool
 		Events     bool
 		News       bool
 		Mondasok   bool
 		QuickLinks bool
-		Search     bool
 	}
 }
 
@@ -50,18 +51,14 @@ func Load() {
 
 	AppConfig.GoogleClientID = getEnv("GOOGLE_CLIENT_ID", "")
 	AppConfig.AdminGoogleEmails = parseEmailList(getEnv("ADMIN_GOOGLE_EMAILS", "attila.bogozi@gmail.com"))
-	AppConfig.SzotarOrigin = strings.TrimRight(getEnv("SZOTAR_ORIGIN", ""), "/")
 	AppConfig.AllowedOrigins = parseOriginList(getEnv("CORS_ALLOWED_ORIGINS", ""))
 	ReloadAllowedOrigins()
-
-	AppConfig.DataAPI = getBoolEnv("DATA_API", true)
 
 	AppConfig.Features.Weather = getBoolEnv("FEATURE_WEATHER", true)
 	AppConfig.Features.Events = getBoolEnv("FEATURE_EVENTS", true)
 	AppConfig.Features.News = getBoolEnv("FEATURE_NEWS", true)
 	AppConfig.Features.Mondasok = getBoolEnv("FEATURE_MONDASOK", true)
 	AppConfig.Features.QuickLinks = getBoolEnv("FEATURE_QUICKLINKS", true)
-	AppConfig.Features.Search = getBoolEnv("FEATURE_SEARCH", true)
 }
 
 // defaultAllowedOrigins covers the four production sites plus the local

@@ -21,11 +21,15 @@
     import HuTimeInput from "$lib/components/HuTimeInput.svelte";
     import EntryPhotosEditor from "$lib/components/EntryPhotosEditor.svelte";
     import GoogleSignIn from "$lib/components/GoogleSignIn.svelte";
+    import AppIcon from "$lib/icons/AppIcon.svelte";
+    import { adminAppLinks } from "$lib/adminApps.js";
     import { canonicalDomain } from "$lib/websiteDomain.js";
 
     const lamszaOrigin =
         (typeof import.meta !== "undefined" && import.meta.env?.VITE_LAMSZA_ORIGIN) ||
         "http://localhost:5174";
+    /** Header switcher: this app, plus the Szótár and Játszótér admin UIs. */
+    const adminApps = adminAppLinks(typeof import.meta !== "undefined" ? import.meta.env : undefined);
 
     /** Local calendar date as YYYY-MM-DD (for date inputs). */
     function localISODate() {
@@ -4096,7 +4100,44 @@
                         <p class="admin-page-greeting">{adminPageHead.greeting}</p>
                     {/if}
                 </div>
-                <button class="btn" type="button" on:click={logout}>Kijelentkezés</button>
+                <nav class="admin-header-actions" aria-label="Lámsza admin alkalmazások">
+                    {#each adminApps as app (app.id)}
+                        <a
+                            href={app.href}
+                            class="btn nav-btn admin-header-icon-btn"
+                            title={app.label}
+                            aria-label={app.label}
+                            aria-current={app.current ? "page" : undefined}
+                            target={app.current ? undefined : "_blank"}
+                            rel={app.current ? undefined : "noopener noreferrer"}
+                        >
+                            <AppIcon name={app.icon} size={20} />
+                        </a>
+                    {/each}
+                    <button
+                        class="btn nav-btn admin-header-icon-btn"
+                        type="button"
+                        on:click={logout}
+                        title="Kijelentkezés"
+                        aria-label="Kijelentkezés"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            aria-hidden="true"
+                            ><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline
+                                points="16 17 21 12 16 7"
+                            /><line x1="21" y1="12" x2="9" y2="12" /></svg
+                        >
+                    </button>
+                </nav>
             </header>
 
             <div class="admin-container w-full">
