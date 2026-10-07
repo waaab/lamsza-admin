@@ -4,17 +4,18 @@
 # receiver instead of only a log nobody opens.
 #
 # Why an issue, and why GitHub writes it instead of an agent reading it: nothing
-# on the dev machine can read CI. There is no `gh` CLI there, git auth is
-# SSH-key only, unauthenticated api.github.com reads from that IP are
-# rate-limited to zero, and two of the four repos are private. So the signal has
-# to be pushed out from inside Actions, where `GITHUB_TOKEN` already exists and
+# on the dev machine can read CI reliably. There is no `gh` CLI there, git auth is
+# SSH-key only, and unauthenticated api.github.com reads only see the two public
+# repos (lamsza, lamsza-admin): lamsza-szotar and lamsza-jatszoter are private.
+# So the signal has to be pushed out from inside Actions, where `GITHUB_TOKEN` already exists and
 # needs no secret to be configured. An issue beats a run-failure email because it
 # survives log retention, it is visible in the repo to anyone including an agent
 # with a token later, and it can be closed again automatically when main goes
-# green — so its mere existence is the current red/green answer.
+# green - so its mere existence is the current red/green answer.
 #
-# Decided on BOG-54 ("both": this, plus branch protection). See R7 in lamsza's
-# docs/network/WAYS_OF_WORKING.md.
+# Decided on BOG-54. Branch protection, the other half of that decision, was
+# declined later, so this issue is the one receiver for a red main. See R7 in
+# lamsza's docs/network/WAYS_OF_WORKING.md.
 #
 # Env in:
 #   GH_TOKEN      credential for gh (the workflow passes github.token)
@@ -46,7 +47,7 @@ failed=""
 #
 # That is the worst failure this script has, because it is silent in the only
 # channel that matters. The receiver stops reporting a red `main`, and the one
-# symptom is the `ci-status` job going red — which is a thing only this script
+# symptom is the `ci-status` job going red - which is a thing only this script
 # reports. Nothing on the dev machine can read Actions to notice (no gh, SSH-only
 # git auth, no API budget, two private repos), so the diagnosis has to be written
 # where a person landing on the run will see it without digging: the step log and
@@ -91,13 +92,13 @@ Run \`bash .github/ci-status-issue.test.sh\` after any fix."
 }
 
 # Runs gh, passing its stdout through on success. On failure it explains itself
-# and returns gh's status, which `set -e` turns into a red job — deliberately, so
+# and returns gh's status, which `set -e` turns into a red job - deliberately, so
 # a broken receiver is never mistaken for a quiet one.
 gh_or_explain() {
   local out rc=0
   out=$(gh "$@" 2>&1) || rc=$?
   if [ "$rc" -ne 0 ]; then
-    # Just "issue list", not the whole jq filter — the subcommand is what tells
+    # Just "issue list", not the whole jq filter - the subcommand is what tells
     # you which call was refused, and the filter buries it.
     explain_failure "${1:-} ${2:-}" "$out"
     return "$rc"
@@ -128,7 +129,7 @@ if [ -n "$failed" ]; then
 
 Per R7 in \`docs/network/WAYS_OF_WORKING.md\`: do not merge more work onto
 \`main\` until this is green, and run the \`docs/LOCAL_DEV_CHECKS.md\` checks
-locally — CI is the weaker of the two gates.
+locally - CI is the weaker of the two gates.
 
 This issue closes itself on the next green run of \`main\`."
 

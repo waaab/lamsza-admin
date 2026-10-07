@@ -154,7 +154,7 @@ DECOYS='[{"number":3,"title":"CI is red on main (old, closed by hand)"},
 OPEN_AMONG_DECOYS='[{"number":4,"title":"Flaky: CI is red on main sometimes"},
                     {"number":7,"title":"CI is red on main"}]'
 
-echo "— goes red —"
+echo "-- goes red --"
 run_case "red with no open issue opens one" \
   "$NONE" failure success "issue create --title CI is red on main" "went red: opened"
 run_case "red names the failing job" \
@@ -162,7 +162,7 @@ run_case "red names the failing job" \
 run_case "red names both failing jobs" \
   "$NONE" failure failure "Failed jobs | **frontend, backend**" "went red"
 
-echo "— stays red —"
+echo "-- stays red --"
 run_case "red with the issue already open comments instead of duplicating" \
   "$OPEN" failure success "issue comment 7" "still red: commented on #7"
 run_case "finds the issue among similarly titled ones" \
@@ -170,19 +170,19 @@ run_case "finds the issue among similarly titled ones" \
 refute_call "a near-miss title is not treated as the issue" \
   "$DECOYS" failure success "issue comment"
 
-echo "— goes green —"
+echo "-- goes green --"
 run_case "green with an open issue closes it" \
   "$OPEN" success success "issue close 7" "recovered: closed #7"
 refute_call "green with no open issue touches nothing" \
   "$NONE" success success "issue c"
 
-echo "— neither —"
+echo "-- neither --"
 # `cancelled` and `skipped` must not be read as failure; the workflow also gates
 # on this, but the script must not depend on that gate being right.
 refute_call "a cancelled run does not open an issue" \
   "$NONE" cancelled success "issue create"
 
-echo "— the receiver itself is broken —"
+echo "-- the receiver itself is broken --"
 GH403='gh: Resource not accessible by integration (HTTP 403)'
 run_broken_case "a 403 on the read names the repo setting to change" \
   "$NONE" list "$GH403" failure success "Workflow permissions"

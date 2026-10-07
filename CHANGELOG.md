@@ -15,6 +15,7 @@ adds a line under `[Unreleased]` in the same commit.
 - Basic small-screen rules for the admin shell: a narrower icon rail, the header buttons above the title, tighter spacing, full-width edit windows.
 
 ### Changed
+- `tests/noEmdash.test.js` (synced from lamsza) keeps em dashes out of code and UI text in `npm test`; the `.github/ci-status-issue.*` comments are corrected network-wide; the Cursor rules are synced.
 - Sign-in follows the network gate (lamsza UI_BASELINE "adm-gate"): a card with "Az admin felülethez lépj be." and the shared `SignInDialog`, which opens by itself. A Google account that is not on the allowlist (the API answers 403) is sent on to Lámsza, through admin's own `signIn` for the shared button; before, it only saw "Belépés sikertelen.". The full-page login box is gone.
 - The confirm and notice dialogs come last in the page, so a notice raised over an edit window shows on top of it.
 - Docs: the README uses the network script as the only launcher and says the DB-backed tests skip in CI; `LOCAL_DEV_CHECKS.md` lost its stale results table and lists all 15 frontend test files; `ARCHITECTURE.md` points to WoW §1 for ports. No em dash in code comments (D5). Synced from lamsza: `global.css` (dark tokens) and `component-typography.css`.

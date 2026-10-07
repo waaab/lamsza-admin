@@ -10,3 +10,5 @@ Do not use an em dash (U+2014) in user-facing text (UI copy, code strings shown 
 End the sentence, or rewrite the line. When a dash is still needed, use a hyphen with spaces: ` - `.
 
 Empty placeholders use `-`.
+
+Checked by `tests/noEmdash.test.js` in every repo's `npm test` (CI included): it scans the code (Go, JS, Svelte, CSS, HTML, shell, SQL, workflow YAML) and skips Markdown, `docs/` and data.
