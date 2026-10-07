@@ -23,7 +23,7 @@ func HandleAdminCatalogEventTypes(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		defer rows.Close()
-		var out []models.CatalogEventType
+		out := []models.CatalogEventType{}
 		for rows.Next() {
 			var t models.CatalogEventType
 			if err := rows.Scan(&t.ID, &t.Slug, &t.LabelHu, &t.SortOrder); err != nil {
@@ -138,7 +138,7 @@ func HandleAdminCatalogEventSubtypes(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		defer rows.Close()
-		var out []models.CatalogEventSubtype
+		out := []models.CatalogEventSubtype{}
 		for rows.Next() {
 			var s models.CatalogEventSubtype
 			if err := rows.Scan(&s.ID, &s.EventTypeID, &s.Slug, &s.LabelHu, &s.SortOrder); err != nil {
