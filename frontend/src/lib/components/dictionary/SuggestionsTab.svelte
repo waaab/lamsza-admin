@@ -115,7 +115,7 @@
                     </td>
                 </tr>
             {:else}
-                <tr><td colspan="5">{loaded ? "Nincs nyitott javaslat." : "Betöltés…"}</td></tr>
+                <tr><td colspan="5">{loaded ? "Nincs elbírálásra váró szójavaslat." : "Betöltés…"}</td></tr>
             {/each}
         </tbody>
     </table>

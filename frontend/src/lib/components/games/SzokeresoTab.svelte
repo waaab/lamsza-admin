@@ -12,7 +12,7 @@
 
     import { onMount } from 'svelte';
     import HuDateInput from '$lib/components/HuDateInput.svelte';
-    import { errorText, localISODate, sectionFetch } from '$lib/sectionApi.js';
+    import { errorText, sectionFetch } from '$lib/sectionApi.js';
 
     const DIRECTIONS = [
         { label: '→', dr: 0, dc: 1 },
@@ -79,7 +79,9 @@
         resetForm();
     });
 
-    const todayISO = () => localISODate();
+    /** Játszótér's today, a Bucharest day (lamsza WAYS_OF_WORKING R19), never the browser's. */
+    let today = $state('');
+    const todayISO = () => today;
 
     /** @param {number} n @returns {string[][]} */
     function emptyGrid(n) {
@@ -139,10 +141,12 @@
         loading = true;
         error = '';
         try {
-            const [wordsRes, listRes] = await Promise.all([
+            const [wordsRes, listRes, stats] = await Promise.all([
                 sectionFetch("games", 'szokereso/words'),
-                sectionFetch("games", 'szokereso/puzzles')
+                sectionFetch("games", 'szokereso/puzzles'),
+                sectionFetch("games", 'stats')
             ]);
+            today = stats?.today ?? '';
             wordPool = wordsRes.words ?? [];
             puzzles = listRes.puzzles ?? [];
         } catch (e) {

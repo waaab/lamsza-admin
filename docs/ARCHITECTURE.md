@@ -37,7 +37,10 @@ below Vezérlőpult, with the section's counts. Icons come from the shared `AppI
 - The first sidebar button opens the section's public app in a new tab. Those origins are
   build-time values: `VITE_LAMSZA_ORIGIN`, `VITE_SZOTAR_ORIGIN`, `VITE_JATSZOTER_ORIGIN`.
 - A tab has a bare hash (`/dictionary#szavak`), and `#szavak/<id>` opens that word's
-  editor; Szótár's entry page links there.
+  editor.
+- "Today" (lamsza WAYS_OF_WORKING R19) is a Bucharest day the server decides: the date
+  defaults and "ma" come from Szótár's and Játszótér's `stats` (`today`), never from the
+  browser's clock (`tests/adminSections.test.js` checks the section code).
 - The Szótár and Játszótér tabs live in `lib/components/dictionary/` and
   `lib/components/games/` (the Szókereső editor moved here from Játszótér). They call the
   relay only through `lib/sectionApi.js`, which returns the app's own Hungarian error

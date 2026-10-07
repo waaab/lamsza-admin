@@ -41,3 +41,21 @@ test("the sections reach Szótár and Játszótér only through the relay helper
         }
     }
 });
+
+test("the sections take today from Szótár and Játszótér, never from the browser's clock", () => {
+    // lamsza WAYS_OF_WORKING R19: "today" is a Bucharest day decided by the
+    // server; the date defaults come from the apps' `today` (their stats).
+    for (const file of sectionFiles) {
+        const src = read(file);
+        assert.doesNotMatch(src, /new Date\(\)|Date\.now\(|localISODate|getFullYear\(/, `${file} computes a date from the browser's clock`);
+    }
+});
+
+test("word suggestions sit right under the words list, with their own icon", () => {
+    const src = read("src/routes/dictionary/+page.svelte");
+    const nav = src.slice(src.indexOf("NAV = ["), src.indexOf("];", src.indexOf("NAV = [")));
+    const ids = [...nav.matchAll(/\{ id: "([^"]+)"/g)].map((m) => m[1]);
+    assert.equal(ids[ids.indexOf("szavak") + 1], "javaslatok");
+    assert.match(nav, /id: "javaslatok", title: "Szójavaslatok", icon: "word-suggestions"/);
+    assert.match(nav, /id: "szavak", title: "Szavak", icon: "list"/);
+});

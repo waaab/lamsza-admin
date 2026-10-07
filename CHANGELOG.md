@@ -18,6 +18,8 @@ adds a line under `[Unreleased]` in the same commit.
 - Basic small-screen rules for the admin shell: a narrower icon rail, the header buttons above the title, tighter spacing, full-width edit windows.
 
 ### Changed
+- `/dictionary`: Javaslatok is "Szójavaslatok", right under Szavak, with the new shared `word-suggestions` icon and a description that says these are users' suggested changes to words (new words, new meanings, forms). The shared `words` and `word-suggestions` icons are synced from lamsza.
+- The date defaults in `/dictionary` (a new mondás) and `/games` (a new Szókereső puzzle) are Szótár's and Játszótér's Bucharest `today` (lamsza WAYS_OF_WORKING R19), not the browser's date; `localISODate` is gone from `sectionApi.js`.
 - The Mondások icon is the new shared one (Google's filled `format_quote`, centered, synced from lamsza); the `svg.app-icon-quote` rules for the old `<text>` glyph are gone from `admin.css`.
 - The header's section and sign-out buttons use the shared toolbar buttons (global.css `.btn.nav-btn` in a `.nav` row, as on Lámsza): pill shape, 16px icons, 0.75rem apart, the current section in the shared active state; before they were admin's own 36px squares with 20px icons. The section dashboards are titled "Vezérlőpult Szótár" and "Vezérlőpult Játszótér" (owner's decision).
 - The header switcher links to `/`, `/dictionary` and `/games` in this app instead of the apps' own `/admin` pages; `VITE_ADMIN_ORIGIN`, `VITE_SZOTAR_ADMIN_ORIGIN` and `VITE_JATSZOTER_ADMIN_ORIGIN` are gone, and `VITE_SZOTAR_ORIGIN` / `VITE_JATSZOTER_ORIGIN` (with `VITE_LAMSZA_ORIGIN`) give the apps' public origins. The sidebar's "open in a new tab" icon is the shared `external` icon.

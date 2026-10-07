@@ -12,7 +12,7 @@
     import AdminPlusIcon from "$lib/components/admin/AdminPlusIcon.svelte";
     import HuDateInput from "$lib/components/HuDateInput.svelte";
     import { confirmDialog } from "$lib/confirm.svelte.js";
-    import { errorText, formatHuDate, localISODate, sectionFetch } from "$lib/sectionApi.js";
+    import { errorText, formatHuDate, sectionFetch } from "$lib/sectionApi.js";
 
     /** @typedef {{ id: number, text: string, meaning: string, display_date: string }} Proverb */
     /** @type {Proverb[]} */
@@ -21,7 +21,9 @@
     let error = $state("");
     let notice = $state("");
     let createOpen = $state(false);
-    let draft = $state({ text: "", meaning: "", display_date: localISODate() });
+    /** Szótár's today, a Bucharest day (lamsza WAYS_OF_WORKING R19), never the browser's. */
+    let today = $state("");
+    let draft = $state({ text: "", meaning: "", display_date: "" });
     let createError = $state("");
     /** @type {Proverb | null} */
     let editing = $state(null);
@@ -30,8 +32,13 @@
 
     async function load() {
         try {
-            const data = await sectionFetch("dictionary", "proverbs");
+            const [data, stats] = await Promise.all([
+                sectionFetch("dictionary", "proverbs"),
+                sectionFetch("dictionary", "stats"),
+            ]);
             proverbs = data?.proverbs || [];
+            today = stats?.today || "";
+            if (!draft.display_date) draft.display_date = today;
             error = "";
         } catch (err) {
             error = errorText(err, "A mondások most nem érhetők el.");
@@ -49,7 +56,7 @@
         try {
             const item = await sectionFetch("dictionary", "proverbs", { method: "POST", body: draft });
             notice = "Mondás hozzáadva.";
-            draft = { text: "", meaning: "", display_date: localISODate() };
+            draft = { text: "", meaning: "", display_date: today };
             createOpen = false;
             proverbs = [item, ...proverbs];
             onChanged();

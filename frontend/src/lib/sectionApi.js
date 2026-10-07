@@ -62,9 +62,3 @@ export function formatHuDate(/** @type {string | null | undefined} */ iso) {
         day: "numeric",
     });
 }
-
-/** Local calendar date as YYYY-MM-DD (for date inputs). */
-export function localISODate(date = new Date()) {
-    const z = (/** @type {number} */ n) => String(n).padStart(2, "0");
-    return `${date.getFullYear()}-${z(date.getMonth() + 1)}-${z(date.getDate())}`;
-}

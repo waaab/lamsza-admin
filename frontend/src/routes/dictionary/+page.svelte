@@ -23,10 +23,9 @@
         { id: "napi", title: "Napi szó", icon: "events", countTitle: "Hangfelvételes, választható szavak" },
         { sep: true },
         { id: "szavak", title: "Szavak", icon: "list" },
+        { id: "javaslatok", title: "Szójavaslatok", icon: "word-suggestions", countTitle: "Elbírálásra váró szójavaslatok" },
         { id: "szofajok", title: "Szófajok", icon: "tags" },
         { id: "mondasok", title: "Mondások", icon: "mondasok" },
-        { sep: true },
-        { id: "javaslatok", title: "Javaslatok", icon: "inbox", countTitle: "Nyitott javaslatok" },
     ];
     const CARDS = /** @type {{ id: string, title: string, icon: string, countTitle?: string }[]} */ (
         NAV.filter((n) => n.id && n.id !== "welcome")
@@ -43,7 +42,11 @@
         szavak: { title: "Szavak", greeting: "Címszavak és jelentések." },
         szofajok: { title: "Szófajok", greeting: "Bemutatkozó szövegek a szófaj oldalakon." },
         mondasok: { title: "Mondások", greeting: "A napi mondások ütemezése." },
-        javaslatok: { title: "Javaslatok", greeting: "A felhasználók beküldött javaslatainak elbírálása." },
+        javaslatok: {
+            title: "Szójavaslatok",
+            greeting:
+                "A felhasználók által beküldött szójavaslatok elbírálása: új szavak és meglévő szavak módosításai (új jelentés, alak és hasonlók).",
+        },
     };
 
     /** @type {AdminShell | null} */
@@ -128,7 +131,7 @@
             {#if counts}
                 {#if counts.javaslatok > 0}
                     <div class="info-box warning" role="status">
-                        <p>{counts.javaslatok} javaslat vár elbírálásra.</p>
+                        <p>{counts.javaslatok} szójavaslat vár elbírálásra.</p>
                         <p>
                             <button type="button" class="btn btn-sm" onclick={() => shell?.select("javaslatok")}
                                 >Megnyitás</button
@@ -136,7 +139,7 @@
                         </p>
                     </div>
                 {:else}
-                    <div class="info-box" role="status"><p>Nincs elbírálásra váró javaslat.</p></div>
+                    <div class="info-box" role="status"><p>Nincs elbírálásra váró szójavaslat.</p></div>
                 {/if}
             {/if}
         </section>
