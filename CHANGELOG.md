@@ -10,6 +10,7 @@ adds a line under `[Unreleased]` in the same commit.
 ## [Unreleased]
 
 ### Added
+- The relay for the coming `/dictionary` and `/games` sections (lamsza WAYS_OF_WORKING R18): `/api/admin/dictionary/…` and `/api/admin/games/…` forward to Szótár's and Játszótér's internal admin APIs on 127.0.0.1 with the service token and the acting admin's email, behind the admin check and the audit log (a `Subtree` audit resource records the real path). Settings `SZOTAR_ADMIN_URL`/`_TOKEN`, `JATSZOTER_ADMIN_URL`/`_TOKEN`. Tests with a fake app backend.
 - The network's error page through the shared minimal `ErrorShell`: the Lámsza and Admin buttons, the lantern, "Hoppácska!", the code and a Hungarian explanation; noindex, nothing fetched.
 - A back-to-top button, as on the other apps; it follows the scroll of the admin's main column.
 - Basic small-screen rules for the admin shell: a narrower icon rail, the header buttons above the title, tighter spacing, full-width edit windows.

@@ -2,7 +2,27 @@
 
 ## Role
 
-Admin UI + API for the **main Lámsza** portal only. Szótár and Játszótér keep their own `/admin` until a later migration.
+The network's one admin app (lamsza WAYS_OF_WORKING R18): `/` for the main Lámsza
+data, `/dictionary` for Szótár, `/games` for Játszótér. Its `ADMIN_GOOGLE_EMAILS` is the
+network's admin list. Until the move ends, Szótár and Játszótér still carry their own
+`/admin` pages.
+
+## The relay to Szótár and Játszótér
+
+Szótár and Játszótér own their databases; this app never connects to them. Their admin
+features are reached through `/api/admin/dictionary/<x>` and `/api/admin/games/<x>`
+(`internal/relay`), registered through `admin(...)` like every admin route, so they need
+an allowlisted session and get an audit record (resource `szotar` / `jatszoter`, the
+request path as route and id, the payload; no before/after state, since the tables live
+elsewhere).
+
+The relay forwards method, query and body to the app's internal admin API,
+`<SZOTAR_ADMIN_URL | JATSZOTER_ADMIN_URL>/internal/admin/<x>`, on `127.0.0.1` (R13), with
+`Authorization: Bearer <SZOTAR_ADMIN_TOKEN | JATSZOTER_ADMIN_TOKEN>` and the acting
+admin's email in `X-Admin-Email`. It sends no cookie. The app trusts that request only
+when it is outside `/api/`, comes from loopback without proxy headers and carries the
+token (each app's `internal/adminapi`). It answers 503 when a URL or token is missing,
+and 502 when the app does not answer within 10 s.
 
 ## Local ports
 

@@ -17,6 +17,14 @@ type Config struct {
 	// cross-origin. Never reflect an unknown Origin back: with
 	// Access-Control-Allow-Credentials that hands any site the signed-in reply.
 	AllowedOrigins []string
+	// Szótár's and Játszótér's internal admin APIs, which the /dictionary and
+	// /games sections reach through the relay (lamsza WAYS_OF_WORKING R18):
+	// server-to-server on 127.0.0.1 (R13), with each app's service token. A
+	// missing URL or token turns that section's relay off (503).
+	SzotarAdminURL      string
+	SzotarAdminToken    string
+	JatszoterAdminURL   string
+	JatszoterAdminToken string
 	// Every flag here gates a route group in main.go. Do not add one that
 	// nothing reads: `.env` then advertises a switch the operator can flip with
 	// no effect, which is worse than no switch at all. `SzotarOrigin`,
@@ -55,6 +63,10 @@ func Load() {
 	AppConfig.GoogleClientID = getEnv("GOOGLE_CLIENT_ID", "")
 	AppConfig.AdminGoogleEmails = parseEmailList(getEnv("ADMIN_GOOGLE_EMAILS", "attila.bogozi@gmail.com"))
 	AppConfig.AllowedOrigins = parseOriginList(getEnv("CORS_ALLOWED_ORIGINS", ""))
+	AppConfig.SzotarAdminURL = strings.TrimRight(getEnv("SZOTAR_ADMIN_URL", "http://127.0.0.1:3002"), "/")
+	AppConfig.SzotarAdminToken = strings.TrimSpace(getEnv("SZOTAR_ADMIN_TOKEN", ""))
+	AppConfig.JatszoterAdminURL = strings.TrimRight(getEnv("JATSZOTER_ADMIN_URL", "http://127.0.0.1:3003"), "/")
+	AppConfig.JatszoterAdminToken = strings.TrimSpace(getEnv("JATSZOTER_ADMIN_TOKEN", ""))
 	ReloadAllowedOrigins()
 
 	AppConfig.Features.Weather = getBoolEnv("FEATURE_WEATHER", true)

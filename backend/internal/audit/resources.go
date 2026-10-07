@@ -34,6 +34,12 @@ type Resource struct {
 	// IDField is the top-level JSON body field holding the resource id, tried
 	// when the query parameter is absent. Defaults to "id" when empty.
 	IDField string
+
+	// Subtree marks a route registered with a trailing slash that serves every
+	// path below it (the relays to Szótár's and Játszótér's admin APIs). Its
+	// record keeps the request's own path as the route, and the part below the
+	// registered route (e.g. "words/5") as the id when nothing else names one.
+	Subtree bool
 }
 
 func (r Resource) idParam() string {
@@ -110,6 +116,12 @@ var resources = map[string]Resource{
 	"/api/admin/news_feeds/check": {Name: "news_feed_check"},
 	"/api/admin/mondasok":         {Name: "mondas", Tables: []string{"mondasok"}},
 	"/api/admin/quick_links":      {Name: "quick_link", Tables: []string{"quick_links"}},
+
+	// The /dictionary and /games sections, relayed to Szótár's and Játszótér's
+	// internal admin APIs (lamsza WAYS_OF_WORKING R18). Their tables live in
+	// other databases, so the record is the payload and the path.
+	"/api/admin/dictionary/": {Name: "szotar", Subtree: true},
+	"/api/admin/games/":      {Name: "jatszoter", Subtree: true},
 }
 
 // Routes returns every registered route path. The route-coverage test uses it

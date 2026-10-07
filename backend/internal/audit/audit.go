@@ -91,6 +91,13 @@ func Wrap(route string, h http.HandlerFunc) http.HandlerFunc {
 
 		payload, bodyJSON := capturePayload(r)
 		id := resourceID(r, res, bodyJSON)
+		recordedRoute := route
+		if res.Subtree {
+			recordedRoute = r.URL.Path
+			if id == "" {
+				id = strings.TrimPrefix(r.URL.Path, route)
+			}
+		}
 		before := snapshot(res, id)
 
 		rec := &recorder{ResponseWriter: w, status: http.StatusOK}
@@ -114,7 +121,7 @@ func Wrap(route string, h http.HandlerFunc) http.HandlerFunc {
 			ResourceID:  id,
 			Action:      action(r.Method),
 			Method:      r.Method,
-			Route:       route,
+			Route:       recordedRoute,
 			StatusCode:  rec.status,
 			Payload:     payload,
 			BeforeState: marshalState(before),

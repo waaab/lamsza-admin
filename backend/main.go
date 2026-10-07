@@ -18,6 +18,7 @@ import (
 	"backend/internal/news"
 	"backend/internal/pagefaq"
 	"backend/internal/pages"
+	"backend/internal/relay"
 	"backend/internal/settings"
 	"backend/internal/venues"
 	"backend/internal/weather"
@@ -139,6 +140,16 @@ func newMux() *http.ServeMux {
 		admin("/api/admin/quick_links", links.HandleAdminQuickLinks)
 		log.Println("Module [QuickLinks] enabled")
 	}
+
+	// The /dictionary and /games sections (lamsza WAYS_OF_WORKING R18): relayed
+	// to Szótár's and Játszótér's internal admin APIs, behind the same admin
+	// check and audit trail as every other admin route.
+	admin("/api/admin/dictionary/", relay.Handler(func() relay.Target {
+		return relay.Target{Name: "A Szótár", URL: config.AppConfig.SzotarAdminURL, Token: config.AppConfig.SzotarAdminToken}
+	}))
+	admin("/api/admin/games/", relay.Handler(func() relay.Target {
+		return relay.Target{Name: "A Játszótér", URL: config.AppConfig.JatszoterAdminURL, Token: config.AppConfig.JatszoterAdminToken}
+	}))
 
 	return mux
 }

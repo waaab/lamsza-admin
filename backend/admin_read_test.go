@@ -259,6 +259,8 @@ var adminHappyPath = map[string][]string{
 	"/api/admin/news_feeds":                {"TestAdminReadsAnswerTheirShape", "TestAdminCatalogCRUD"},
 	"/api/admin/mondasok":                  {"TestAdminReadsAnswerTheirShape", "TestAdminCatalogCRUD"},
 	"/api/admin/quick_links":               {"TestAdminReadsAnswerTheirShape", "TestAdminCatalogCRUD"},
+	"/api/admin/dictionary/":               {"TestRelayForwardsAReadWithTheServiceToken", "TestRelayPassesTheAppsErrorThrough"},
+	"/api/admin/games/":                    {"TestRelayForwardsAWriteAndAuditsIt"},
 }
 
 func TestEveryAdminRouteHasAHappyPath(t *testing.T) {
