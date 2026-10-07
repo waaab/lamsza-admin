@@ -301,6 +301,70 @@
             <path d="M9 3v18M15 3v18M3 9h18M3 15h18" opacity="0.45"></path>
             <path d="M6 6l12 12"></path>
         </svg>
+    {:else if name === "tajszorejtveny"}
+        <!-- Tájszórejtvény: an arrow-word grid; the top-left cell is a clue cell whose
+             arrow runs down, then right into its answer -->
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+            <path d="M12 3v18M3 12h18" opacity="0.45"></path>
+            <path d="M6.5 5.5V9h3.5"></path>
+            <path d="M8.5 7.5 10 9l-1.5 1.5"></path>
+        </svg>
+    {:else if name === "keyboard"}
+        <!-- The games' Billentyűzet tool (moved from Játszótér's gameToolIcons.js, same drawing) -->
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="6" width="20" height="12" rx="2" ry="2"></rect>
+            <path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M8 14h8"></path>
+        </svg>
+    {:else if name === "sound_on"}
+        <!-- Sound on: a speaker with two waves (the games' Hang tool) -->
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+        </svg>
+    {:else if name === "sound_off"}
+        <!-- Sound off: the speaker with a cross -->
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <line x1="23" y1="9" x2="17" y2="15"></line>
+            <line x1="17" y1="9" x2="23" y2="15"></line>
+        </svg>
+    {:else if name === "help"}
+        <!-- Help: a question mark in a circle (the games' Súgó tool) -->
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+            <path d="M12 17h.01"></path>
+        </svg>
+    {:else if name === "zoom_in"}
+        <!-- Zoom in: the magnifier with a plus -->
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.35-4.35"></path>
+            <path d="M11 8v6M8 11h6"></path>
+        </svg>
+    {:else if name === "zoom_out"}
+        <!-- Zoom out: the magnifier with a minus -->
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.35-4.35"></path>
+            <path d="M8 11h6"></path>
+        </svg>
+    {:else if name === "flag"}
+        <!-- Flag: report a problem (Tájszórejtvény's Hibát találtam) -->
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
+            <path d="M4 22v-7"></path>
+        </svg>
+    {:else if name === "text_size"}
+        <!-- Text size: a large A and a small a -->
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m3 16 4.5-9 4.5 9"></path>
+            <path d="M4.5 13h6"></path>
+            <path d="M16 16v-3.5a2.5 2.5 0 0 1 5 0V16"></path>
+            <path d="M21 14h-5"></path>
+        </svg>
     {:else if name === "words"}
         <!-- Words: the rovás letter G (𐲍, U+10C8D). Its strokes are the centrelines
              of the --font-rovas glyph (Noto Sans Old Hungarian), traced, not drawn. -->

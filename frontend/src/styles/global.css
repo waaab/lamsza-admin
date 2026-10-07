@@ -1300,6 +1300,16 @@ section.page-section{
   overflow-y: auto;
 }
 
+/* Phones: the shell uses the screen's width, not 70vw (about 273px on a 390px
+   phone), in every app. Admin's edit windows already did this (admin.css). */
+@media (max-width: 768px) {
+  .link-dialog {
+    width: calc(100vw - 1rem);
+    max-width: calc(100vw - 1rem);
+    padding: 1.25rem 1rem;
+  }
+}
+
 .link-dialog h3 {
   margin: 0 0 1.25rem;
   font-size: var(--text-md);
