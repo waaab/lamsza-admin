@@ -314,10 +314,12 @@
                 if (row) startEdit(row);
             }
         } catch (e) {
-            error = errorText(e, 'A mentés nem sikerült.');
+            const message = errorText(e, 'A mentés nem sikerült.');
             // A new puzzle is saved as a draft before it is published; when
-            // the publish is refused, that draft still exists, so list it.
+            // the publish is refused, that draft still exists, so list it
+            // (loadAll clears the error, so set it afterwards).
             if (editingId) await loadAll();
+            error = message;
         } finally {
             saving = false;
         }
