@@ -5,6 +5,7 @@ import (
 	"backend/internal/utils"
 	"database/sql"
 	"encoding/json"
+	"log"
 	"net/http"
 	"strings"
 	"unicode/utf8"
@@ -253,13 +254,25 @@ func HandleAdminAttractions(w http.ResponseWriter, r *http.Request) {
 		for rows.Next() {
 			var a Attraction
 			var activitiesText, prohibitionsText string
+			// latitude/longitude come from a LEFT JOIN on geo_locations and are
+			// NULL for an attraction saved without coordinates. Scanning those
+			// straight into float64 fails, and the error used to be swallowed
+			// by an `err == nil` guard, so an attraction with no coordinates
+			// was stored and then invisible in the admin list, with no way to
+			// edit or delete it from the UI. Found on BOG-55; guarded by
+			// TestAdminAttractionsListIncludesOneWithoutCoordinates.
+			var lat, lon sql.NullFloat64
 			if err := rows.Scan(&a.ID, &a.CountyID, &a.CountySlug, &a.CountyName, &a.Name, &a.NameRo, &a.NameDe,
-				&a.Slug, &a.Description, &a.FeaturedImage, &a.FeaturedImageCopyright, &a.Content, &activitiesText, &prohibitionsText, &a.Latitude, &a.Longitude); err == nil {
-				a.Activities = splitActivities(activitiesText)
-				a.Prohibitions = splitActivities(prohibitionsText)
-				a.Images = loadAttractionImages(a.ID)
-				list = append(list, a)
+				&a.Slug, &a.Description, &a.FeaturedImage, &a.FeaturedImageCopyright, &a.Content, &activitiesText, &prohibitionsText, &lat, &lon); err != nil {
+				log.Printf("admin attractions scan: %v", err)
+				continue
 			}
+			a.Latitude = lat.Float64
+			a.Longitude = lon.Float64
+			a.Activities = splitActivities(activitiesText)
+			a.Prohibitions = splitActivities(prohibitionsText)
+			a.Images = loadAttractionImages(a.ID)
+			list = append(list, a)
 		}
 		if list == nil {
 			list = []Attraction{}
