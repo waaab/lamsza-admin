@@ -14,7 +14,6 @@ import (
 	"backend/internal/health"
 	"backend/internal/links"
 	"backend/internal/middleware"
-	"backend/internal/mondasok"
 	"backend/internal/news"
 	"backend/internal/pagefaq"
 	"backend/internal/pages"
@@ -129,11 +128,6 @@ func newMux() *http.ServeMux {
 		admin("/api/admin/news_feeds", news.HandleAdminNewsFeeds)
 		admin("/api/admin/news_feeds/check", news.HandleAdminNewsFeedCheck)
 		log.Println("Module [News] enabled")
-	}
-
-	if config.AppConfig.Features.Mondasok {
-		admin("/api/admin/mondasok", mondasok.HandleAdminMondasok)
-		log.Println("Module [Mondasok] enabled")
 	}
 
 	if config.AppConfig.Features.QuickLinks {

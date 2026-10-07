@@ -145,15 +145,6 @@ func crudCases() []crudCase {
 			cleanupSQL:  `DELETE FROM news_feeds WHERE id = $1`,
 		},
 		{
-			path: "/api/admin/mondasok",
-			create: func(t *testing.T) map[string]interface{} {
-				return map[string]interface{}{"text": testName("mondas"), "display_date": "2099-01-01"}
-			},
-			updateField: "text",
-			updateValue: testName("mondas-edited"),
-			cleanupSQL:  `DELETE FROM mondasok WHERE id = $1`,
-		},
-		{
 			path: "/api/admin/quick_links",
 			create: func(t *testing.T) map[string]interface{} {
 				return map[string]interface{}{
@@ -326,8 +317,6 @@ func TestAdminCatalogRejectsEmptyRequiredFields(t *testing.T) {
 		{"/api/admin/catalog_event_types", map[string]interface{}{"slug": "", "label_hu": ""}, "a blank event type"},
 		{"/api/admin/venue_types", map[string]interface{}{"slug": "", "label_hu": ""}, "a blank venue type"},
 		{"/api/admin/venues", map[string]interface{}{"name": "", "settlement_id": 0}, "a venue with no settlement"},
-		{"/api/admin/mondasok", map[string]interface{}{"text": "", "display_date": ""}, "a mondás with no text or date"},
-		{"/api/admin/mondasok", map[string]interface{}{"text": "x", "display_date": "not-a-date"}, "a mondás with an unparseable date"},
 	} {
 		t.Run(tc.what, func(t *testing.T) {
 			mustStatus(t, asAdmin(t, http.MethodPost, tc.path, tc.body), http.StatusBadRequest, "POST "+tc.path+" with "+tc.what)

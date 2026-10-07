@@ -28,13 +28,6 @@
 
     const lamszaOrigin = APP_ORIGINS.lamsza;
 
-    /** Local calendar date as YYYY-MM-DD (for date inputs). */
-    function localISODate() {
-        const d = new Date();
-        const z = (n) => String(n).padStart(2, "0");
-        return `${d.getFullYear()}-${z(d.getMonth() + 1)}-${z(d.getDate())}`;
-    }
-
     /** @type {AdminShell | null} sign-in gate, sidebar, header (lib/components/admin/AdminShell.svelte) */
     let shell = null;
     let adminOffline = false;
@@ -43,7 +36,6 @@
     /** Sidebar, in order; the dashboard cards are the same entries below Vezérlőpult. */
     const ADMIN_NAV = [
         { id: "welcome", title: "Vezérlőpult", icon: "dashboard" },
-        { id: "mondasok", title: "Mondások" },
         { id: "quicklinks", title: "Gyorslinkek" },
         { sep: true },
         { id: "websites", title: "Weboldalak" },
@@ -165,7 +157,6 @@
         setAdminTabError(msg);
     }
 
-    let mondasok = [];
     let quickLinks = [];
     let newsFeeds = [];
     let locations = [];
@@ -186,7 +177,6 @@
     let feedTimestamps = {};
 
     // Form binding objects
-    let newMondas = { text: "", display_date: localISODate() };
     let newLink = { title: "", url: "", bg_color: "#e6f0ff" };
     let newNews = { title: "", feed_url: "", bg_color: "#ffebd6" };
     let newLocation = {
@@ -292,7 +282,6 @@
     /** @type {Record<string, unknown> | null} */
     let editingVenueType = null;
 
-    let searchMondasok = "";
     let searchQuickLinks = "";
     let searchNewsFeeds = "";
     let searchLocations = "";
@@ -311,7 +300,6 @@
     let searchAdminPages = "";
     let searchPageFaqRows = "";
     let searchUsers = "";
-    let pageMondasok = 1;
     let pageQuickLinks = 1;
     let pageNewsFeeds = 1;
     let pageLocations = 1;
@@ -388,7 +376,6 @@
     let editingCategory = null;
     let editingType = null;
     let editingTag = null;
-    let editingMondas = null;
     let editingLink = null;
     let editingNews = null;
     let editingEvent = null;
@@ -443,7 +430,6 @@
     let apiNotices = [];
 
     const ADMIN_API_LABELS = {
-        mondasok: "Mondások",
         quick_links: "Gyorslinkek",
         news_feeds: "Hírfolyamok",
         locations: "Települések",
@@ -946,11 +932,6 @@
             greeting:
                 "Üdvözöllek. A kártyákon a táblák rekordjainak száma látható, a név pedig megegyezik az oldalsáv gombjaival. Kattintva megnyílik a megfelelő kezelőfelület.",
         },
-        mondasok: {
-            title: "Mondások",
-            greeting:
-                "A kezdőlap napi idézeteinek és megjelenési napjának kezelése.",
-        },
         quicklinks: {
             title: "Gyorslinkek",
             greeting: "Kezdőlap gyors hivatkozásai: cím, URL és háttérszín.",
@@ -1176,16 +1157,6 @@
         return s ? s.label_hu : ss;
     }
 
-    $: rfMondasok = filterRows(mondasok, searchMondasok, (m) => [
-        m.id,
-        m.text,
-        m.display_date,
-    ]);
-    $: pgMondasok = adminPageSlice(rfMondasok, pageMondasok);
-    $: mondasTodayYmd = localISODate();
-    $: mondasokTodayCount = mondasok.filter(
-        (m) => normalizeYmdInput(m.display_date) === mondasTodayYmd,
-    ).length;
     $: rfQuickLinks = filterRows(quickLinks, searchQuickLinks, (q) => [
         q.title,
         q.url,
@@ -1412,7 +1383,6 @@
         collectBrowserCaches();
         await fetchDashboardStats();
         await fetchListingQueue();
-        fetchMondasok();
         fetchQuickLinks();
         fetchNewsFeeds();
         fetchLocations();
@@ -1686,9 +1656,6 @@
     }
 
     // --- specific fetches ---
-    function fetchMondasok() {
-        loadData("mondasok", (d) => (mondasok = d));
-    }
     function fetchQuickLinks() {
         loadData("quick_links", (d) => (quickLinks = d));
     }
@@ -2492,15 +2459,6 @@
                 action: "open",
             });
         }
-        if (mondasok.length > 0 && mondasokTodayCount === 0) {
-            messages.push({
-                id: "mondas",
-                level: "warning",
-                text: `Ma (${mondasTodayYmd}) nincs beütemezett mondás, ezért a kezdőlapon a mondás-blokk rejtve marad.`,
-                tab: "mondasok",
-                action: "open",
-            });
-        }
         if (eventsWithIncompleteDateTime.length > 0) {
             messages.push({
                 id: "events",
@@ -2556,9 +2514,6 @@
         listingQueueClaims,
         listingQueueSuggestions,
         listingQueueMembers,
-        mondasok,
-        mondasokTodayCount,
-        mondasTodayYmd,
         eventsWithIncompleteDateTime,
         browserCacheNotices,
         apiNotices,
@@ -2846,18 +2801,6 @@
     }
 
     // specific creates
-    function submitMondas(e) {
-        e.preventDefault();
-        const display_date =
-            normalizeYmdInput(newMondas.display_date) || localISODate();
-        const text = String(newMondas.text ?? "").trim();
-        createRecord(
-            "mondasok",
-            { text, display_date },
-            fetchMondasok,
-            () => (newMondas = { text: "", display_date: localISODate() }),
-        );
-    }
     function submitLink(e) {
         e.preventDefault();
         createRecord(
@@ -3229,35 +3172,6 @@
         if (!ok) return;
         await updateRecord("entry_types", editingType, fetchEntryTypes);
         editingType = null;
-    }
-
-    // --- Inline edit helpers for mondasok ---
-    async function startEditMondas(m) {
-        const ok = await showConfirm("Biztosan szerkeszteni szeretné?");
-        if (!ok) return;
-        editingMondas = {
-            ...m,
-            display_date:
-                normalizeYmdInput(m.display_date) || localISODate(),
-        };
-    }
-    function cancelEditMondas() {
-        editingMondas = null;
-    }
-    async function saveEditMondas() {
-        if (!editingMondas) return;
-        const ok = await showConfirm("Biztosan menteni szeretné a módosítást?");
-        if (!ok) return;
-        const id = parseInt(String(editingMondas.id ?? ""), 10);
-        const display_date =
-            normalizeYmdInput(editingMondas.display_date) || localISODate();
-        const text = String(editingMondas.text ?? "").trim();
-        await updateRecord(
-            "mondasok",
-            { id, text, display_date },
-            fetchMondasok,
-        );
-        editingMondas = null;
     }
 
     // --- Inline edit helpers for quick links ---
@@ -4100,166 +4014,6 @@
                             {/each}
                         </ul>
                     </section>
-                {/if}
-
-                <!-- Mondások Tab -->
-                {#if activeTab === "mondasok"}
-                    {#if adminTabError && activeTab === adminTabError.tab}
-                        <div class="info-box error" role="alert">
-                            <p>{adminTabError.message}</p>
-                        </div>
-                    {:else}
-                        <p class="admin-info">
-                            A kezdőlapon az adott <strong>naptári napra</strong> beütemezett mondások jelennek meg
-                            (a látogató böngészőjének helyi dátuma, ugyanaz mint a „Dátum és idő” widget a főoldalon).
-                            Ugyanarra a napra több mondás is
-                            beállítható. Ha nincs egyetlen idézet sem az aktuális napra, a főoldalon nem
-                            jelenik meg mondás-blokk.
-                        </p>
-                    {/if}
-                    {#if mondasok.length > 0 && mondasokTodayCount === 0}
-                        <div class="info-box warning" role="status">
-                            <p>
-                                Ma ({mondasTodayYmd}) nincs beütemezett mondás, ezért a kezdőlapon
-                                a mondás-blokk rejtve marad. Állítsd egy idézet
-                                <strong>megjelenés napját</strong> a mai dátumra.
-                            </p>
-                        </div>
-                    {/if}
-                    <details class="admin-create-panel">
-                        <summary class="admin-create-summary"
-                            ><span>Új mondás hozzáadása</span><AdminPlusIcon /></summary
-                        >
-                        <form class="admin-form admin-create-form" on:submit={submitMondas}>
-                            <label for="mondas_text">Mondás szövege</label>
-                            <textarea
-                                id="mondas_text"
-                                name="mondas_text"
-                                bind:value={newMondas.text}
-                                required
-                                rows="3"
-                            ></textarea>
-                            <label for="mondas_day">Megjelenés napja</label>
-                            <div class="admin-date-field">
-                                <HuDateInput
-                                    id="mondas_day"
-                                    name="display_date"
-                                    bind:value={newMondas.display_date}
-                                    required
-                                />
-                                <button
-                                    type="button"
-                                    class="btn btn-sm"
-                                    on:click={() =>
-                                        (newMondas.display_date = localISODate())}
-                                    >Mai nap</button
-                                >
-                            </div>
-                            <button type="submit" class="admin-submit-btn"
-                                >Hozzáadás</button
-                            >
-                        </form>
-                    </details>
-
-                    {@render adminNotice("mondasok")}
-                    <div class="admin-table-toolbar">
-                        <label class="admin-search-label"
-                            >Keresés
-                            <input
-                                id="search_mondasok"
-                                name="search_mondasok"
-                                type="search"
-                                class="admin-search-input"
-                                bind:value={searchMondasok}
-                                on:input={() => (pageMondasok = 1)}
-                                placeholder="Szöveg vagy ID…"
-                            /></label
-                        >
-                    </div>
-                    <AdminPaginationBar
-                        total={pgMondasok.total}
-                        page={pgMondasok.page}
-                        totalPages={pgMondasok.totalPages}
-                        from={pgMondasok.from}
-                        to={pgMondasok.to}
-                        on:prev={() =>
-                            (pageMondasok = Math.max(1, pageMondasok - 1))}
-                        on:next={() =>
-                            (pageMondasok = Math.min(
-                                pgMondasok.totalPages,
-                                pageMondasok + 1,
-                            ))}
-                    />
-                    <div class="admin-table-wrapper">
-                        <table class="admin-table">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Megjelenés napja</th>
-                                    <th>Szöveg</th>
-                                    <th class="admin-table-col--action">Szerk.</th>
-                                    <th class="admin-table-col--action">Törlés</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {#each pgMondasok.rows as m (m.id)}
-                                    {@const isToday =
-                                        normalizeYmdInput(m.display_date) ===
-                                        mondasTodayYmd}
-                                    <tr class:admin-row-today={isToday}>
-                                        <td>{m.id}</td>
-                                        <td>
-                                            {m.display_date ?? "-"}
-                                            {#if isToday}
-                                                <span class="admin-date-today-badge"
-                                                    >ma</span
-                                                >
-                                            {/if}
-                                        </td>
-                                        <td>{m.text}</td>
-                                        <td>
-                                            <button
-                                                class="btn-update"
-                                                on:click={() =>
-                                                    startEditMondas(m)}
-                                                >Szerk.</button
-                                            >
-                                        </td>
-                                        <td>
-                                            <button
-                                                class="btn-delete"
-                                                on:click={() =>
-                                                    deleteRecord(
-                                                        "mondasok",
-                                                        m.id,
-                                                        fetchMondasok,
-                                                    )}>Törlés</button
-                                            >
-                                        </td>
-                                    </tr>
-                                {:else}
-                                    <tr
-                                        ><td colspan="5">Nincsenek idézetek.</td
-                                        ></tr
-                                    >
-                                {/each}
-                            </tbody>
-                        </table>
-                    </div>
-                    <AdminPaginationBar
-                        total={pgMondasok.total}
-                        page={pgMondasok.page}
-                        totalPages={pgMondasok.totalPages}
-                        from={pgMondasok.from}
-                        to={pgMondasok.to}
-                        on:prev={() =>
-                            (pageMondasok = Math.max(1, pageMondasok - 1))}
-                        on:next={() =>
-                            (pageMondasok = Math.min(
-                                pgMondasok.totalPages,
-                                pageMondasok + 1,
-                            ))}
-                    />
                 {/if}
 
                 <!-- Quick Links Tab -->
@@ -7971,64 +7725,6 @@
                     />
                 {/if}
     {#snippet overlays()}
-
-    <!-- Edit Mondas Modal -->
-    {#if editingMondas}
-        <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
-        <div
-            class="link-dialog-overlay"
-            role="dialog"
-            tabindex="-1"
-            on:click|self={cancelEditMondas}
-            on:keydown={(e) => e.key === "Escape" && cancelEditMondas()}
-        >
-            <div class="link-dialog admin-modal">
-                <h3>Mondás szerkesztése</h3>
-                <form
-                    class="admin-form"
-                    on:submit|preventDefault={saveEditMondas}
-                >
-                    <label for="emondas_text">Mondás szövege</label>
-                    <textarea
-                        id="emondas_text"
-                        name="mondas_text"
-                        bind:value={editingMondas.text}
-                        required
-                        rows="4"
-                        class="w-full"
-                    ></textarea>
-                    <label for="emondas_day_edit">Megjelenés napja</label>
-                    <div class="admin-date-field">
-                        <HuDateInput
-                            id="emondas_day_edit"
-                            name="display_date"
-                            bind:value={editingMondas.display_date}
-                            required
-                            class="w-full"
-                        />
-                        <button
-                            type="button"
-                            class="btn btn-sm"
-                            on:click={() =>
-                                (editingMondas.display_date = localISODate())}
-                            >Mai nap</button
-                        >
-                    </div>
-
-                    <div class="modal-actions">
-                        <button type="submit" class="admin-submit-btn"
-                            >Mentés</button
-                        >
-                        <button
-                            type="button"
-                            class="btn-delete"
-                            on:click={cancelEditMondas}>Mégse</button
-                        >
-                    </div>
-                </form>
-            </div>
-        </div>
-    {/if}
 
     <!-- Edit QuickLink Modal -->
     {#if editingLink}

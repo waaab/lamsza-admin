@@ -12,7 +12,6 @@ var dashboardCountTables = []struct {
 	Key   string
 	Table string
 }{
-	{"mondasok", "mondasok"},
 	{"quicklinks", "quick_links"},
 	{"newsfeeds", "news_feeds"},
 	{"locations", "locations"},

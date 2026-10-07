@@ -91,7 +91,6 @@ func TestMain(m *testing.M) {
 	config.AppConfig.Features.Weather = true
 	config.AppConfig.Features.Events = true
 	config.AppConfig.Features.News = true
-	config.AppConfig.Features.Mondasok = true
 	config.AppConfig.Features.QuickLinks = true
 
 	testMux = newMux()

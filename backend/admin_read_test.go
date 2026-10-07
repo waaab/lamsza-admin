@@ -51,7 +51,6 @@ var adminReads = []struct {
 	{path: "/api/admin/venues"},
 	{path: "/api/admin/venue_types"},
 	{path: "/api/admin/news_feeds"},
-	{path: "/api/admin/mondasok"},
 	{path: "/api/admin/quick_links"},
 }
 
@@ -257,7 +256,6 @@ var adminHappyPath = map[string][]string{
 	"/api/admin/venues":                    {"TestAdminReadsAnswerTheirShape", "TestAdminCatalogCRUD"},
 	"/api/admin/venue_types":               {"TestAdminReadsAnswerTheirShape", "TestAdminCatalogCRUD"},
 	"/api/admin/news_feeds":                {"TestAdminReadsAnswerTheirShape", "TestAdminCatalogCRUD"},
-	"/api/admin/mondasok":                  {"TestAdminReadsAnswerTheirShape", "TestAdminCatalogCRUD"},
 	"/api/admin/quick_links":               {"TestAdminReadsAnswerTheirShape", "TestAdminCatalogCRUD"},
 	"/api/admin/dictionary/":               {"TestRelayForwardsAReadWithTheServiceToken", "TestRelayPassesTheAppsErrorThrough"},
 	"/api/admin/games/":                    {"TestRelayForwardsAWriteAndAuditsIt"},

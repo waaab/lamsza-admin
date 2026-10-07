@@ -194,13 +194,6 @@ type EventWithSchedule struct {
 	Schedule []EventScheduleDay `json:"schedule"`
 }
 
-type Mondas struct {
-	ID          int    `json:"id"`
-	Text        string `json:"text"`
-	DisplayDate string `json:"display_date"` // YYYY-MM-DD - day the quote is shown on the homepage
-	CreatedAt   string `json:"created_at"`
-}
-
 type QuickLink struct {
 	ID      int    `json:"id"`
 	Title   string `json:"title"`

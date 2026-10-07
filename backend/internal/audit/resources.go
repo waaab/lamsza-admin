@@ -114,7 +114,6 @@ var resources = map[string]Resource{
 
 	"/api/admin/news_feeds":       {Name: "news_feed", Tables: []string{"news_feeds"}},
 	"/api/admin/news_feeds/check": {Name: "news_feed_check"},
-	"/api/admin/mondasok":         {Name: "mondas", Tables: []string{"mondasok"}},
 	"/api/admin/quick_links":      {Name: "quick_link", Tables: []string{"quick_links"}},
 
 	// The /dictionary and /games sections, relayed to Szótár's and Játszótér's
