@@ -40,7 +40,7 @@ the rest of the code this backend never routed. **Do not wire a migration into `
 if a schema change is needed, it belongs in the main `lamsza` repo. `boot_ddl_test.go` still
 holds the rule.
 
-## No public read surface
+## The public read surface is five routes
 
 This backend was forked from `lamsza/backend` and kept the whole public half: 31 `Handle*`
 functions `main.go` never routed, and 186 functions behind them, against the same database
@@ -50,9 +50,12 @@ account prefs, the listing claim/catalog/members surface, website submit and loo
 attractions, and `internal/webdomain` and `internal/account/prefs.go` entirely.
 (`internal/search` went earlier, on BOG-40.)
 
-**This repo is the write side only.** If the admin UI needs something the public app serves,
-call `lamsza` on `:3001` — do not copy the handler back. `main.go` routes 42 `Handle*`
-functions and none is unrouted; keep it that way:
+**This repo is the write side.** Five public reads remain, because the admin UI needs them
+for its own forms: `/api/config/public`, `/api/counties`, `/api/historical_seats`,
+`/api/venues` and `/api/venue_types`. Anything else the admin UI needs from the public app,
+call `lamsza` on `:3001` — do not copy the handler back. Every route lives in `newMux()` in
+`main.go`, and `route_guard_test.go` reads that table on every test run; keep every handler
+routed:
 
 ```bash
 cd ~/projects/lamsza-network/lamsza-admin/backend && go build ./... && go test ./...

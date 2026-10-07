@@ -2,8 +2,11 @@
 
 Independent admin app for the main [Lámsza](https://github.com/waaab/lamsza) portal.
 
-**Local URL:** http://localhost:5173/  
+**Local URL:** http://localhost:5173/ (Google sign-in works here) · https://admin.lamsza.test  
 **API:** http://localhost:3000  
+
+Every admin write is recorded in the append-only `admin_audit_log` table, readable at
+`/api/admin/audit-log` (see `docs/ARCHITECTURE.md`).
 
 ## Stack
 
@@ -18,13 +21,14 @@ lamsza-admin/
 ├── frontend/   # SvelteKit UI (port 5173)
 ├── backend/    # Go API (port 3000)
 ├── docs/
-└── scripts/
+└── scripts/    # test-backend.sh (scratch-DB test run)
 ```
 
 ## Prerequisites
 
-- Main Lámsza Postgres running (`cd ~/projects/lamsza-network/lamsza && docker compose up -d`)
-- Schema migrations are applied by the **main** Lámsza backend — run that at least once
+- Main Lámsza Postgres running (`~/projects/lamsza-network/start-lamsza-network.sh start`
+  brings up all databases)
+- The schema is owned by the **main** Lámsza repo (`backend/schema/`); this app runs no DDL
 - Google OAuth authorized JS origins include `http://localhost:5173`
 
 ## Quick start

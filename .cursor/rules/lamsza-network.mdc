@@ -1,0 +1,30 @@
+---
+description: Keep every Lámsza network app visually and behaviorally aligned with lamsza.com
+alwaysApply: true
+---
+
+# Lámsza network consistency
+
+lamsza.com is the source. szotar.lamsza.com, jatszoter.lamsza.com, and every future Lámsza app copy its theme, toolbar, and shared controls. A dictionary or a game may add its own pages. It does not invent a second look.
+
+Before adding or changing a shared control, open the same control in `/home/attila/projects/lamsza-network/lamsza` and match it.
+
+- Dev frontends stay on the fixed ports of `start-lamsza-network.sh` (WAYS_OF_WORKING §1) with `strictPort: true`. If that port is not free, do not start the app on another port.
+- Theme uses `data-theme` and the `theme` localStorage key (`light`, `dark`, `system`). Vanilla CSS. No Tailwind, Material, or a new font, color, or card system.
+- Toolbar: left side is the app's sections, icon plus visible name. Right side is account and settings, icon only. The name goes in `title` and `<span class="sr-only">`, the same way Lámsza does **Belépés** and **Kijelentkezés**.
+- Toolbar icons are the Lámsza set: 24 viewBox, stroke 2, drawn at 16×16 by `.nav-btn svg`. Copy the path from `AppIcon.svelte`. Do not give one toolbar icon its own size.
+- Hungarian UI. Reuse Lámsza's wording for the same action.
+- Belépés is a dialog, not its own page. Copy `SignInDialog`: title Belépés, the line `Jelentkezz be a Google-fiókoddal, hogy ki tudd használni a {app name} teljes funkcióit és lehetőségeit.`, then `A Lámsza hálózat alkalmazása. A belépés csak ezen az oldalon jelentkeztet be.` with one link, Irányelvek (`/iranyelvek` on Lámsza, `https://lamsza.com/iranyelvek` on the other apps), a centered Google button, and Mégse underneath.
+- Footer, two centered rows, Játszótér spacing (`.footer-bottom` gap `1em`; `.social-links` and `.policy-links` gap `0.75rem`). Line one: `Sok ❤️-el Székelyföldről. © 2009 - {current year} • {this app's name and description}`. 2009 is the network's first launch. Line two: Facebook, Twitter, Instagram only when the main app admin saved a URL (`social_links` from the matching Lámsza's `/api/config/public`, resolved with `lamszaUrl()` from `networkOrigins.js`; in dev that is localhost or `lamsza.test`, never lamsza.com), each `target="_blank"`. Irányelvek, Feltételek, and Sütik exist once, on lamsza.com; other apps link there. Then this app's own `v{version} - Változásnapló`.
+
+```svelte
+<!-- ❌ visible label on an account button -->
+<button class="btn nav-btn" title="Belépés"><svg>...</svg><span>Belépés</span></button>
+
+<!-- ✅ icon, tooltip, screen-reader name -->
+<button class="btn nav-btn" title="Belépés"><svg>...</svg><span class="sr-only">Belépés</span></button>
+```
+
+- lamsza-admin is a back office: it has no public toolbar or footer, but it keeps the Hungarian UI, the shared design tokens and the `SignInDialog` (owner decision, 2026-10-07).
+
+This file is canonical in `lamsza/.cursor/rules/`. Do not edit the copies in the other repos: change it here and run `lamsza/scripts/sync-cursor-rules.sh` (WAYS_OF_WORKING R11). A new Lámsza app is added to that script's list.

@@ -36,10 +36,7 @@ No `npm install` is needed for the tests. The frontend suite uses only `node:tes
 > Keep the glob quoted — `"tests/**/*.test.js"`, the same string szotar and jatszoter use.
 > `node --test tests/` (the directory form) crashes with `MODULE_NOT_FOUND` on Node 24.
 
-**Status 2026-10-06** — Node v24.11.1, Go 1.25.7:
-
-| Suite | Result |
-|---|---|
+---|---|
 | frontend (`frontend/tests/`) | **64 / 64 pass**, 11 test files |
 | backend (`backend/...`) | **pass**, 11 packages with tests |
 
@@ -80,9 +77,10 @@ Without `TEST_DATABASE_URL` (CI) the DB-backed tests skip and the route guards r
 | `scheduleActivityTypes.test.js` | `scheduleActivityTypes.js` |
 | `websiteDomain.test.js` | `websiteDomain.js` |
 
-Eight of these modules are byte-identical to the main `lamsza` copies — admin was extracted
-from that repo. Their tests were taken from `lamsza/tests/` on purpose: **if a shared module
-changes in one repo, the same test has to pass in both.** Keep them in step.
+Several of these modules are shared with the main `lamsza` app. They are generated copies:
+`lamsza` owns them, `lamsza/scripts/sync-shared-frontend.sh` copies them here, and
+`sharedFrontendModules.test.js` fails if a copy drifts from the hash manifest. Never edit a
+shared module here; change it in `lamsza` and sync (`lamsza/docs/network/SHARED_FRONTEND_MODULES.md`).
 
 Not covered, and why:
 
@@ -99,7 +97,7 @@ Add a new test as `frontend/tests/<module>.test.js`. The glob picks it up — no
 ## Before you call a change done
 
 1. `npm test` green, output pasted into the task rather than summarised.
-2. `npm run build` still passes (CI runs the frontend build and the Go build, not the tests).
+2. `cd frontend && npm run build` still passes (CI runs the build and both test suites).
 3. If the change touches a module shared with `lamsza`, run that repo's suite too.
 4. For anything that crosses apps, run the network checks in
    `lamsza/docs/LOCAL_DEV_CHECKS.md`.

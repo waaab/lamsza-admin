@@ -60,9 +60,9 @@ jobs:
       - run: go build -o /tmp/lamsza-admin .
 
   # The receiver. A red CI is only a gate if it reaches a person, and nothing on
-  # the dev machine can read Actions: no `gh` CLI, git auth is SSH-key only, the
-  # unauthenticated api.github.com limit for that IP is spent, and two of the four
-  # repos are private. So the signal is pushed from in here, into one GitHub issue
+  # the dev machine can fully read Actions: no `gh` CLI, git auth is SSH-key only,
+  # and two of the four repos are private (the two public ones can be read
+  # unauthenticated; see R7). So the signal is pushed from in here, into one GitHub issue
   # that closes itself when main goes green. Decided on BOG-54; see R7 in lamsza's
   # docs/network/WAYS_OF_WORKING.md.
   #

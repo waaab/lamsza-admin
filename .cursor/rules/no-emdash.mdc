@@ -1,0 +1,12 @@
+---
+description: Never use an em dash in UI text or code comments
+alwaysApply: true
+---
+
+# No em dash
+
+Do not use an em dash (U+2014) in user-facing text (UI copy, code strings shown to users) or in code comments. Documentation (Markdown files) is exempt (owner decision, 2026-10-07).
+
+End the sentence, or rewrite the line. When a dash is still needed, use a hyphen with spaces: ` - `.
+
+Empty placeholders use `-`.
