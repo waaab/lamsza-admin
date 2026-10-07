@@ -89,6 +89,10 @@ export function meToAuthState(me) {
         theme: me.theme ?? null,
         quicklinkSlots: me.quicklink_slots ?? null,
         prefsImportedAt: me.prefs_imported_at ?? null,
+        // Only an app with an account API reports prefs_imported_at at all
+        // (lamsza does, admin does not); the one-time browser import runs
+        // only there.
+        prefsImportSupported: Object.prototype.hasOwnProperty.call(me, "prefs_imported_at"),
         preferredLocation: normalizePreferredLocation(me.preferred_location),
         adminQueueCount: me.admin_queue_count ?? 0,
     };

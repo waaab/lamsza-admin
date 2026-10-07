@@ -106,9 +106,10 @@ var resources = map[string]Resource{
 	"/api/admin/venues":                 {Name: "venue", Tables: []string{"venues"}},
 	"/api/admin/venue_types":            {Name: "venue_type", Tables: []string{"venue_types"}},
 
-	"/api/admin/news_feeds":  {Name: "news_feed", Tables: []string{"news_feeds"}},
-	"/api/admin/mondasok":    {Name: "mondas", Tables: []string{"mondasok"}},
-	"/api/admin/quick_links": {Name: "quick_link", Tables: []string{"quick_links"}},
+	"/api/admin/news_feeds":       {Name: "news_feed", Tables: []string{"news_feeds"}},
+	"/api/admin/news_feeds/check": {Name: "news_feed_check"},
+	"/api/admin/mondasok":         {Name: "mondas", Tables: []string{"mondasok"}},
+	"/api/admin/quick_links":      {Name: "quick_link", Tables: []string{"quick_links"}},
 }
 
 // Routes returns every registered route path. The route-coverage test uses it

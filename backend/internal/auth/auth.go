@@ -326,14 +326,13 @@ func WriteMe(w http.ResponseWriter, userID int) error {
 		email, name, givenName, familyName, picture, locale, googleSub, displayName string
 		theme                                                                       sql.NullString
 		quicklinkSlots                                                              sql.NullInt64
-		prefsImportedAt                                                             sql.NullTime
 		lastLoginAt, createdAt                                                      time.Time
 		preferredID                                                                 sql.NullInt64
 		preferredSlug, preferredName, preferredCounty                               sql.NullString
 	)
 	err := db.DB.QueryRow(`
 		SELECT u.email, u.name, u.given_name, u.family_name, u.picture, u.locale, u.google_sub, u.display_name,
-		       u.last_login_at, u.created_at, u.theme, u.quicklink_slots, u.prefs_imported_at,
+		       u.last_login_at, u.created_at, u.theme, u.quicklink_slots,
 		       u.preferred_settlement_id, s.slug, s.name, c.slug
 		FROM users u
 		LEFT JOIN settlements s ON s.id = u.preferred_settlement_id
@@ -341,7 +340,7 @@ func WriteMe(w http.ResponseWriter, userID int) error {
 		WHERE u.id = $1
 	`, userID).Scan(
 		&email, &name, &givenName, &familyName, &picture, &locale, &googleSub, &displayName,
-		&lastLoginAt, &createdAt, &theme, &quicklinkSlots, &prefsImportedAt,
+		&lastLoginAt, &createdAt, &theme, &quicklinkSlots,
 		&preferredID, &preferredSlug, &preferredName, &preferredCounty,
 	)
 	if err != nil {
@@ -370,11 +369,9 @@ func WriteMe(w http.ResponseWriter, userID int) error {
 	} else {
 		resp["quicklink_slots"] = nil
 	}
-	if prefsImportedAt.Valid {
-		resp["prefs_imported_at"] = prefsImportedAt.Time
-	} else {
-		resp["prefs_imported_at"] = nil
-	}
+	// No prefs_imported_at: the shared auth store runs its one-time browser
+	// import only when /api/auth/me reports that field, and this app has no
+	// /api/account/import to receive it (the main lamsza backend does).
 	if preferredID.Valid && preferredSlug.Valid && strings.TrimSpace(preferredSlug.String) != "" {
 		resp["preferred_location"] = map[string]interface{}{
 			"id":          preferredID.Int64,

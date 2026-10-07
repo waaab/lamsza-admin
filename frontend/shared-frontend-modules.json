@@ -4,7 +4,7 @@
   "consumer": "waaab/lamsza-admin (frontend/ prefix)",
   "doc": "docs/network/SHARED_FRONTEND_MODULES.md",
   "modules": {
-    "src/lib/accountPrefs.js": "sha256:87ae04660dde3075331bcf621776c4c393ee26a1faa4f0b1bf155ce74789a25b",
+    "src/lib/accountPrefs.js": "sha256:88753291ccf12aa69fa4e05ab93c30396f8f49e520f052b06ed26c3cf9c85468",
     "src/lib/components/CategoryMultiSelect.svelte": "sha256:5a567a2b55b3c45890b1902f5f458af7af8510265b2959edb3b7b2953a4b6889",
     "src/lib/components/EntryHoursEditor.svelte": "sha256:7e24fb5c099d6478bf8325bdc9acc2bf4f1f050da3726f4a124d2cbdfd4082fc",
     "src/lib/components/GoogleSignIn.svelte": "sha256:c52cf5f0de2ece67be1f0909449160a2240785d014d5cbd8421737d0919c3182",
@@ -17,7 +17,7 @@
     "src/lib/eventImage.js": "sha256:2aded3cdf6553045e2dd3cf7cc0884d2d23ffc3d07a729c6de437793de4cf329",
     "src/lib/quickLinksDisplay.js": "sha256:510e3d38d8c1d356fc21c3e23d377d75d672bba91bc67563b04e76b91f34cf10",
     "src/lib/scheduleActivityTypes.js": "sha256:59c8be8972dcf333fb7d627f9038d66759b6a6c5a76eae77f4d141727c76aa2f",
-    "src/lib/stores/auth.js": "sha256:1c962ae37df30f48653a3f11d5748a2c6b5241400a73e57debb2e4426f33ff2c",
+    "src/lib/stores/auth.js": "sha256:a596a7287c055a6588fce333e44f989373efa0fdeaedd056a2fea4992bfd6f56",
     "src/lib/stores/theme.js": "sha256:dba66ba2464d77c79e98df6d1f3864c3753a157517019c69957101ef622c0936",
     "src/lib/websiteDomain.js": "sha256:90336a31a01fec10ed811da112c90680cc94cea96236da03d722dfd7d2f5844a",
     "tests/sharedFrontendModules.test.js": "sha256:a19dbab5f28881615848346c271afa2009ffc680e7fbf9ad54550de19f4f68d2"

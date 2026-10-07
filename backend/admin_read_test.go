@@ -215,6 +215,7 @@ var adminHappyPath = map[string][]string{
 	"/api/admin/dashboard_stats":              {"TestAdminReadsAnswerTheirShape"},
 	"/api/admin/users":                        {"TestAdminReadsAnswerTheirShape", "TestAdminUsersListsTheSignedInAdmin"},
 	"/api/admin/audit-log":                    {"TestAdminAuditLogRecordsAnAdminWrite"},
+	"/api/admin/news_feeds/check":             {"TestAdminNewsFeedCheck"},
 	"/api/admin/entry-images":                 {"TestAdminEntryImageUpload"},
 	"/api/admin/attraction-suggestions":       {"TestAdminReadsAnswerTheirShape", "TestAdminAttractionSuggestionsRead"},
 	"/api/admin/counties":                     {"TestAdminCountyUpdate"},

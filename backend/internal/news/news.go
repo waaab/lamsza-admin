@@ -5,11 +5,13 @@ import (
 	"backend/internal/models"
 	"encoding/json"
 	"encoding/xml"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"regexp"
 	"sort"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -246,4 +248,61 @@ func HandleAdminNewsFeeds(w http.ResponseWriter, r *http.Request) {
 		}
 		w.WriteHeader(http.StatusOK)
 	}
+}
+
+// feedCheck is the answer of GET /api/admin/news_feeds/check: whether the
+// stored feed answers and parses as RSS, and how many items it carries.
+type feedCheck struct {
+	OK    bool   `json:"ok"`
+	Items int    `json:"items"`
+	Error string `json:"error,omitempty"`
+}
+
+// checkFeedURL fetches a feed the way the public news page does and reports
+// what it finds, errors included, instead of swallowing them.
+func checkFeedURL(url string) feedCheck {
+	client := &http.Client{Timeout: 8 * time.Second}
+	resp, err := client.Get(url)
+	if err != nil {
+		return feedCheck{Error: "A hírfolyam nem érhető el."}
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return feedCheck{Error: fmt.Sprintf("A hírfolyam %d választ adott.", resp.StatusCode)}
+	}
+	body, err := io.ReadAll(io.LimitReader(resp.Body, 1<<20))
+	if err != nil {
+		return feedCheck{Error: "A hírfolyam olvasása megszakadt."}
+	}
+	var rss rssRoot
+	if err := xml.Unmarshal(body, &rss); err != nil {
+		return feedCheck{Error: "A válasz nem RSS hírfolyam."}
+	}
+	if len(rss.Channel.Items) == 0 {
+		return feedCheck{Error: "A hírfolyam üres."}
+	}
+	return feedCheck{OK: true, Items: len(rss.Channel.Items)}
+}
+
+// HandleAdminNewsFeedCheck checks one stored feed: GET ?id=N. It only ever
+// fetches a URL already saved in news_feeds, never one from the request, so it
+// cannot be used to make this server fetch arbitrary addresses.
+func HandleAdminNewsFeedCheck(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		w.Header().Set("Allow", http.MethodGet)
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	id, err := strconv.Atoi(r.URL.Query().Get("id"))
+	if err != nil || id <= 0 {
+		http.Error(w, "id required", http.StatusBadRequest)
+		return
+	}
+	var url string
+	if err := db.DB.QueryRow(`SELECT feed_url FROM news_feeds WHERE id = $1`, id).Scan(&url); err != nil {
+		http.Error(w, "no such feed", http.StatusNotFound)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(checkFeedURL(url))
 }

@@ -2912,29 +2912,36 @@
         );
     }
 
-    async function updateSingleFeed(feed) {
+    /**
+     * Ask the admin API to fetch the stored feed and report whether it is a
+     * usable RSS feed. The public site refreshes its news by itself; this
+     * only tells the admin that a feed works.
+     */
+    async function checkFeed(feed) {
         loadingFeeds.add(feed.id);
         loadingFeeds = new Set(loadingFeeds);
 
         try {
-            const res = await apiCall(
-                `/api/proxy?url=${encodeURIComponent(feed.feed_url)}`,
-            );
-            if (res.ok) {
+            const res = await apiCall(`/api/admin/news_feeds/check?id=${feed.id}`);
+            if (!res.ok) {
+                await noteAdminFailure("newsfeeds", res, "Ellenőrzési hiba: ");
+                return;
+            }
+            const result = await res.json();
+            if (result.ok) {
                 feedTimestamps[feed.feed_url] = Date.now();
                 localStorage.setItem(
                     "news_feed_timestamps",
                     JSON.stringify(feedTimestamps),
                 );
                 feedTimestamps = { ...feedTimestamps };
-                localStorage.removeItem("news_cache");
-                noteAdminAction("newsfeeds", "A hírfolyam frissítve.");
+                noteAdminAction("newsfeeds", `A hírfolyam rendben: ${result.items} hír.`);
             } else {
-                await noteAdminFailure("newsfeeds", res, "Frissítési hiba: ");
+                noteAdminAction("newsfeeds", `A hírfolyam hibás: ${result.error}`, false);
             }
         } catch (e) {
-            console.error("Feed frissítési hiba:", e);
-            await noteAdminFailure("newsfeeds", e && e.message ? e.message : String(e), "Frissítési hiba: ");
+            console.error("Feed ellenőrzési hiba:", e);
+            await noteAdminFailure("newsfeeds", e && e.message ? e.message : String(e), "Ellenőrzési hiba: ");
         } finally {
             loadingFeeds.delete(feed.id);
             loadingFeeds = new Set(loadingFeeds);
@@ -4830,7 +4837,7 @@
                                 <tr>
                                     <th>Név</th>
                                     <th>Forrás</th>
-                                    <th>Utolsó frissítés</th>
+                                    <th>Utolsó sikeres ellenőrzés</th>
                                     <th>Szín</th>
                                     <th class="admin-table-col--action">Szerk.</th>
                                     <th class="admin-table-col--action">Törlés</th>
@@ -4857,10 +4864,10 @@
                                                         nf.id,
                                                     )}
                                                     on:click={() =>
-                                                        updateSingleFeed(nf)}
+                                                        checkFeed(nf)}
                                                     >{loadingFeeds.has(nf.id)
                                                         ? "Folyamatban..."
-                                                        : "Frissítés"}</button
+                                                        : "Ellenőrzés"}</button
                                                 >
                                             </div>
                                         </td>

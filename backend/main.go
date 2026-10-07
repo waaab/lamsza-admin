@@ -32,7 +32,8 @@ func main() {
 
 	port := config.AppConfig.Port
 	log.Printf("Lamsza Admin API active on port %s\n", port)
-	if err := http.ListenAndServe(":"+port, mux); err != nil {
+	// LimitBody caps every request body; the image uploads get a larger cap.
+	if err := http.ListenAndServe(":"+port, middleware.LimitBody(mux)); err != nil {
 		log.Fatal(err)
 	}
 }
@@ -87,8 +88,8 @@ func newMux() *http.ServeMux {
 	admin("/api/admin/users", auth.HandleAdminUsers)
 	admin("/api/admin/audit-log", audit.HandleAdminAuditLog)
 	admin("/api/admin/entry-images", handlers.HandleEntryImageUpload)
-	mux.Handle("/api/media/entry-images/", middleware.ApplyCORS(http.StripPrefix("/api/media/entry-images/", http.FileServer(http.Dir(handlers.EntryImagesDir()))).ServeHTTP))
-	mux.Handle("/api/media/event-images/", middleware.ApplyCORS(http.StripPrefix("/api/media/event-images/", http.FileServer(http.Dir(handlers.EventImagesDir()))).ServeHTTP))
+	mux.Handle("/api/media/entry-images/", middleware.ApplyCORS(http.StripPrefix("/api/media/entry-images/", middleware.NoDirListing(http.FileServer(http.Dir(handlers.EntryImagesDir())))).ServeHTTP))
+	mux.Handle("/api/media/event-images/", middleware.ApplyCORS(http.StripPrefix("/api/media/event-images/", middleware.NoDirListing(http.FileServer(http.Dir(handlers.EventImagesDir())))).ServeHTTP))
 	admin("/api/admin/attraction-suggestions", handlers.HandleAdminAttractionSuggestions)
 	admin("/api/admin/counties", handlers.HandleAdminCounties)
 	admin("/api/admin/historical_seats", handlers.HandleAdminHistoricalSeats)
@@ -125,6 +126,7 @@ func newMux() *http.ServeMux {
 
 	if config.AppConfig.Features.News {
 		admin("/api/admin/news_feeds", news.HandleAdminNewsFeeds)
+		admin("/api/admin/news_feeds/check", news.HandleAdminNewsFeedCheck)
 		log.Println("Module [News] enabled")
 	}
 

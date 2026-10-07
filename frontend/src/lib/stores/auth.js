@@ -21,6 +21,7 @@ const empty = {
     theme: null,
     quicklinkSlots: null,
     prefsImportedAt: null,
+    prefsImportSupported: false,
     preferredLocation: null,
     adminQueueCount: 0,
     offline: false,
@@ -132,7 +133,7 @@ function createAuthStore() {
                 set(next);
                 applyAccountTheme(next.theme);
 
-                if (next.prefsImportedAt == null && typeof localStorage !== "undefined") {
+                if (next.prefsImportSupported && next.prefsImportedAt == null && typeof localStorage !== "undefined") {
                     try {
                         const importRes = await fetch(`${getApiBase()}/api/account/import`, {
                             method: "POST",
