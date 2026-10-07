@@ -20,8 +20,8 @@ type Config struct {
 	// Every flag here gates a route group in main.go. Do not add one that
 	// nothing reads: `.env` then advertises a switch the operator can flip with
 	// no effect, which is worse than no switch at all. `SzotarOrigin`,
-	// `DataAPI` and `Features.Search` were exactly that — read by nothing in
-	// this process — and were removed on BOG-40 together with the dead
+	// `DataAPI` and `Features.Search` were exactly that - read by nothing in
+	// this process - and were removed on BOG-40 together with the dead
 	// `internal/search` package that `SzotarOrigin` was extracted with.
 	Features struct {
 		Weather    bool

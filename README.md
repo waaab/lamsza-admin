@@ -38,8 +38,11 @@ cp .env.example .env   # fill GOOGLE_CLIENT_ID / ADMIN_GOOGLE_EMAILS
 cp .env backend/.env
 
 cd frontend && npm install && cd ..
-~/projects/lamsza-network/start-lamsza-network.sh start   # the whole network; or: cd backend && go run .  &  cd frontend && npm run dev
+~/projects/lamsza-network/start-lamsza-network.sh start   # the only launcher (network rule R12)
 ```
+
+The script starts this app (backend `:3000`, frontend `:5173`) next to the other three and
+skips whatever already runs; `stop` and `restart` work the same way.
 
 Open http://localhost:5173/
 
@@ -53,7 +56,8 @@ npm run test:backend   # rebuilds lamsza_admin_test from lamsza/backend/schema/
 
 The backend suites never use `DATABASE_URL` or `.env`, which point at the shared dev
 `lamsza` database. They read only `TEST_DATABASE_URL`, which `npm run test:backend` sets.
-A plain `go test ./...` skips the two DB-backed tests.
+A plain `go test ./...` skips the DB-backed tests (they need `TEST_DATABASE_URL`). CI has no
+Postgres service, so they skip there too and run only locally (`OPEN_ITEMS.md`).
 
 See [`docs/LOCAL_DEV_CHECKS.md`](docs/LOCAL_DEV_CHECKS.md) for what is covered and what a
 complete local pass looks like.

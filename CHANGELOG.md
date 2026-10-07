@@ -15,7 +15,9 @@ adds a line under `[Unreleased]` in the same commit.
 - Basic small-screen rules for the admin shell: a narrower icon rail, the header buttons above the title, tighter spacing, full-width edit windows.
 
 ### Changed
-- Sign-in follows the network gate (lamsza UI_BASELINE "adm-gate"): a card with "Az admin felülethez lépj be." and the shared `SignInDialog`, which opens by itself; a signed-in non-admin is sent on to Lámsza. The full-page login box is gone.
+- Sign-in follows the network gate (lamsza UI_BASELINE "adm-gate"): a card with "Az admin felülethez lépj be." and the shared `SignInDialog`, which opens by itself. A Google account that is not on the allowlist (the API answers 403) is sent on to Lámsza, through admin's own `signIn` for the shared button; before, it only saw "Belépés sikertelen.". The full-page login box is gone.
+- The confirm and notice dialogs come last in the page, so a notice raised over an edit window shows on top of it.
+- Docs: the README uses the network script as the only launcher and says the DB-backed tests skip in CI; `LOCAL_DEV_CHECKS.md` lost its stale results table and lists all 15 frontend test files; `ARCHITECTURE.md` points to WoW §1 for ports. No em dash in code comments (D5). Synced from lamsza: `global.css` (dark tokens) and `component-typography.css`.
 - Confirmations use the shared `ConfirmDialog` (Mégse, then Igen) and messages the shared `NoticeDialog` (closed with "Bezárás"), instead of the inline dialog with "OK"; the one native `confirm()` (deleting an attraction) goes through the same dialog.
 - The edit windows sit on the network's content-dialog shell (`.link-dialog`); a wide table inside scrolls sideways.
 - English labels are Hungarian: "Vezérlőpult", "Jóváhagyás", "Elutasítás", "Felhasználó tiltása", "Lámsza megnyitása új lapon", and "Lámsza admin" in the app switcher.

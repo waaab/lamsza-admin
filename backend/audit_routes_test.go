@@ -5,7 +5,7 @@ package main
 // "Every mutating admin route writes one audit record" only holds if every
 // admin route goes through the one wrapper that writes it. A reviewer cannot
 // hold that by reading thirty handlers across twelve packages, and the next
-// route is always the one that gets forgotten — so this test re-derives it from
+// route is always the one that gets forgotten - so this test re-derives it from
 // main.go on every `go test` run, the way boot_ddl_test.go does for DDL.
 //
 // Three things are checked, all without a database:
@@ -17,8 +17,8 @@ package main
 //  3. The registry has no entry for a route main.go does not register, so a
 //     deleted route leaves no stale declaration behind.
 //
-// Together with internal/audit's own tests — which assert exactly one record
-// per route per write method — route coverage is a property of the wiring.
+// Together with internal/audit's own tests - which assert exactly one record
+// per route per write method - route coverage is a property of the wiring.
 
 import (
 	"go/ast"
@@ -77,7 +77,7 @@ func TestEveryAdminRouteGoesThroughTheAuditWrapper(t *testing.T) {
 		t.Fatal("found no admin(…) registrations in main.go; the guard is not reading the right file")
 	}
 	for _, d := range direct {
-		t.Errorf("admin route registered without the audit wrapper: %s — register it with admin(path, handler)", d)
+		t.Errorf("admin route registered without the audit wrapper: %s - register it with admin(path, handler)", d)
 	}
 }
 

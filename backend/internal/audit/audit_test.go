@@ -80,7 +80,7 @@ func okHandler(w http.ResponseWriter, r *http.Request) { w.WriteHeader(http.Stat
 
 // TestEveryRouteAndWriteMethodRecordsExactlyOne is the route-group assertion
 // the issue asks for, derived from the registry rather than from a hand-written
-// list — so a route added to resources.go is covered the moment it is added,
+// list - so a route added to resources.go is covered the moment it is added,
 // and a route that stops recording goes red here.
 func TestEveryRouteAndWriteMethodRecordsExactlyOne(t *testing.T) {
 	for _, route := range Routes() {
@@ -115,7 +115,7 @@ func TestEveryRouteAndWriteMethodRecordsExactlyOne(t *testing.T) {
 	}
 }
 
-// TestReadMethodsRecordNothing — the trail is the write trail. A GET on every
+// TestReadMethodsRecordNothing - the trail is the write trail. A GET on every
 // admin route would bury the writes it exists to surface.
 func TestReadMethodsRecordNothing(t *testing.T) {
 	for _, route := range Routes() {
@@ -153,7 +153,7 @@ func TestActionPerMethod(t *testing.T) {
 	}
 }
 
-// TestUpdateRecordsBeforeAfterAndDiff — "enough of a before/after to undo a
+// TestUpdateRecordsBeforeAfterAndDiff - "enough of a before/after to undo a
 // mistake".
 func TestUpdateRecordsBeforeAfterAndDiff(t *testing.T) {
 	sink := useSink(t)
@@ -174,7 +174,7 @@ func TestUpdateRecordsBeforeAfterAndDiff(t *testing.T) {
 	assertJSON(t, "diff", rec.Diff, `{"tags":{"name":{"from":"régi","to":"új"}}}`)
 }
 
-// TestDeleteKeepsTheWholeRow — a delete whose record only said "deleted #3" is
+// TestDeleteKeepsTheWholeRow - a delete whose record only said "deleted #3" is
 // not undoable, which is the case the issue names.
 func TestDeleteKeepsTheWholeRow(t *testing.T) {
 	sink := useSink(t)
@@ -195,7 +195,7 @@ func TestDeleteKeepsTheWholeRow(t *testing.T) {
 		`{"entries":{"id":{"from":88},"name":{"from":"Vendéglő"},"published":{"from":true}}}`)
 }
 
-// TestCreateLearnsTheIDFromTheReply — a create has no id in the request.
+// TestCreateLearnsTheIDFromTheReply - a create has no id in the request.
 func TestCreateLearnsTheIDFromTheReply(t *testing.T) {
 	sink := useSink(t)
 	call(t, "/api/admin/tags", http.MethodPost, "/api/admin/tags", `{"name":"friss"}`,
@@ -225,7 +225,7 @@ func TestResourceIDFromBodyField(t *testing.T) {
 	}
 }
 
-// TestFailedWriteIsStillRecorded — a refused write is part of the trail. The
+// TestFailedWriteIsStillRecorded - a refused write is part of the trail. The
 // status code says what happened.
 func TestFailedWriteIsStillRecorded(t *testing.T) {
 	sink := useSink(t)
@@ -241,7 +241,7 @@ func TestFailedWriteIsStillRecorded(t *testing.T) {
 	}
 }
 
-// TestHandlerStillReadsTheBody — the wrapper consumes the body to record it, so
+// TestHandlerStillReadsTheBody - the wrapper consumes the body to record it, so
 // the handler must get an unread copy or every write breaks.
 func TestHandlerStillReadsTheBody(t *testing.T) {
 	useSink(t)
@@ -315,14 +315,14 @@ func TestOversizedValuesAreReplacedNotTruncated(t *testing.T) {
 	}
 }
 
-// TestSinkFailureDoesNotFailTheRequest — the record is written after the
+// TestSinkFailureDoesNotFailTheRequest - the record is written after the
 // handler has committed, so a 500 here would hide a change that already landed.
 func TestSinkFailureDoesNotFailTheRequest(t *testing.T) {
 	sink := useSink(t)
 	sink.fail = fmt.Errorf("database is down")
 	w := call(t, "/api/admin/tags", http.MethodDelete, "/api/admin/tags?id=1", "", okHandler)
 	if w.Code != http.StatusOK {
-		t.Errorf("status = %d, want 200 — a failed audit write must not fail the request", w.Code)
+		t.Errorf("status = %d, want 200 - a failed audit write must not fail the request", w.Code)
 	}
 }
 

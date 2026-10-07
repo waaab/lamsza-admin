@@ -6,7 +6,7 @@ the owner's.
 **Scope:** this repo. The network-wide checks (all four apps up, every API smoked, dump and
 restore) live in `lamsza/docs/LOCAL_DEV_CHECKS.md`. That file stays the definition of
 "verified" for the network; this one is the repo-level gate.
-**Last updated:** 2026-10-06 — every command below was run and the output recorded.
+Commands and what to expect, not recorded results or counts (WAYS_OF_WORKING R10).
 
 ---
 
@@ -36,10 +36,6 @@ No `npm install` is needed for the tests. The frontend suite uses only `node:tes
 > Keep the glob quoted — `"tests/**/*.test.js"`, the same string szotar and jatszoter use.
 > `node --test tests/` (the directory form) crashes with `MODULE_NOT_FOUND` on Node 24.
 
----|---|
-| frontend (`frontend/tests/`) | **64 / 64 pass**, 11 test files |
-| backend (`backend/...`) | **pass**, 11 packages with tests |
-
 ---
 
 ## What the backend handler suite covers
@@ -66,16 +62,20 @@ Without `TEST_DATABASE_URL` (CI) the DB-backed tests skip and the route guards r
 | Test file | Module |
 |---|---|
 | `accountPrefs.test.js` | `accountPrefs.js` |
+| `adminApps.test.js` | `adminApps.js`: the header app switcher's links and their env names |
 | `adminPageSlice.test.js` | `adminPageSlice.js` — admin table paging |
 | `apiFetch.test.js` | `api.js` — `parseApiPayload` |
+| `csp.test.js` | `svelte.config.js`: the Content-Security-Policy stays strict |
 | `entryHistory.test.js` | `entryHistory.js` |
 | `entryHours.test.js` | `entryHours.js` |
 | `entryPhotos.test.js` | `entryPhotos.js` |
 | `entryPublicExtras.test.js` | `entryPublicExtras.js` |
 | `entryType.test.js` | `entryType.js` — the closed three-type catalog |
 | `quickLinksDisplay.test.js` | `quickLinksDisplay.js` |
+| `robots.test.js` | `static/robots.txt`: admin is never crawled |
 | `scheduleActivityTypes.test.js` | `scheduleActivityTypes.js` |
 | `websiteDomain.test.js` | `websiteDomain.js` |
+| `sharedFrontendModules.test.js` | the drift guard for the files shared with lamsza (below) |
 
 Several of these modules are shared with the main `lamsza` app. They are generated copies:
 `lamsza` owns them, `lamsza/scripts/sync-shared-frontend.sh` copies them here, and

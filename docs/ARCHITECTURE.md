@@ -6,12 +6,9 @@ Admin UI + API for the **main Lámsza** portal only. Szótár and Játszótér k
 
 ## Local ports
 
-| App | Frontend | Backend |
-|-----|----------|---------|
-| Lámsza Admin | 5173 | 3000 |
-| Main Lámsza | 5174 | 3001 |
-| Szótár | 5175 | 3002 |
-| Játszótér | 5176 | 3003 |
+This app is backend `:3000`, frontend `:5173`. The network's port table lives in one place,
+`lamsza/docs/network/WAYS_OF_WORKING.md` §1, matching `lamsza/scripts/start-lamsza-network.sh`
+(rule R7: one fact, one home).
 
 ## Shared database (current)
 
@@ -145,9 +142,9 @@ same retention note in `lamsza/backend/migrations/admin_audit_log.sql`. Nothing 
 ## Shared frontend modules
 
 The frontend files listed in `frontend/shared-frontend-modules.json` are identical to
-`lamsza`'s: helpers, the shared dialogs (`ConfirmDialog`, `NoticeDialog`, `SignInDialog`),
-the icons (`AppIcon`, `ErrorLantern`), the error page (`ErrorPage`) and the three base
-stylesheets. **`lamsza` owns them**; this repo carries a generated copy under
+`lamsza`'s: helpers, the shared dialogs (`ConfirmDialog`, `NoticeDialog`, `SignInDialog`,
+`GoogleSignIn`), the icons (`AppIcon`, `ErrorLantern`), the error page (`ErrorPage`,
+`ErrorShell`) and the three base stylesheets. **`lamsza` owns them**; this repo carries a generated copy under
 `frontend/src`. Never edit one here: edit it in `lamsza`, run
 `lamsza/scripts/sync-shared-frontend.sh`, and commit lamsza and every app that changed. `frontend/tests/sharedFrontendModules.test.js` hashes the copies against
 the manifest on every `npm test`, so an edit made here goes red. The rule and the rejected

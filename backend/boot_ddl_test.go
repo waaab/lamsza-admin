@@ -9,7 +9,7 @@ package main
 // and added a constraint; both are gone.
 //
 // These tests re-derive the startup path from the source on every run, so they
-// fail if DDL — or a migrate helper that could reach DDL through a .sql file —
+// fail if DDL - or a migrate helper that could reach DDL through a .sql file -
 // is wired back onto it.
 
 import (
@@ -109,7 +109,7 @@ func TestNoDDLOnStartupPath(t *testing.T) {
 	}
 
 	if len(violations) > 0 {
-		t.Errorf("the admin startup path must not change the schema — the main lamsza backend owns it (see docs/ARCHITECTURE.md). Found %d violation(s):", len(violations))
+		t.Errorf("the admin startup path must not change the schema - the main lamsza backend owns it (see docs/ARCHITECTURE.md). Found %d violation(s):", len(violations))
 		for _, v := range violations {
 			t.Errorf("  %s: reached via %s.%s: %s", v.pos, v.fn.pkg, v.fn.name, v.what)
 		}
@@ -153,7 +153,7 @@ func TestDBPackageHasNoDDL(t *testing.T) {
 // indexModule parses every non-test .go file under the backend module and
 // returns the function index plus the startup seeds: main.main and every
 // init(). Every init() in the module is seeded rather than only the imported
-// ones — over-approximating keeps the guard on the safe side.
+// ones - over-approximating keeps the guard on the safe side.
 func indexModule(t *testing.T, fset *token.FileSet) (map[funcKey][]*srcFunc, []funcKey) {
 	t.Helper()
 

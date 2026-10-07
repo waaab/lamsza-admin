@@ -1,7 +1,7 @@
 package audit
 
 // The route registry. One entry per route `main.go` registers, and `Wrap`
-// panics at wiring time on a route that has none — so adding an admin route
+// panics at wiring time on a route that has none - so adding an admin route
 // without deciding what it audits does not start.
 //
 // `Tables` is the set of tables whose row carries the state of this resource.
@@ -10,7 +10,7 @@ package audit
 // *or* settlements, chosen by a `type` field in the body) work without the
 // audit layer having to understand the handler.
 //
-// An empty `Tables` means "no single row holds this" — a composite write (an
+// An empty `Tables` means "no single row holds this" - a composite write (an
 // event's whole schedule, an entry's category links), a key/value map
 // (site_settings), an upload, or a cache bump. Those records carry the actor,
 // the action and the request payload, but no before/after. That limit is
@@ -53,7 +53,7 @@ func (r Resource) idField() string {
 // resources maps route path -> what it writes. Keep it in the same order as
 // main.go so the two are easy to read against each other.
 var resources = map[string]Resource{
-	// Listing queue — the human review surface over user-submitted entries.
+	// Listing queue - the human review surface over user-submitted entries.
 	"/api/admin/listing-queue":            {Name: "listing_queue"},
 	"/api/admin/listing-queue/publish":    {Name: "entry", Tables: []string{"entries"}, IDField: "entry_id"},
 	"/api/admin/listing-queue/member":     {Name: "entry_member", IDField: "entry_id"},

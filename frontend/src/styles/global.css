@@ -64,6 +64,8 @@
 
   /* Search/Discover seam - subtle border between input and discover when active */
   --discover-seam-color: rgba(115, 115, 115, 0.4);
+  /* Hover tint for quiet buttons (dialog cancel, sign-in Mégse). */
+  --hover-bg: rgba(0, 0, 0, 0.04);
 
   /* Admin Buttons - Light */
   --btn-danger-bg: #dc3545;
@@ -106,11 +108,13 @@
   --badge-bg: #404040;
   --badge-text: #111111;
   --entry-category-bg: #222222;
+  --thin-grey: #2a2a2a;
   --white: #ffffff;
   /* keep white for some specific contrasts if needed, or change to #1e1e1e */
 
   /* Search/Discover seam */
   --discover-seam-color: rgba(163, 163, 163, 0.35);
+  --hover-bg: rgba(255, 255, 255, 0.05);
 
   /* Layout & Components */
   --tab-hover-bg: #2a2a2a;
@@ -178,8 +182,13 @@
     --badge-bg: #404040;
     --badge-text: #111111;
     --entry-category-bg: #222222;
+    --thin-grey: #2a2a2a;
     --white: #ffffff;
     /* keep white for some specific contrasts if needed, or change to #1e1e1e */
+
+    /* Search/Discover seam */
+    --discover-seam-color: rgba(163, 163, 163, 0.35);
+    --hover-bg: rgba(255, 255, 255, 0.05);
 
     /* Layout & Components */
     --tab-hover-bg: #2a2a2a;

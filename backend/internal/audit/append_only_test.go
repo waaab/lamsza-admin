@@ -14,8 +14,8 @@ import (
 // file in the backend for a statement that writes `admin_audit_log`, and fail
 // on anything that is not an INSERT.
 //
-// Real append-only enforcement — a database role with INSERT and SELECT but no
-// UPDATE or DELETE on this table — belongs to the production database and is
+// Real append-only enforcement - a database role with INSERT and SELECT but no
+// UPDATE or DELETE on this table - belongs to the production database and is
 // the owner's, not an agent's. This guard is the half that lives in the code.
 
 var (

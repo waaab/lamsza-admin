@@ -50,7 +50,7 @@ func TestAdminSessionCookieIsNotThePublicOne(t *testing.T) {
 
 // TestAuthPackageNeverTouchesThePublicSessionsTable is the static half of the
 // boundary, in the style of boot_ddl_test.go: the cookie name is only
-// presentation — anyone can put any token in any cookie — so the store is what
+// presentation - anyone can put any token in any cookie - so the store is what
 // actually separates the two apps. One query against `sessions` here would
 // re-open the hole with every other test still green.
 func TestAuthPackageNeverTouchesThePublicSessionsTable(t *testing.T) {
@@ -82,7 +82,7 @@ func TestAuthPackageNeverTouchesThePublicSessionsTable(t *testing.T) {
 				return true
 			}
 			if m := publicTable.FindString(lit.Value); m != "" {
-				t.Errorf("%s: SQL against the public `sessions` table (%q) — admin uses `admin_sessions`",
+				t.Errorf("%s: SQL against the public `sessions` table (%q) - admin uses `admin_sessions`",
 					filepath.Base(fset.Position(lit.Pos()).Filename), strings.TrimSpace(m))
 			}
 			return true
@@ -192,7 +192,7 @@ func TestPublicSessionIsRejectedByTheAdminAPI(t *testing.T) {
 
 	token := mintPublicSession(t, "boundary-admin@test.lamsza")
 
-	// 1. Presented under the admin cookie name — a token is just a string, so
+	// 1. Presented under the admin cookie name - a token is just a string, so
 	//    nothing stops a caller doing this deliberately.
 	req := httptest.NewRequest(http.MethodGet, "/api/auth/me", nil)
 	req.AddCookie(&http.Cookie{Name: SessionCookieName, Value: token})
@@ -204,7 +204,7 @@ func TestPublicSessionIsRejectedByTheAdminAPI(t *testing.T) {
 		t.Errorf("public token under the admin cookie name: got %d, want 401 (body %q)", rr.Code, rr.Body.String())
 	}
 
-	// 2. Presented under the public cookie name — what the browser itself does
+	// 2. Presented under the public cookie name - what the browser itself does
 	//    on localhost, where cookies ignore the port.
 	req = httptest.NewRequest(http.MethodGet, "/api/auth/me", nil)
 	req.AddCookie(&http.Cookie{Name: "lamsza_session", Value: token})

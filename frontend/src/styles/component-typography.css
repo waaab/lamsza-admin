@@ -327,10 +327,6 @@
   font-size: var(--text-xs);
 }
 
-.admin-dialog p {
-  font-size: var(--text-base);
-}
-
 .admin-region-heading {
   font-size: var(--text-md);
 }

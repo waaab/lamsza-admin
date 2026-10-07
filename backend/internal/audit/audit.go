@@ -127,7 +127,7 @@ func Wrap(route string, h http.HandlerFunc) http.HandlerFunc {
 // write sends the record and shouts if it cannot.
 //
 // It does not fail the request. The record is written after the handler has
-// already committed, so refusing the response would not undo the change — it
+// already committed, so refusing the response would not undo the change - it
 // would only hide a completed write behind a 500. A dropped record is instead
 // made loud in the log, prefixed so it is greppable.
 func write(rec Record) {
@@ -281,7 +281,7 @@ func formatInt(n int64) string {
 
 // snapshot reads the resource's row from every table it may live in, keyed by
 // table name. A route with no tables, or a write with no id yet, snapshots
-// nothing — see the note in resources.go.
+// nothing - see the note in resources.go.
 func snapshot(res Resource, id string) map[string]any {
 	if id == "" || len(res.Tables) == 0 {
 		return nil

@@ -608,10 +608,6 @@
     font-size: var(--text-sm);
 }
 
-.schedule-notes {
-    flex: 1;
-    min-width: 12rem;
-}
 
 .schedule-act-table {
     font-size: var(--text-sm);

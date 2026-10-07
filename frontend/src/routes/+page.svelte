@@ -12,7 +12,6 @@
     } from "$lib/scheduleActivityTypes.js";
     import { absoluteMediaUrl } from "$lib/eventImage.js";
     import { getApiBase, apiCall } from "$lib/api.js";
-    import { ENTRY_TYPE_VALLALKOZAS } from "$lib/entryType.js";
     import { emptyWeekHours, normalizeHours, withDefaultWeekHours } from "$lib/entryHours.js";
     import { offersDelivery } from "$lib/entryPublicExtras.js";
     import { emptyPhotos, normalizePhotos } from "$lib/entryPhotos.js";
@@ -1435,6 +1434,30 @@
             fetchAll();
         } else {
             sendNonAdminAway();
+        }
+    }
+
+    /**
+     * Sign in through admin's own API, for the shared GoogleSignIn. A Google
+     * account that is not on the admin allowlist gets 403 from
+     * /api/auth/google; that visitor is sent on to Lámsza (UI_BASELINE
+     * "adm-gate") instead of seeing only "Belépés sikertelen.". Any other
+     * failure throws, and the button shows that message.
+     * @param {string} credential
+     */
+    async function adminSignIn(credential) {
+        const res = await apiCall("/api/auth/google", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ credential }),
+        });
+        if (res.status === 403) {
+            sendNonAdminAway();
+            return new Promise(() => {}); // the page is leaving
+        }
+        if (!res.ok) {
+            console.warn("admin sign-in refused:", res.status, await res.text());
+            throw new Error("refused");
         }
     }
 
@@ -3892,6 +3915,7 @@
         configReady={authReady}
         onClose={() => (loginOpen = false)}
         onSignedIn={onGoogleSignedIn}
+        signIn={adminSignIn}
         policyHref={`${lamszaOrigin}/iranyelvek`}
     />
 {:else}
@@ -9100,18 +9124,6 @@
         </div>
     {/if}
 
-    <!-- Network dialogs (UI_BASELINE "dlg-confirm", "dlg-notice"): showConfirm()
-         asks with Mégse next to Igen; showAlert() only informs, so it closes
-         with Bezárás ("dlg-close-label"). -->
-    <ConfirmDialog
-        open={dialogVisible && dialogType === "confirm"}
-        message={dialogMsg}
-        onYes={dialogOk}
-        onNo={dialogCancel}
-    />
-    {#if dialogVisible && dialogType === "alert"}
-        <NoticeDialog title="Üzenet" message={dialogMsg} onClose={dialogOk} />
-    {/if}
 
     <!-- Edit Event Modal -->
     {#if editingEvent}
@@ -9641,6 +9653,21 @@
                 </form>
             </div>
         </div>
+    {/if}
+
+    <!-- Network dialogs (UI_BASELINE "dlg-confirm", "dlg-notice"): showConfirm()
+         asks with Mégse next to Igen; showAlert() only informs, so it closes
+         with Bezárás ("dlg-close-label"). Last in the markup: the notice shares
+         the edit windows' overlay layer, so it must come after them to show on
+         top of one. -->
+    <ConfirmDialog
+        open={dialogVisible && dialogType === "confirm"}
+        message={dialogMsg}
+        onYes={dialogOk}
+        onNo={dialogCancel}
+    />
+    {#if dialogVisible && dialogType === "alert"}
+        <NoticeDialog title="Üzenet" message={dialogMsg} onClose={dialogOk} />
     {/if}
 {/if}
 

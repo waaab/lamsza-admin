@@ -31,14 +31,14 @@ import (
 //   - A different cookie name. Browsers scope cookies by host and ignore the
 //     port, so on localhost a cookie set by lamsza on :3001/:5174 is sent to
 //     this API on :3000 regardless. A different name means no collision.
-//   - A different table. The name alone is only presentation — anyone can put
+//   - A different table. The name alone is only presentation - anyone can put
 //     any token in any cookie. The store is the real boundary: an admin token
 //     hash exists only in `admin_sessions`, a public one only in `sessions`,
 //     so neither API can accept the other's token even when it is handed over
 //     deliberately.
 //
 // `admin_sessions` is created by the main lamsza backend, which owns this
-// shared schema — this process runs no DDL (see docs/ARCHITECTURE.md).
+// shared schema - this process runs no DDL (see docs/ARCHITECTURE.md).
 const (
 	SessionCookieName = "lamsza_admin_session"
 	sessionTTL        = 30 * 24 * time.Hour
@@ -99,7 +99,7 @@ var VerifyIDToken IDTokenVerifier = VerifyGoogleIDToken
 // That includes `admin_sessions`, the table this package reads and writes:
 // `lamsza/backend/internal/auth/auth.go` creates it, and
 // `lamsza/backend/migrations/admin_sessions.sql` is the explicit form. Do not
-// add a CREATE TABLE here when a fresh database is missing it — run the main
+// add a CREATE TABLE here when a fresh database is missing it - run the main
 // backend, or that migration.
 
 func IsAdmin(email string) bool {
@@ -195,7 +195,7 @@ func UserFromContext(ctx context.Context) *User {
 // The context key is unexported so nothing outside this package can forge an
 // identity by writing to the request context. That also makes the signed-in
 // case untestable from another package, which is a problem for the audit trail
-// (BOG-48) — its whole job is recording *who*. This is the one sanctioned way
+// (BOG-48) - its whole job is recording *who*. This is the one sanctioned way
 // in, and it takes an *auth.User, so a caller still has to have a real user.
 func WithUser(ctx context.Context, u *User) context.Context {
 	return context.WithValue(ctx, userContextKey, u)
@@ -252,7 +252,7 @@ func HandleGoogleLogin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Only an allowlisted account gets an admin session. Every route on this API
-	// is behind RequireAdmin, so a session for anyone else bought nothing — but
+	// is behind RequireAdmin, so a session for anyone else bought nothing - but
 	// it did put a public-grade row in `admin_sessions`, which is the one thing
 	// a separate session store must never hold. A row here now means an admin is
 	// signed in, and that is what makes the table worth separating.

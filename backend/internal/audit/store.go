@@ -16,7 +16,7 @@ import (
 // database.
 //
 // INSERT and SELECT only. There is no UPDATE and no DELETE here, and
-// `append_only_test.go` fails if one is added — "append-only from the app's
+// `append_only_test.go` fails if one is added - "append-only from the app's
 // perspective" has to be a property of the code, not a habit.
 //
 // The table is created by the main `lamsza` backend
@@ -132,7 +132,7 @@ type logRow struct {
 // HandleAdminAuditLog makes the trail queryable: newest first, filtered by
 // resource, resource id or actor.
 //
-// GET only. There is deliberately no route that edits or removes a record —
+// GET only. There is deliberately no route that edits or removes a record -
 // see the package comment.
 func HandleAdminAuditLog(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {

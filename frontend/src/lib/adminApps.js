@@ -1,8 +1,8 @@
 /**
  * Targets for the header app switcher.
  *
- * The three admin UIs sit on three different origins — this app on its own
- * host, Szótár and Játszótér still on `/admin` inside their own apps — so the
+ * The three admin UIs sit on three different origins - this app on its own
+ * host, Szótár and Játszótér still on `/admin` inside their own apps - so the
  * links cannot be relative. They come from build-time `VITE_*` values.
  *
  * The variable names below are the contract with `.env.example`. If you rename
@@ -10,7 +10,7 @@
  * silent drift fails the suite instead of quietly falling back to localhost.
  */
 
-/** Fixed local dev ports, from `docs/ARCHITECTURE.md`. */
+/** Fixed local dev ports, from lamsza's `docs/network/WAYS_OF_WORKING.md` §1. */
 export const ADMIN_APP_DEFAULTS = {
     directory: "http://localhost:5173",
     szotar: "http://localhost:5175/admin",
