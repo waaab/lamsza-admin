@@ -524,3 +524,31 @@ func ParseTestIDToken(idToken, audience string) (GoogleIdentity, error) {
 		Name:  "Test User",
 	}, nil
 }
+
+// HandleAdminStatus answers GET /api/auth/admin-status with {"is_admin": bool}
+// for the browser's admin session, and nothing else: no email, no profile.
+// Szótár's and Játszótér's toolbars call it cross-origin with credentials to
+// decide whether to show their Admin link (lamsza WAYS_OF_WORKING R18). It is
+// the only route that admits the network's sibling sites
+// (config.NetworkOriginAllowed), and only for this read, so the rest of the
+// admin API never has to trust them: a script on a sibling site cannot read or
+// write anything else here. A visitor without a session gets false, not 401.
+func HandleAdminStatus(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Vary", "Origin")
+	w.Header().Set("Cache-Control", "no-store")
+	if origin := r.Header.Get("Origin"); config.NetworkOriginAllowed(origin) {
+		w.Header().Set("Access-Control-Allow-Origin", origin)
+		w.Header().Set("Access-Control-Allow-Credentials", "true")
+		w.Header().Set("Access-Control-Allow-Methods", "GET")
+	}
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	isAdmin := false
+	if u, err := UserFromRequest(r); err == nil && u != nil {
+		isAdmin = IsAdmin(u.Email)
+	}
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	_ = json.NewEncoder(w).Encode(map[string]bool{"is_admin": isAdmin})
+}

@@ -4,8 +4,9 @@
 
 The network's one admin app (lamsza WAYS_OF_WORKING R18): `/` for the main Lámsza
 data, `/dictionary` for Szótár, `/games` for Játszótér. Its `ADMIN_GOOGLE_EMAILS` is the
-network's admin list. Until the move ends, Szótár and Játszótér still carry their own
-`/admin` pages.
+network's admin list. Szótár and Játszótér have no admin pages or admin list of their
+own: their old `/admin` URLs redirect here, and their toolbars show an Admin link for a
+browser signed in here as an admin (see `/api/auth/admin-status` under CORS below).
 
 ## The relay to Szótár and Játszótér
 
@@ -264,8 +265,15 @@ the development hosts. The built-in list covers the four `*.lamsza.com` sites pl
 `*.lamsza.test` and `localhost` development hosts. Behaviour is covered in
 `backend/internal/middleware/middleware_test.go`.
 
-The admin frontend reaches this API same-origin — through the Vite dev proxy locally, through
-Nginx in production — so there is no expected cross-origin caller today.
+The admin frontend reaches this API same-origin, through the Vite dev proxy locally and
+through Nginx in production. The one expected cross-origin caller is
+`GET /api/auth/admin-status`: Szótár's and Játszótér's toolbars ask it, with credentials,
+whether to show their Admin link (R18). It answers only `{"is_admin": true|false}` and has
+its own CORS: it admits the network's sites from the built-in list
+(`config.NetworkOriginAllowed`) for that GET, whatever `CORS_ALLOWED_ORIGINS` says. So
+production keeps `CORS_ALLOWED_ORIGINS` to the admin app alone, and a script on a sibling
+site can never read or write the rest of the API with an admin's cookie
+(`admin_status_test.go`).
 
 ## Production (Phase 2)
 

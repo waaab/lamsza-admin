@@ -101,6 +101,21 @@ var defaultAllowedOrigins = []string{
 
 var allowedOriginSet map[string]bool
 
+// NetworkOriginAllowed reports whether origin is one of the network's own
+// sites (the built-in list above), whatever CORS_ALLOWED_ORIGINS says. Only
+// /api/auth/admin-status uses it: Szótár's and Játszótér's toolbars ask it,
+// cross-origin, whether to show their Admin link (lamsza WAYS_OF_WORKING R18).
+// The rest of the API keeps CORS_ALLOWED_ORIGINS, which production limits to
+// the admin app itself.
+func NetworkOriginAllowed(origin string) bool {
+	for _, o := range defaultAllowedOrigins {
+		if o == origin {
+			return true
+		}
+	}
+	return false
+}
+
 // OriginAllowed reports whether an Origin header value is on the allowlist.
 // The match is exact: scheme, host and port must all agree, so a lookalike
 // host such as "https://admin.lamsza.com.evil.test" never passes.
