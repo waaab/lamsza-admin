@@ -37,11 +37,14 @@ var AppConfig Config
 func Load() {
 	// Load optional parent .env first, then cwd .env so the project always wins
 	// (Previously ../.env alone could shadow ./.env when the server was started from repo root.)
+	// A variable already set in the process environment beats both files, so
+	// `DATABASE_URL=... go run .` really uses that URL.
+	preset := presetEnv()
 	if _, err := os.Stat("../.env"); err == nil {
-		loadEnvFile("../.env")
+		loadEnvFile("../.env", preset)
 	}
 	if _, err := os.Stat(".env"); err == nil {
-		loadEnvFile(".env")
+		loadEnvFile(".env", preset)
 	}
 
 	AppConfig.DatabaseURL = getEnv("DATABASE_URL", "postgres://lamsza_user:lamsza_password@localhost:5433/lamsza?sslmode=disable")
@@ -161,7 +164,19 @@ func getBoolEnv(key string, fallback bool) bool {
 	return fallback
 }
 
-func loadEnvFile(filename string) {
+// presetEnv records which keys the process environment set before any .env
+// file was read.
+func presetEnv() map[string]bool {
+	preset := map[string]bool{}
+	for _, kv := range os.Environ() {
+		if key, _, ok := strings.Cut(kv, "="); ok {
+			preset[key] = true
+		}
+	}
+	return preset
+}
+
+func loadEnvFile(filename string, preset map[string]bool) {
 	file, err := os.Open(filename)
 	if err != nil {
 		return
@@ -176,7 +191,11 @@ func loadEnvFile(filename string) {
 		}
 		parts := strings.SplitN(line, "=", 2)
 		if len(parts) == 2 {
-			os.Setenv(strings.TrimSpace(parts[0]), strings.TrimSpace(parts[1]))
+			key := strings.TrimSpace(parts[0])
+			if preset[key] {
+				continue
+			}
+			os.Setenv(key, strings.TrimSpace(parts[1]))
 		}
 	}
 }

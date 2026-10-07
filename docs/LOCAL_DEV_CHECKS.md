@@ -21,9 +21,14 @@ It runs both suites and stops at the first failure:
 | Step | Script | What it runs |
 |---|---|---|
 | 1 | `npm run test:frontend` | `node --test "tests/**/*.test.js"` in `frontend/` |
-| 2 | `npm run test:backend` | `go test ./...` in `backend/` |
+| 2 | `npm run test:backend` | `scripts/test-backend.sh`: drops and recreates the scratch database `lamsza_admin_test` from `lamsza/backend/schema/`, then `go test -count=1 ./...` in `backend/` against it |
 
 Run one side on its own with `npm run test:frontend` or `npm run test:backend`.
+
+The backend suites never touch the shared dev `lamsza` database: they read only
+`TEST_DATABASE_URL`, and a local test database name must end in `_test`
+(`backend/internal/db/testguard.go`). Step 2 needs the lamsza repo next to this one and the
+`lamsza-db` container up.
 
 No `npm install` is needed for the tests. The frontend suite uses only `node:test` and
 `node:assert`, and imports the modules under `frontend/src/lib/` directly.

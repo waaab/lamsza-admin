@@ -42,10 +42,14 @@ Open http://localhost:5173/
 ## Tests
 
 ```bash
-npm test               # frontend (node:test) + backend (go test)
+npm test               # frontend (node:test) + backend (go test on a scratch DB)
 npm run test:frontend
-npm run test:backend
+npm run test:backend   # rebuilds lamsza_admin_test from lamsza/backend/schema/
 ```
+
+The backend suites never use `DATABASE_URL` or `.env`, which point at the shared dev
+`lamsza` database. They read only `TEST_DATABASE_URL`, which `npm run test:backend` sets.
+A plain `go test ./...` skips the two DB-backed tests.
 
 See [`docs/LOCAL_DEV_CHECKS.md`](docs/LOCAL_DEV_CHECKS.md) for what is covered and what a
 complete local pass looks like.

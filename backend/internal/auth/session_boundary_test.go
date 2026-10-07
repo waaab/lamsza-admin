@@ -94,21 +94,29 @@ func TestAuthPackageNeverTouchesThePublicSessionsTable(t *testing.T) {
 // Database needed
 // ---------------------------------------------------------------------------
 
-// withDB opens the shared database, or skips. The tests below are about which
-// table a token lives in, so there is nothing to fake.
+// withDB opens the scratch test database, or skips. The tests below are about
+// which table a token lives in, so there is nothing to fake.
 //
 // It opens its own pool instead of calling db.InitDB(), which log.Fatal()s on a
 // missing database and would take the whole test binary with it. CI has no
 // Postgres; a skip there is honest, and the two static tests above still run.
+//
+// It reads only TEST_DATABASE_URL, never DATABASE_URL or .env: those point at
+// the shared dev database, which these tests used to fill with
+// boundary-admin@test.lamsza users. `npm run test:backend` sets it.
 func withDB(t *testing.T) {
 	t.Helper()
 	if db.DB != nil && db.DB.Ping() == nil {
 		return
 	}
-	if config.AppConfig.DatabaseURL == "" {
-		config.Load()
+	if os.Getenv("TEST_DATABASE_URL") == "" {
+		t.Skip("TEST_DATABASE_URL is not set; run `npm run test:backend` to use a scratch database")
 	}
-	conn, err := sql.Open("postgres", config.AppConfig.DatabaseURL)
+	url, err := db.TestDatabaseURL()
+	if err != nil {
+		t.Fatal(err)
+	}
+	conn, err := sql.Open("postgres", url)
 	if err != nil {
 		t.Skipf("shared lamsza database not reachable: %v", err)
 	}
@@ -138,7 +146,20 @@ func testUserID(t *testing.T, email string) int {
 	if err != nil {
 		t.Fatalf("test user %s: %v", email, err)
 	}
+	cleanupTestUser(t, email)
 	return id
+}
+
+// cleanupTestUser removes the test account, and the session rows that point at
+// it, once the test is done. Register it before anything that creates rows for
+// the user: cleanups run last-in first-out, so this one runs after theirs.
+func cleanupTestUser(t *testing.T, email string) {
+	t.Helper()
+	t.Cleanup(func() {
+		_, _ = db.DB.Exec(`DELETE FROM sessions WHERE user_id IN (SELECT id FROM users WHERE email = $1)`, email)
+		_, _ = db.DB.Exec(`DELETE FROM admin_sessions WHERE user_id IN (SELECT id FROM users WHERE email = $1)`, email)
+		_, _ = db.DB.Exec(`DELETE FROM users WHERE email = $1`, email)
+	})
 }
 
 // mintPublicSession writes a row the way the main lamsza backend does: into
@@ -216,6 +237,7 @@ func TestAdminLoginWritesOnlyTheAdminSessionTable(t *testing.T) {
 	config.AppConfig.AdminGoogleEmails = []string{"boundary-admin@test.lamsza"}
 	config.AppConfig.GoogleClientID = "test-client"
 	VerifyIDToken = ParseTestIDToken
+	cleanupTestUser(t, "boundary-admin@test.lamsza")
 
 	cookie := signIn(t, "boundary-admin@test.lamsza", http.StatusOK)
 	if cookie == nil {

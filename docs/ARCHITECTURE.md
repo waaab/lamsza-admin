@@ -196,8 +196,10 @@ backend or that migration; do **not** add a `CREATE TABLE` here.
 
 Held by `backend/internal/auth/session_boundary_test.go` on this side and
 `lamsza/backend/admin_session_boundary_test.go` on the other. The two DB-backed tests here
-skip when the shared Postgres is not reachable; the cookie-name check and the static check
-that this package never queries `sessions` need no database and run in CI.
+run only against the scratch database `npm run test:backend` builds (`TEST_DATABASE_URL`,
+name ending in `_test`), never the shared dev database, and skip without it; the
+cookie-name check and the static check that this package never queries `sessions` need no
+database and run in CI.
 
 ## Cross-origin calls (CORS)
 
