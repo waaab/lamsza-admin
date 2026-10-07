@@ -45,6 +45,23 @@ No `npm install` is needed for the tests. The frontend suite uses only `node:tes
 
 ---
 
+## What the backend handler suite covers
+
+`backend/*_test.go` (BOG-55) serves requests through the real route table,
+`newMux()` in `main.go`, so the wrappers, their order and the feature flags are the
+ones the process runs:
+
+- **Route guards, no database:** every `/api/admin/` path and every `admin(...)`
+  registration is behind `RequireAdmin`; anonymous calls get 401; a non-admin
+  session gets 403; CORS refuses foreign origins.
+- **Every admin route has a named happy-path test** (`adminHappyPath` in
+  `admin_read_test.go`). Add a route and the suite goes red until it has one.
+- **CRUD, validation, listing queue, website moderation, singletons, uploads and the
+  audit log**, against the scratch database. Each test creates its own tagged rows
+  and removes them; the catalog it needs comes from lamsza's `002_reference.sql`.
+
+Without `TEST_DATABASE_URL` (CI) the DB-backed tests skip and the route guards run.
+
 ## What the frontend suite covers
 
 `frontend/tests/` holds one file per module under `frontend/src/lib/`:

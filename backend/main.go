@@ -28,7 +28,26 @@ func main() {
 	config.Load()
 	db.InitDB()
 
-	mux := http.DefaultServeMux
+	mux := newMux()
+
+	port := config.AppConfig.Port
+	log.Printf("Lamsza Admin API active on port %s\n", port)
+	if err := http.ListenAndServe(":"+port, mux); err != nil {
+		log.Fatal(err)
+	}
+}
+
+// newMux builds the whole route table. It is separate from main() so the
+// handler suite (testsupport_test.go) serves the real routes: the same
+// wrappers, in the same order, behind the same feature flags, instead of a
+// hand-copied mux that drifts from this one. It reads config.AppConfig but
+// never touches the database, so the route-guard tests run with no Postgres.
+//
+// It returns a fresh mux rather than http.DefaultServeMux: the default mux is
+// process-global and panics on a duplicate pattern, so a test that built the
+// routes twice would take the whole package down.
+func newMux() *http.ServeMux {
+	mux := http.NewServeMux()
 
 	// Every admin route is registered through this one function, and nothing
 	// else may register an /api/admin/ path (BOG-48). It is the single place
@@ -119,9 +138,5 @@ func main() {
 		log.Println("Module [QuickLinks] enabled")
 	}
 
-	port := config.AppConfig.Port
-	log.Printf("Lamsza Admin API active on port %s\n", port)
-	if err := http.ListenAndServe(":"+port, mux); err != nil {
-		log.Fatal(err)
-	}
+	return mux
 }
