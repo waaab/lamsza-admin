@@ -4,14 +4,23 @@ on:
   push:
   pull_request:
 
+# Versions are pinned on purpose; the one place that records them is
+# lamsza/docs/network/VERSIONS.md.
+# - runs-on: ubuntu-24.04 is the OS of the production droplet (Ubuntu 24.04 LTS).
+#   Do not change it back to ubuntu-latest: that moves to a new Ubuntu on
+#   GitHub's schedule, not ours, and CI would stop matching production.
+# - Node comes from .nvmrc and Go from backend/go.mod. No version is written in
+#   this file, so the two can never disagree with the repo.
+# When the droplet is upgraded (Ubuntu, Node or Go), update the runs-on pin,
+# .nvmrc, go.mod and VERSIONS.md together, in the same change.
 jobs:
   frontend:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: frontend
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # The receiver below has no other gate, and it is the one script whose
       # failure is self-concealing: if ci-status-issue.sh breaks, the only symptom
@@ -25,9 +34,9 @@ jobs:
         working-directory: .
         run: bash .github/ci-status-issue.test.sh
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
-          node-version: "22"
+          node-version-file: .nvmrc
           cache: npm
           cache-dependency-path: frontend/package-lock.json
       - run: npm ci
@@ -37,15 +46,15 @@ jobs:
       - run: npm run build
 
   backend:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: backend
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
         with:
-          go-version: "1.25.x"
+          go-version-file: backend/go.mod
           cache-dependency-path: backend/go.sum
       - run: go test -count=1 ./...
       - run: go build -o /tmp/lamsza-admin .
@@ -69,12 +78,12 @@ jobs:
       && github.ref == 'refs/heads/main'
       && (needs.frontend.result == 'failure' || needs.backend.result == 'failure'
       || (needs.frontend.result == 'success' && needs.backend.result == 'success'))
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
       issues: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Open, update or close the "CI is red on main" issue
         env:
           GH_TOKEN: ${{ github.token }}

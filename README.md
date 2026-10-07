@@ -34,7 +34,7 @@ cp .env.example .env   # fill GOOGLE_CLIENT_ID / ADMIN_GOOGLE_EMAILS
 cp .env backend/.env
 
 cd frontend && npm install && cd ..
-npm run restart        # or: cd backend && go run .  &  cd frontend && npm run dev
+~/projects/lamsza-network/start-lamsza-network.sh start   # the whole network; or: cd backend && go run .  &  cd frontend && npm run dev
 ```
 
 Open http://localhost:5173/
