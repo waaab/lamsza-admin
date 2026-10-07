@@ -310,6 +310,12 @@
             <path d="M6.5 5.5V9h3.5"></path>
             <path d="M8.5 7.5 10 9l-1.5 1.5"></path>
         </svg>
+    {:else if name === "rosette"}
+        <!-- The Székely six-petal rosette (Tájszórejtvény's decorative grid cells) -->
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M12 12A8 8 0 0 1 12.00 4.00A8 8 0 0 1 12 12M12 12A8 8 0 0 1 18.93 8.00A8 8 0 0 1 12 12M12 12A8 8 0 0 1 18.93 16.00A8 8 0 0 1 12 12M12 12A8 8 0 0 1 12.00 20.00A8 8 0 0 1 12 12M12 12A8 8 0 0 1 5.07 16.00A8 8 0 0 1 12 12M12 12A8 8 0 0 1 5.07 8.00A8 8 0 0 1 12 12"></path>
+        </svg>
     {:else if name === "keyboard"}
         <!-- The games' Billentyűzet tool (moved from Játszótér's gameToolIcons.js, same drawing) -->
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

@@ -10,6 +10,7 @@ adds a line under `[Unreleased]` in the same commit.
 ## [Unreleased]
 
 ### Added
+- Synced from lamsza: the shared `rosette` icon (the Székely six-petal rosette).
 - Synced from lamsza: nine shared icons (`tajszorejtveny`, `zoom_in`, `zoom_out`, `flag`, `text_size`, `keyboard`, `sound_on`, `sound_off`, `help`) and the content-dialog shell taking the screen's width on phones (up to 768px).
 - The `/dictionary` (Szótár) and `/games` (Játszótér) sections (lamsza WAYS_OF_WORKING R18), with everything the apps' own `/admin` pages do: Napi szó (pin until a date, or automatic), Szavak (search, letter filter, paging, create, live edit of every sense field, delete), Szófajok (16 intro texts), Mondások (one per day), Javaslatok (accept, reject), Rovásfejtő (create with rune preview, edit, soft delete) and the Szókereső editor, moved here from Játszótér. Each section has its own sidebar (the app in a new tab, Vezérlőpult, its tabs) and dashboard cards with the same entries and counts; tabs have a `#hash` and `#szavak/<id>` opens a word's editor. Every call goes through the relay; errors show the app's own message.
 - `AdminShell` holds the sign-in gate, sidebar, header and back-to-top for all three sections; the main admin looks the same (before/after screenshots identical). New `tests/adminSections.test.js`.
