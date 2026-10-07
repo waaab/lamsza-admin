@@ -864,3 +864,54 @@
         padding: 1.25rem 1rem;
     }
 }
+
+/* The /dictionary and /games sections (lamsza WAYS_OF_WORKING R18) reuse the
+   main admin's forms, tables and edit windows; these few rules are theirs. */
+.admin-modal-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.admin-status {
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+}
+
+.admin-choices {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 1rem;
+    margin: 0;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+}
+
+.admin-choices legend {
+    padding: 0 0.35rem;
+    font-weight: 500;
+}
+
+.admin-choices label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin: 0;
+    font-weight: normal;
+}
+
+.admin-row-muted {
+    opacity: 0.55;
+}
+
+.admin-form .admin-choices input {
+    padding: 0;
+}
+
+/* A section with a few tabs keeps its buttons at the top instead of spreading
+   them over the whole rail (the main admin's long list fills it). */
+.admin-sidebar-inner.admin-sidebar-inner--short {
+    justify-content: flex-start;
+    gap: 0.5rem;
+}

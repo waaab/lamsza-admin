@@ -62,7 +62,8 @@ Without `TEST_DATABASE_URL` (CI) the DB-backed tests skip and the route guards r
 | Test file | Module |
 |---|---|
 | `accountPrefs.test.js` | `accountPrefs.js` |
-| `adminApps.test.js` | `adminApps.js`: the header app switcher's links and their env names |
+| `adminApps.test.js` | `adminApps.js`: the section switcher's links and the app-origin env names |
+| `adminSections.test.js` | the `/`, `/dictionary` and `/games` pages: shared icons only, every Szótár and Játszótér call through `sectionApi.js` |
 | `adminPageSlice.test.js` | `adminPageSlice.js` — admin table paging |
 | `apiFetch.test.js` | `api.js` — `parseApiPayload` |
 | `csp.test.js` | `svelte.config.js`: the Content-Security-Policy stays strict |

@@ -1,0 +1,43 @@
+import assert from "node:assert/strict";
+import { readFileSync, readdirSync } from "node:fs";
+import test from "node:test";
+
+const read = (/** @type {string} */ path) => readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
+const dir = (/** @type {string} */ path) =>
+    readdirSync(new URL(`../${path}`, import.meta.url)).map((name) => `${path}/${name}`);
+
+const pages = ["src/routes/+page.svelte", "src/routes/dictionary/+page.svelte", "src/routes/games/+page.svelte"];
+const sectionFiles = [
+    "src/routes/dictionary/+page.svelte",
+    "src/routes/games/+page.svelte",
+    ...dir("src/lib/components/dictionary"),
+    ...dir("src/lib/components/games"),
+];
+
+test("every sidebar and card icon is one of the shared AppIcon icons", () => {
+    // Sections use the network's icon set only (lamsza WAYS_OF_WORKING R18);
+    // an entry without `icon` uses its id as the icon name.
+    const icons = read("src/lib/icons/AppIcon.svelte");
+    for (const page of pages) {
+        const src = read(page);
+        const nav = src.slice(src.indexOf("NAV = ["), src.indexOf("];", src.indexOf("NAV = [")));
+        assert.ok(nav.length > 0, `${page} has no NAV list`);
+        for (const [, id, icon] of nav.matchAll(/\{ id: "([^"]+)", title: "[^"]+"(?:, icon: "([^"]+)")?/g)) {
+            const name = icon || id;
+            assert.ok(icons.includes(`name === "${name}"`), `${page}: AppIcon has no "${name}" icon`);
+        }
+    }
+});
+
+test("the sections reach Szótár and Játszótér only through the relay helper", () => {
+    // This app never calls the other apps directly (lamsza WAYS_OF_WORKING
+    // R18): the browser talks to this backend, which relays with the token.
+    for (const file of sectionFiles) {
+        const src = read(file);
+        assert.doesNotMatch(src, /\bfetch\(|apiCall\(|apiFetch\(/, `${file} calls an API without sectionFetch`);
+        assert.doesNotMatch(src, /\/api\/admin\//, `${file} builds an /api/admin/ path by hand`);
+        for (const [, section] of src.matchAll(/sectionFetch\(\s*"([^"]+)"/g)) {
+            assert.ok(["dictionary", "games"].includes(section), `${file}: unknown section "${section}"`);
+        }
+    }
+});

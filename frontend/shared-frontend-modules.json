@@ -21,7 +21,7 @@
     "src/lib/stores/theme.js": "sha256:dba66ba2464d77c79e98df6d1f3864c3753a157517019c69957101ef622c0936",
     "src/lib/websiteDomain.js": "sha256:90336a31a01fec10ed811da112c90680cc94cea96236da03d722dfd7d2f5844a",
     "tests/sharedFrontendModules.test.js": "sha256:49658146677c7d5e198f35d3064aa32000d85f79664f4be90568e67ed0b0daf7",
-    "src/lib/icons/AppIcon.svelte": "sha256:ff4f107b6472e7f2a240b7027dd56c051bbd1cebe0e2fcc9a89b430f6ca3968c",
+    "src/lib/icons/AppIcon.svelte": "sha256:13a218619321b5540a3f4661e10d35be6731af59752c7b64711b2714c1679ae5",
     "src/lib/components/ConfirmDialog.svelte": "sha256:b8f88b5406d552bf3d1e8028d0bc9fb72f8dc6e878f6a4c850b9eb6310ffee46",
     "src/lib/components/NoticeDialog.svelte": "sha256:926daefc0e3e027dcbf58fce50ace8b09bf33a05eda16d6e6e45cf9fb43e2a6e",
     "src/lib/components/SignInDialog.svelte": "sha256:aeebd68cd9ca5b1f8b362deae68275dc7f6e8e9a5318def3f9f2c24b0aaa6d33",

@@ -24,6 +24,26 @@ when it is outside `/api/`, comes from loopback without proxy headers and carrie
 token (each app's `internal/adminapi`). It answers 503 when a URL or token is missing,
 and 502 when the app does not answer within 10 s.
 
+## The three sections in the frontend
+
+`frontend/src/routes/+page.svelte` (`/`), `routes/dictionary/+page.svelte` and
+`routes/games/+page.svelte` each render `lib/components/admin/AdminShell.svelte`: the
+sign-in gate, the icon sidebar, the header with the section switcher (`lib/adminApps.js`)
+and sign-out, and back-to-top. A page passes its tabs as `nav` (separators are
+`{ sep: true }`), and the dashboard cards (`AdminWelcomeGrid.svelte`) are the same entries
+below Vezérlőpult, with the section's counts. Icons come from the shared `AppIcon` only;
+`tests/adminSections.test.js` checks that.
+
+- The first sidebar button opens the section's public app in a new tab. Those origins are
+  build-time values: `VITE_LAMSZA_ORIGIN`, `VITE_SZOTAR_ORIGIN`, `VITE_JATSZOTER_ORIGIN`.
+- A tab has a bare hash (`/dictionary#szavak`), and `#szavak/<id>` opens that word's
+  editor; Szótár's entry page links there.
+- The Szótár and Játszótér tabs live in `lib/components/dictionary/` and
+  `lib/components/games/` (the Szókereső editor moved here from Játszótér). They call the
+  relay only through `lib/sectionApi.js`, which returns the app's own Hungarian error
+  message, and ask for confirmation through `lib/confirm.svelte.js` with one
+  `ConfirmHost` per page.
+
 ## Local ports
 
 This app is backend `:3000`, frontend `:5173`. The network's port table lives in one place,

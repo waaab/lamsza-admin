@@ -1,6 +1,5 @@
 <script>
     import { onMount } from "svelte";
-    import { fade } from "svelte/transition";
     import AdminNavIcon from "$lib/components/admin/AdminNavIcon.svelte";
     import AdminPlusIcon from "$lib/components/admin/AdminPlusIcon.svelte";
     import AdminPaginationBar from "$lib/components/admin/AdminPaginationBar.svelte";
@@ -20,18 +19,14 @@
     import HuDateInput from "$lib/components/HuDateInput.svelte";
     import HuTimeInput from "$lib/components/HuTimeInput.svelte";
     import EntryPhotosEditor from "$lib/components/EntryPhotosEditor.svelte";
-    import SignInDialog from "$lib/components/SignInDialog.svelte";
     import ConfirmDialog from "$lib/components/ConfirmDialog.svelte";
     import NoticeDialog from "$lib/components/NoticeDialog.svelte";
-    import AppIcon from "$lib/icons/AppIcon.svelte";
-    import { adminAppLinks } from "$lib/adminApps.js";
+    import AdminShell from "$lib/components/admin/AdminShell.svelte";
+    import AdminWelcomeGrid from "$lib/components/admin/AdminWelcomeGrid.svelte";
+    import { APP_ORIGINS } from "$lib/adminApps.js";
     import { canonicalDomain } from "$lib/websiteDomain.js";
 
-    const lamszaOrigin =
-        (typeof import.meta !== "undefined" && import.meta.env?.VITE_LAMSZA_ORIGIN) ||
-        "http://localhost:5174";
-    /** Header switcher: this app, plus the Szótár and Játszótér admin UIs. */
-    const adminApps = adminAppLinks(typeof import.meta !== "undefined" ? import.meta.env : undefined);
+    const lamszaOrigin = APP_ORIGINS.lamsza;
 
     /** Local calendar date as YYYY-MM-DD (for date inputs). */
     function localISODate() {
@@ -40,42 +35,51 @@
         return `${d.getFullYear()}-${z(d.getMonth() + 1)}-${z(d.getDate())}`;
     }
 
-    let authenticated = false;
-    let authReady = false;
-    let authDenied = false;
-    let googleClientId = "";
-    let configUnreachable = false;
-    let loginOpen = false;
-    /** The admin shell scrolls inside <main>, not the window (back-to-top). */
-    let adminMainEl = null;
-    let adminMainScrollTop = 0;
+    /** @type {AdminShell | null} sign-in gate, sidebar, header (lib/components/admin/AdminShell.svelte) */
+    let shell = null;
     let adminOffline = false;
     let activeTab = "welcome";
 
-    /** Section shortcuts: order matches sidebar (below Vezérlőpult / home). Footer hint = right column label. */
-    /** Same id, icon, and title as the sidebar buttons, in sidebar order. */
-    const ADMIN_WELCOME_ITEMS = [
+    /** Sidebar, in order; the dashboard cards are the same entries below Vezérlőpult. */
+    const ADMIN_NAV = [
+        { id: "welcome", title: "Vezérlőpult", icon: "dashboard" },
         { id: "mondasok", title: "Mondások" },
         { id: "quicklinks", title: "Gyorslinkek" },
+        { sep: true },
         { id: "websites", title: "Weboldalak" },
         { id: "entries", title: "Index" },
         { id: "entry_categories", title: "Bejegyzés Kategóriák" },
         { id: "entry_types", title: "Bejegyzés típusok" },
         { id: "tags", title: "Címkék" },
+        { sep: true },
         { id: "locations", title: "Települések" },
         { id: "counties", title: "Megyék" },
         { id: "venues", title: "Helyszínek" },
         { id: "attractions", title: "Látnivalók" },
+        { sep: true },
         { id: "events", title: "Események" },
+        { sep: true },
         { id: "pages", title: "Oldalak" },
         { id: "page_faq", title: "GYIK" },
         { id: "weather_translations", title: "Időjárás fordítások" },
+        { sep: true },
         { id: "newsfeeds", title: "Hírfolyamok" },
+        { sep: true },
         { id: "users", title: "Felhasználók" },
         { id: "settings", title: "Beállítások" },
     ];
+    const ADMIN_WELCOME_ITEMS = /** @type {{ id: string, title: string }[]} */ (
+        ADMIN_NAV.filter((n) => n.id && n.id !== "welcome")
+    );
 
+    /** Opens a tab through the shell, so the address bar's #tab follows. */
     function goToAdminTab(/** @type {string} */ tab) {
+        if (shell) shell.select(tab);
+        else loadTab(tab);
+    }
+
+    /** The shell's onSelect: show the tab and load what it needs. */
+    function loadTab(/** @type {string} */ tab) {
         activeTab = tab;
         if (tab === "welcome") {
             fetchDashboardStats();
@@ -1389,33 +1393,6 @@
         : [];
 
     onMount(() => {
-        (async () => {
-            try {
-                const res = await apiCall("/api/config/public");
-                if (res.ok) {
-                    const data = await res.json();
-                    googleClientId = data.google_client_id || "";
-                    configUnreachable = false;
-                } else {
-                    configUnreachable = true;
-                }
-            } catch (e) {
-                configUnreachable = true;
-                console.error(e);
-            }
-            const me = await auth.refresh();
-            authReady = true;
-            adminOffline = !!me.offline;
-            if (me.isAdmin) {
-                authenticated = true;
-                fetchAll();
-            } else if (me.loggedIn) {
-                sendNonAdminAway();
-            } else {
-                // Sign-in gate (UI_BASELINE "adm-gate"): open the dialog straight away.
-                loginOpen = true;
-            }
-        })();
 
         const storedTs = localStorage.getItem("news_feed_timestamps");
         if (storedTs) {
@@ -1425,52 +1402,10 @@
         }
     });
 
-    async function onGoogleSignedIn() {
-        const me = await auth.refresh();
-        loginOpen = false;
-        if (me.isAdmin) {
-            authenticated = true;
-            authDenied = false;
-            fetchAll();
-        } else {
-            sendNonAdminAway();
-        }
-    }
-
-    /**
-     * Sign in through admin's own API, for the shared GoogleSignIn. A Google
-     * account that is not on the admin allowlist gets 403 from
-     * /api/auth/google; that visitor is sent on to Lámsza (UI_BASELINE
-     * "adm-gate") instead of seeing only "Belépés sikertelen.". Any other
-     * failure throws, and the button shows that message.
-     * @param {string} credential
-     */
-    async function adminSignIn(credential) {
-        const res = await apiCall("/api/auth/google", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ credential }),
-        });
-        if (res.status === 403) {
-            sendNonAdminAway();
-            return new Promise(() => {}); // the page is leaving
-        }
-        if (!res.ok) {
-            console.warn("admin sign-in refused:", res.status, await res.text());
-            throw new Error("refused");
-        }
-    }
-
-    /** A signed-in non-admin has nothing to do here: on to Lámsza (UI_BASELINE "adm-gate"). */
-    function sendNonAdminAway() {
-        authDenied = true;
-        window.location.assign(lamszaOrigin);
-    }
-
-    async function logout() {
-        authenticated = false;
-        await auth.logout();
-        window.location.href = "/";
+    /** The shell's onReady: the person is in as admin. */
+    function onShellReady(/** @type {{ offline: boolean }} */ me) {
+        adminOffline = me.offline;
+        fetchAll();
     }
 
     async function fetchAll() {
@@ -3887,285 +3822,16 @@
 {/snippet}
 
 
-{#if !authenticated}
-    <!-- Sign-in gate, network baseline (UI_BASELINE "adm-gate", Játszótér's): the
-         shared sign-in dialog opens by itself; a signed-in non-admin is sent on
-         to Lámsza. The admin app keeps its own shell, so no toolbar or footer. -->
-    <div class="container">
-        <div class="admin-login-wrapper">
-            <div class="card login-box">
-                {#if !authReady}
-                    <p class="greeting">Betöltés…</p>
-                {:else if authDenied}
-                    <p class="greeting">Ehhez admin jogosultság kell.</p>
-                {:else}
-                    <p class="greeting">Az admin felülethez lépj be.</p>
-                    {#if configUnreachable}
-                        <p>Az API nem elérhető, ezért a belépés most nem lehetséges.</p>
-                    {/if}
-                    <button type="button" class="btn" on:click={() => (loginOpen = true)}>Belépés</button>
-                {/if}
-            </div>
-        </div>
-    </div>
-    <SignInDialog
-        open={loginOpen}
-        appName="Lámsza admin"
-        clientId={googleClientId}
-        configReady={authReady}
-        onClose={() => (loginOpen = false)}
-        onSignedIn={onGoogleSignedIn}
-        signIn={adminSignIn}
-        policyHref={`${lamszaOrigin}/iranyelvek`}
-    />
-{:else}
-    <div class="admin-layout">
-        <aside class="admin-sidebar">
-            <div class="admin-sidebar-inner">
-            <a
-                href={lamszaOrigin}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="admin-sidebar-btn admin-sidebar-btn--external"
-                title="Lámsza megnyitása új lapon"
-            >
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"
-                    ><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline
-                        points="15 3 21 3 21 9"
-                    ></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg
-                >
-            </a>
-
-            <button
-                type="button"
-                class="admin-sidebar-btn {activeTab === 'welcome' ? 'active' : ''}"
-                on:click={() => goToAdminTab('welcome')}
-                title="Vezérlőpult"
-            >
-                <AdminNavIcon name="dashboard" />
-            </button>
-
-            <button
-                class="admin-sidebar-btn {activeTab === 'mondasok'
-                    ? 'active'
-                    : ''}"
-                on:click={() => goToAdminTab("mondasok")}
-                title="Mondások"
-            >
-                <AdminNavIcon name="mondasok" />
-            </button>
-
-            <button
-                class="admin-sidebar-btn {activeTab === 'quicklinks'
-                    ? 'active'
-                    : ''}"
-                on:click={() => goToAdminTab("quicklinks")}
-                title="Gyorslinkek"
-            >
-                <AdminNavIcon name="quicklinks" />
-            </button>
-
-            <hr class="admin-sidebar-sep" aria-hidden="true" />
-
-            <button
-                class="admin-sidebar-btn {activeTab === 'websites'
-                    ? 'active'
-                    : ''}"
-                on:click={() => goToAdminTab("websites")}
-                title="Weboldalak"
-            >
-                <AdminNavIcon name="websites" />
-            </button>
-
-            <button
-                class="admin-sidebar-btn {activeTab === 'entries'
-                    ? 'active'
-                    : ''}"
-                on:click={() => goToAdminTab("entries")}
-                title="Index"
-            >
-                <AdminNavIcon name="entries" />
-            </button>
-
-            <button
-                class="admin-sidebar-btn {activeTab === 'entry_categories'
-                    ? 'active'
-                    : ''}"
-                on:click={() => goToAdminTab("entry_categories")}
-                title="Bejegyzés Kategóriák"
-            >
-                <AdminNavIcon name="entry_categories" />
-            </button>
-
-            <button
-                class="admin-sidebar-btn {activeTab === 'entry_types'
-                    ? 'active'
-                    : ''}"
-                on:click={() => goToAdminTab("entry_types")}
-                title="Bejegyzés típusok"
-            >
-                <AdminNavIcon name="entry_types" />
-            </button>
-
-            <button
-                class="admin-sidebar-btn {activeTab === 'tags' ? 'active' : ''}"
-                on:click={() => goToAdminTab("tags")}
-                title="Címkék"
-            >
-                <AdminNavIcon name="tags" />
-            </button>
-
-            <hr class="admin-sidebar-sep" aria-hidden="true" />
-
-            <button
-                class="admin-sidebar-btn {activeTab === 'locations'
-                    ? 'active'
-                    : ''}"
-                on:click={() => goToAdminTab("locations")}
-                title="Települések"
-            >
-                <AdminNavIcon name="locations" />
-            </button>
-
-            <button
-                class="admin-sidebar-btn {activeTab === 'counties'
-                    ? 'active'
-                    : ''}"
-                on:click={() => goToAdminTab("counties")}
-                title="Megyék"
-            >
-                <AdminNavIcon name="counties" />
-            </button>
-
-            <button
-                class="admin-sidebar-btn {activeTab === 'venues' ? 'active' : ''}"
-                on:click={() => goToAdminTab("venues")}
-                title="Helyszínek"
-            >
-                <AdminNavIcon name="venues" />
-            </button>
-
-            <button
-                class="admin-sidebar-btn {activeTab === 'attractions'
-                    ? 'active'
-                    : ''}"
-                on:click={() => goToAdminTab("attractions")}
-                title="Látnivalók"
-            >
-                <AdminNavIcon name="attractions" />
-            </button>
-
-            <hr class="admin-sidebar-sep" aria-hidden="true" />
-
-            <button
-                class="admin-sidebar-btn {activeTab === 'events'
-                    ? 'active'
-                    : ''}"
-                on:click={() => goToAdminTab("events")}
-                title="Események"
-            >
-                <AdminNavIcon name="events" />
-            </button>
-
-            <hr class="admin-sidebar-sep" aria-hidden="true" />
-
-            <button
-                class="admin-sidebar-btn {activeTab === 'pages' ? 'active' : ''}"
-                on:click={() => goToAdminTab('pages')}
-                title="Oldalak"
-            >
-                <AdminNavIcon name="pages" />
-            </button>
-
-            <button
-                class="admin-sidebar-btn {activeTab === 'page_faq' ? 'active' : ''}"
-                on:click={() => goToAdminTab('page_faq')}
-                title="GYIK"
-            >
-                <AdminNavIcon name="page_faq" />
-            </button>
-
-            <button
-                class="admin-sidebar-btn {activeTab === 'weather_translations' ? 'active' : ''}"
-                on:click={() => goToAdminTab('weather_translations')}
-                title="Időjárás fordítások"
-            >
-                <AdminNavIcon name="weather_translations" />
-            </button>
-
-            <hr class="admin-sidebar-sep" aria-hidden="true" />
-
-            <button
-                class="admin-sidebar-btn {activeTab === 'newsfeeds'
-                    ? 'active'
-                    : ''}"
-                on:click={() => goToAdminTab("newsfeeds")}
-                title="Hírfolyamok"
-            >
-                <AdminNavIcon name="newsfeeds" />
-            </button>
-
-            <hr class="admin-sidebar-sep" aria-hidden="true" />
-
-            <button
-                class="admin-sidebar-btn {activeTab === 'users' ? 'active' : ''}"
-                on:click={() => goToAdminTab("users")}
-                title="Felhasználók"
-            >
-                <AdminNavIcon name="users" />
-            </button>
-
-            <button
-                class="admin-sidebar-btn {activeTab === 'settings'
-                    ? 'active'
-                    : ''}"
-                on:click={() => goToAdminTab("settings")}
-                title="Beállítások"
-            >
-                <AdminNavIcon name="settings" />
-            </button>
-            </div>
-        </aside>
-
-        <main
-            class="admin-main"
-            bind:this={adminMainEl}
-            on:scroll={() => (adminMainScrollTop = adminMainEl?.scrollTop ?? 0)}
-        >
-            <header class="admin-header">
-                <div class="admin-header-text">
-                    <h1 class="admin-page-title">{adminPageHead.title}</h1>
-                    {#if adminPageHead.greeting}
-                        <p class="admin-page-greeting">{adminPageHead.greeting}</p>
-                    {/if}
-                </div>
-                <nav class="admin-header-actions" aria-label="Lámsza admin alkalmazások">
-                    {#each adminApps as app (app.id)}
-                        <a
-                            href={app.href}
-                            class="btn nav-btn admin-header-icon-btn"
-                            title={app.label}
-                            aria-label={app.label}
-                            aria-current={app.current ? "page" : undefined}
-                            target={app.current ? undefined : "_blank"}
-                            rel={app.current ? undefined : "noopener noreferrer"}
-                        >
-                            <AppIcon name={app.icon} size={20} />
-                        </a>
-                    {/each}
-                    <button
-                        class="btn nav-btn admin-header-icon-btn"
-                        type="button"
-                        on:click={logout}
-                        title="Kijelentkezés"
-                        aria-label="Kijelentkezés"
-                    >
-                        <AppIcon name="logout" size={20} />
-                    </button>
-                </nav>
-            </header>
-
-            <div class="admin-container w-full">
+<AdminShell
+    bind:this={shell}
+    title={adminPageHead.title}
+    greeting={adminPageHead.greeting}
+    nav={ADMIN_NAV}
+    active={activeTab}
+    external={{ href: lamszaOrigin, title: "Lámsza megnyitása új lapon" }}
+    onSelect={loadTab}
+    onReady={onShellReady}
+>
                 {#if activeTab === "welcome"}
                     <section class="admin-subsection" aria-labelledby="admin-messages-title">
                         <h3 id="admin-messages-title">Üzenetek</h3>
@@ -4414,36 +4080,11 @@
                             {/if}
                         {/if}
                     </section>
-                    <div class="admin-welcome" role="navigation" aria-label="Admin részlegek">
-                        <div class="admin-welcome-grid">
-                            {#each ADMIN_WELCOME_ITEMS as item}
-                                <button
-                                    type="button"
-                                    class="admin-welcome-card"
-                                    on:click={() => goToAdminTab(item.id)}
-                                    title={item.title}
-                                    aria-label={item.title}
-                                >
-                                    <div class="admin-welcome-card-body">
-                                        <AdminNavIcon name={item.id} size={56} />
-                                    </div>
-                                    <div class="admin-welcome-card-footer">
-                                        <span class="admin-welcome-card-footer-left"
-                                            title={dashboardStatsFetched && dashboardStats[item.id] != null
-                                                ? "Rekordok száma az adatbázisban"
-                                                : "Betöltés…"}
-                                            >{dashboardStatsFetched && dashboardStats[item.id] != null
-                                                ? dashboardStats[item.id]
-                                                : "…"}</span
-                                        >
-                                        <span class="admin-welcome-card-footer-right" title={item.title}
-                                            >{item.title}</span
-                                        >
-                                    </div>
-                                </button>
-                            {/each}
-                        </div>
-                    </div>
+                    <AdminWelcomeGrid
+                        items={ADMIN_WELCOME_ITEMS}
+                        counts={dashboardStatsFetched ? dashboardStats : null}
+                        onSelect={goToAdminTab}
+                    />
                     <section class="admin-subsection" aria-labelledby="admin-cache-title">
                         <h3 id="admin-cache-title">Gyorsítótár</h3>
                         <p>
@@ -8329,19 +7970,7 @@
                             ))}
                     />
                 {/if}
-            </div>
-        </main>
-        <!-- Back-to-top, as on the other apps (UI_BASELINE "tb-backtotop"). -->
-        {#if adminMainScrollTop > 500}
-            <button
-                type="button"
-                class="btn back-to-top"
-                on:click={() => adminMainEl?.scrollTo({ top: 0, behavior: "smooth" })}
-                aria-label="Ugrás az oldal tetejére"
-                transition:fade={{ duration: 200 }}>↑</button
-            >
-        {/if}
-    </div>
+    {#snippet overlays()}
 
     <!-- Edit Mondas Modal -->
     {#if editingMondas}
@@ -9669,7 +9298,8 @@
     {#if dialogVisible && dialogType === "alert"}
         <NoticeDialog title="Üzenet" message={dialogMsg} onClose={dialogOk} />
     {/if}
-{/if}
+    {/snippet}
+</AdminShell>
 
 <style>
     @import "../styles/admin.css";
@@ -9708,11 +9338,6 @@
     .modal-actions {
         display: flex;
         gap: 0.75rem;
-    }
-    .login-box {
-        max-width: 400px;
-        text-align: center;
-        width: 100%;
     }
     .mt-lg {
         margin: 2rem auto;

@@ -280,6 +280,33 @@
             <path d="M12 8v8"></path>
             <path d="M8 12h8"></path>
         </svg>
+    {:else if name === "external"}
+        <!-- Open in a new tab (the admin sidebar's link to each app) -->
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+            <polyline points="15 3 21 3 21 9"></polyline>
+            <line x1="10" y1="14" x2="21" y2="3"></line>
+        </svg>
+    {:else if name === "inbox"}
+        <!-- Incoming items to review (Szótár suggestions) -->
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline>
+            <path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path>
+        </svg>
+    {:else if name === "rovasfejto"}
+        <!-- Rovásfejtő: two rune-like signs, drawn as strokes (the game's own
+             glyph needs the rovás web font) -->
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7 3v18M7 8l4-3M7 14l4 3"></path>
+            <path d="M17 3v18M13 8l8 8M21 8l-8 8"></path>
+        </svg>
+    {:else if name === "szokereso"}
+        <!-- Szókereső: a letter grid with a word found on the diagonal -->
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+            <path d="M9 3v18M15 3v18M3 9h18M3 15h18" opacity="0.45"></path>
+            <path d="M6 6l12 12"></path>
+        </svg>
     {:else if name === "page_faq"}
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="10"></circle>

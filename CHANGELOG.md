@@ -10,12 +10,15 @@ adds a line under `[Unreleased]` in the same commit.
 ## [Unreleased]
 
 ### Added
+- The `/dictionary` (Szótár) and `/games` (Játszótér) sections (lamsza WAYS_OF_WORKING R18), with everything the apps' own `/admin` pages do: Napi szó (pin until a date, or automatic), Szavak (search, letter filter, paging, create, live edit of every sense field, delete), Szófajok (16 intro texts), Mondások (one per day), Javaslatok (accept, reject), Rovásfejtő (create with rune preview, edit, soft delete) and the Szókereső editor, moved here from Játszótér. Each section has its own sidebar (the app in a new tab, Vezérlőpult, its tabs) and dashboard cards with the same entries and counts; tabs have a `#hash` and `#szavak/<id>` opens a word's editor. Every call goes through the relay; errors show the app's own message.
+- `AdminShell` holds the sign-in gate, sidebar, header and back-to-top for all three sections; the main admin looks the same (before/after screenshots identical). New `tests/adminSections.test.js`.
 - The relay for the coming `/dictionary` and `/games` sections (lamsza WAYS_OF_WORKING R18): `/api/admin/dictionary/…` and `/api/admin/games/…` forward to Szótár's and Játszótér's internal admin APIs on 127.0.0.1 with the service token and the acting admin's email, behind the admin check and the audit log (a `Subtree` audit resource records the real path). Settings `SZOTAR_ADMIN_URL`/`_TOKEN`, `JATSZOTER_ADMIN_URL`/`_TOKEN`. Tests with a fake app backend.
 - The network's error page through the shared minimal `ErrorShell`: the Lámsza and Admin buttons, the lantern, "Hoppácska!", the code and a Hungarian explanation; noindex, nothing fetched.
 - A back-to-top button, as on the other apps; it follows the scroll of the admin's main column.
 - Basic small-screen rules for the admin shell: a narrower icon rail, the header buttons above the title, tighter spacing, full-width edit windows.
 
 ### Changed
+- The header switcher links to `/`, `/dictionary` and `/games` in this app instead of the apps' own `/admin` pages; `VITE_ADMIN_ORIGIN`, `VITE_SZOTAR_ADMIN_ORIGIN` and `VITE_JATSZOTER_ADMIN_ORIGIN` are gone, and `VITE_SZOTAR_ORIGIN` / `VITE_JATSZOTER_ORIGIN` (with `VITE_LAMSZA_ORIGIN`) give the apps' public origins. The sidebar's "open in a new tab" icon is the shared `external` icon.
 - `tests/noEmdash.test.js` (synced from lamsza) keeps em dashes out of code and UI text in `npm test`; the `.github/ci-status-issue.*` comments are corrected network-wide; the Cursor rules are synced.
 - Sign-in follows the network gate (lamsza UI_BASELINE "adm-gate"): a card with "Az admin felülethez lépj be." and the shared `SignInDialog`, which opens by itself. A Google account that is not on the allowlist (the API answers 403) is sent on to Lámsza, through admin's own `signIn` for the shared button; before, it only saw "Belépés sikertelen.". The full-page login box is gone.
 - The confirm and notice dialogs come last in the page, so a notice raised over an edit window shows on top of it.
