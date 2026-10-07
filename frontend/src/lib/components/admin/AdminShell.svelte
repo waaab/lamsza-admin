@@ -242,26 +242,27 @@
                         <p class="admin-page-greeting">{greeting}</p>
                     {/if}
                 </div>
-                <nav class="admin-header-actions" aria-label="Lámsza admin részlegek">
+                <nav class="nav admin-header-actions" aria-label="Lámsza admin részlegek">
                     {#each apps as app (app.id)}
                         <a
                             href={app.href}
-                            class="btn nav-btn admin-header-icon-btn"
+                            class="btn nav-btn"
+                            class:active={app.current}
                             title={app.label}
                             aria-label={app.label}
                             aria-current={app.current ? "page" : undefined}
                         >
-                            <AppIcon name={app.icon} size={20} />
+                            <AppIcon name={app.icon} size={16} />
                         </a>
                     {/each}
                     <button
-                        class="btn nav-btn admin-header-icon-btn"
+                        class="btn nav-btn"
                         type="button"
                         onclick={logout}
                         title="Kijelentkezés"
                         aria-label="Kijelentkezés"
                     >
-                        <AppIcon name="logout" size={20} />
+                        <AppIcon name="logout" size={16} />
                     </button>
                 </nav>
             </header>

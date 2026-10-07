@@ -35,7 +35,7 @@
     /** @type {Record<string, { title: string, greeting: string }>} */
     const COPY = {
         welcome: {
-            title: "Szótár",
+            title: "Vezérlőpult Szótár",
             greeting:
                 "A Székely szótár adminisztrációja. A kártyákon a rekordok száma látható, a név pedig megegyezik az oldalsáv gombjaival.",
         },

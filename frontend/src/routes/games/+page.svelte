@@ -28,7 +28,7 @@
     /** @type {Record<string, { title: string, greeting: string }>} */
     const COPY = {
         welcome: {
-            title: "Játszótér",
+            title: "Vezérlőpult Játszótér",
             greeting:
                 "A Játszótér feladványainak adminisztrációja. A kártyákon a feladványok száma látható, a név pedig megegyezik az oldalsáv gombjaival.",
         },
