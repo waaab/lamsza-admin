@@ -34,7 +34,7 @@ export function adminAppLinks(env) {
         {
             id: "directory",
             icon: "dashboard",
-            label: "Directory admin",
+            label: "Lámsza admin",
             href: read("VITE_ADMIN_ORIGIN", ADMIN_APP_DEFAULTS.directory),
             current: true,
         },

@@ -1,5 +1,6 @@
 <script>
     import { onMount } from "svelte";
+    import { fade } from "svelte/transition";
     import AdminNavIcon from "$lib/components/admin/AdminNavIcon.svelte";
     import AdminPlusIcon from "$lib/components/admin/AdminPlusIcon.svelte";
     import AdminPaginationBar from "$lib/components/admin/AdminPaginationBar.svelte";
@@ -20,7 +21,9 @@
     import HuDateInput from "$lib/components/HuDateInput.svelte";
     import HuTimeInput from "$lib/components/HuTimeInput.svelte";
     import EntryPhotosEditor from "$lib/components/EntryPhotosEditor.svelte";
-    import GoogleSignIn from "$lib/components/GoogleSignIn.svelte";
+    import SignInDialog from "$lib/components/SignInDialog.svelte";
+    import ConfirmDialog from "$lib/components/ConfirmDialog.svelte";
+    import NoticeDialog from "$lib/components/NoticeDialog.svelte";
     import AppIcon from "$lib/icons/AppIcon.svelte";
     import { adminAppLinks } from "$lib/adminApps.js";
     import { canonicalDomain } from "$lib/websiteDomain.js";
@@ -43,10 +46,14 @@
     let authDenied = false;
     let googleClientId = "";
     let configUnreachable = false;
+    let loginOpen = false;
+    /** The admin shell scrolls inside <main>, not the window (back-to-top). */
+    let adminMainEl = null;
+    let adminMainScrollTop = 0;
     let adminOffline = false;
     let activeTab = "welcome";
 
-    /** Section shortcuts: order matches sidebar (below Dashboard / home). Footer hint = right column label. */
+    /** Section shortcuts: order matches sidebar (below Vezérlőpult / home). Footer hint = right column label. */
     /** Same id, icon, and title as the sidebar buttons, in sidebar order. */
     const ADMIN_WELCOME_ITEMS = [
         { id: "mondasok", title: "Mondások" },
@@ -932,7 +939,7 @@
     /** Cím + rövid köszöntő / leírás - minden admin-fülön egységes fejléc. */
     const ADMIN_PAGE_COPY = {
         welcome: {
-            title: "Dashboard",
+            title: "Vezérlőpult",
             greeting:
                 "Üdvözöllek. A kártyákon a táblák rekordjainak száma látható, a név pedig megegyezik az oldalsáv gombjaival. Kattintva megnyílik a megfelelő kezelőfelület.",
         },
@@ -1404,7 +1411,10 @@
                 authenticated = true;
                 fetchAll();
             } else if (me.loggedIn) {
-                authDenied = true;
+                sendNonAdminAway();
+            } else {
+                // Sign-in gate (UI_BASELINE "adm-gate"): open the dialog straight away.
+                loginOpen = true;
             }
         })();
 
@@ -1418,13 +1428,20 @@
 
     async function onGoogleSignedIn() {
         const me = await auth.refresh();
+        loginOpen = false;
         if (me.isAdmin) {
             authenticated = true;
             authDenied = false;
             fetchAll();
         } else {
-            authDenied = true;
+            sendNonAdminAway();
         }
+    }
+
+    /** A signed-in non-admin has nothing to do here: on to Lámsza (UI_BASELINE "adm-gate"). */
+    function sendNonAdminAway() {
+        authDenied = true;
+        window.location.assign(lamszaOrigin);
     }
 
     async function logout() {
@@ -3815,7 +3832,7 @@
         cancelEditAttraction();
     }
     async function deleteAttraction(id) {
-        if (!confirm("Biztosan törölni szeretnéd ezt a látnivalót?")) return;
+        if (!(await showConfirm("Biztosan törölni szeretnéd ezt a látnivalót?"))) return;
         try {
             const res = await apiCall(`/api/admin/attractions?id=${id}`, { method: "DELETE" });
             if (res.ok) {
@@ -3848,48 +3865,35 @@
 
 
 {#if !authenticated}
+    <!-- Sign-in gate, network baseline (UI_BASELINE "adm-gate", Játszótér's): the
+         shared sign-in dialog opens by itself; a signed-in non-admin is sent on
+         to Lámsza. The admin app keeps its own shell, so no toolbar or footer. -->
     <div class="container">
         <div class="admin-login-wrapper">
-            <div class="admin-container login-box">
+            <div class="card login-box">
                 {#if !authReady}
-                    <h2>Adminisztráció</h2>
-                    <p>Ellenőrzés…</p>
+                    <p class="greeting">Betöltés…</p>
                 {:else if authDenied}
-                    <h2>Nincs jogosultság</h2>
-                    <p>
-                        Ez a Google-fiók be van jelentkezve, de nem
-                        adminisztrátor.
-                    </p>
-                    <button
-                        type="button"
-                        class="admin-submit-btn"
-                        on:click={logout}>Kijelentkezés</button
-                    >
+                    <p class="greeting">Ehhez admin jogosultság kell.</p>
                 {:else}
-                    <h2>Adminisztráció Belépés</h2>
-                    <p>
-                        Jelentkezz be Google-fiókkal. Csak az admin e-mail
-                        érheti el ezt a felületet.
-                    </p>
-                    {#if googleClientId}
-                        {#key googleClientId}
-                            <GoogleSignIn
-                                clientId={googleClientId}
-                                onSignedIn={onGoogleSignedIn}
-                            />
-                        {/key}
-                    {:else if configUnreachable}
+                    <p class="greeting">Az admin felülethez lépj be.</p>
+                    {#if configUnreachable}
                         <p>Az API nem elérhető, ezért a belépés most nem lehetséges.</p>
-                    {:else}
-                        <p>
-                            A Google belépés nincs beállítva
-                            (GOOGLE_CLIENT_ID).
-                        </p>
                     {/if}
+                    <button type="button" class="btn" on:click={() => (loginOpen = true)}>Belépés</button>
                 {/if}
             </div>
         </div>
     </div>
+    <SignInDialog
+        open={loginOpen}
+        appName="Lámsza admin"
+        clientId={googleClientId}
+        configReady={authReady}
+        onClose={() => (loginOpen = false)}
+        onSignedIn={onGoogleSignedIn}
+        policyHref={`${lamszaOrigin}/iranyelvek`}
+    />
 {:else}
     <div class="admin-layout">
         <aside class="admin-sidebar">
@@ -3899,7 +3903,7 @@
                 target="_blank"
                 rel="noopener noreferrer"
                 class="admin-sidebar-btn admin-sidebar-btn--external"
-                title="Open homepage in new tab"
+                title="Lámsza megnyitása új lapon"
             >
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"
                     ><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline
@@ -3912,7 +3916,7 @@
                 type="button"
                 class="admin-sidebar-btn {activeTab === 'welcome' ? 'active' : ''}"
                 on:click={() => goToAdminTab('welcome')}
-                title="Dashboard"
+                title="Vezérlőpult"
             >
                 <AdminNavIcon name="dashboard" />
             </button>
@@ -4099,7 +4103,11 @@
             </div>
         </aside>
 
-        <main class="admin-main">
+        <main
+            class="admin-main"
+            bind:this={adminMainEl}
+            on:scroll={() => (adminMainScrollTop = adminMainEl?.scrollTop ?? 0)}
+        >
             <header class="admin-header">
                 <div class="admin-header-text">
                     <h1 class="admin-page-title">{adminPageHead.title}</h1>
@@ -4128,21 +4136,7 @@
                         title="Kijelentkezés"
                         aria-label="Kijelentkezés"
                     >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="20"
-                            height="20"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            aria-hidden="true"
-                            ><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline
-                                points="16 17 21 12 16 7"
-                            /><line x1="21" y1="12" x2="9" y2="12" /></svg
-                        >
+                        <AppIcon name="logout" size={20} />
                     </button>
                 </nav>
             </header>
@@ -4195,10 +4189,10 @@
                                                             10,
                                                         ),
                                                         websiteApproveExtra[msg.websiteId] || [],
-                                                    )}>Approve</button
+                                                    )}>Jóváhagyás</button
                                             >
-                                            <button type="button" class="btn btn-sm" on:click={() => reviewWebsite(msg.websiteId, "reject")}>Reject</button>
-                                            <button type="button" class="btn btn-sm" on:click={() => reviewWebsite(msg.websiteId, "ban")}>Ban User</button>
+                                            <button type="button" class="btn btn-sm" on:click={() => reviewWebsite(msg.websiteId, "reject")}>Elutasítás</button>
+                                            <button type="button" class="btn btn-sm" on:click={() => reviewWebsite(msg.websiteId, "ban")}>Felhasználó tiltása</button>
                                         {/if}
                                     </p>
                                 {/if}
@@ -4396,7 +4390,7 @@
                             {/if}
                         {/if}
                     </section>
-                    <div class="admin-welcome" role="navigation" aria-label="Admin sections">
+                    <div class="admin-welcome" role="navigation" aria-label="Admin részlegek">
                         <div class="admin-welcome-grid">
                             {#each ADMIN_WELCOME_ITEMS as item}
                                 <button
@@ -8313,19 +8307,29 @@
                 {/if}
             </div>
         </main>
+        <!-- Back-to-top, as on the other apps (UI_BASELINE "tb-backtotop"). -->
+        {#if adminMainScrollTop > 500}
+            <button
+                type="button"
+                class="btn back-to-top"
+                on:click={() => adminMainEl?.scrollTo({ top: 0, behavior: "smooth" })}
+                aria-label="Ugrás az oldal tetejére"
+                transition:fade={{ duration: 200 }}>↑</button
+            >
+        {/if}
     </div>
 
     <!-- Edit Mondas Modal -->
     {#if editingMondas}
         <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
         <div
-            class="admin-modal-overlay"
+            class="link-dialog-overlay"
             role="dialog"
             tabindex="-1"
             on:click|self={cancelEditMondas}
             on:keydown={(e) => e.key === "Escape" && cancelEditMondas()}
         >
-            <div class="admin-modal">
+            <div class="link-dialog admin-modal">
                 <h3>Mondás szerkesztése</h3>
                 <form
                     class="admin-form"
@@ -8377,13 +8381,13 @@
     {#if editingLink}
         <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
         <div
-            class="admin-modal-overlay"
+            class="link-dialog-overlay"
             role="dialog"
             tabindex="-1"
             on:click|self={cancelEditLink}
             on:keydown={(e) => e.key === "Escape" && cancelEditLink()}
         >
-            <div class="admin-modal">
+            <div class="link-dialog admin-modal">
                 <h3>Gyorslink szerkesztése</h3>
                 <form
                     class="admin-form"
@@ -8431,13 +8435,13 @@
     {#if editingNews}
         <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
         <div
-            class="admin-modal-overlay"
+            class="link-dialog-overlay"
             role="dialog"
             tabindex="-1"
             on:click|self={cancelEditNews}
             on:keydown={(e) => e.key === "Escape" && cancelEditNews()}
         >
-            <div class="admin-modal">
+            <div class="link-dialog admin-modal">
                 <h3>Hírfolyam szerkesztése</h3>
                 <form
                     class="admin-form"
@@ -8485,13 +8489,13 @@
     {#if editingEntry}
         <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
         <div
-            class="admin-modal-overlay"
+            class="link-dialog-overlay"
             role="dialog"
             tabindex="-1"
             on:click|self={closeEdit}
             on:keydown={(e) => e.key === "Escape" && closeEdit()}
         >
-            <div class="admin-modal">
+            <div class="link-dialog admin-modal">
                 <h3>Bejegyzés szerkesztése</h3>
                 <form class="admin-form" on:submit|preventDefault={saveEdit}>
                     <label for="edit_type">Típus</label>
@@ -8681,13 +8685,13 @@
     {#if editingLocation}
         <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
         <div
-            class="admin-modal-overlay"
+            class="link-dialog-overlay"
             role="dialog"
             tabindex="-1"
             on:click|self={cancelEditLocation}
             on:keydown={(e) => e.key === "Escape" && cancelEditLocation()}
         >
-            <div class="admin-modal">
+            <div class="link-dialog admin-modal">
                 <h3>Település szerkesztése</h3>
                 <form
                     class="admin-form"
@@ -8806,13 +8810,13 @@
     {#if editingVenue}
         <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
         <div
-            class="admin-modal-overlay"
+            class="link-dialog-overlay"
             role="dialog"
             tabindex="-1"
             on:click|self={cancelEditVenue}
             on:keydown={(e) => e.key === "Escape" && cancelEditVenue()}
         >
-            <div class="admin-modal">
+            <div class="link-dialog admin-modal">
                 <h3>Helyszín szerkesztése</h3>
                 <form
                     class="admin-form"
@@ -8945,13 +8949,13 @@
     {#if editingCategory}
         <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
         <div
-            class="admin-modal-overlay"
+            class="link-dialog-overlay"
             role="dialog"
             tabindex="-1"
             on:click|self={cancelEditCategory}
             on:keydown={(e) => e.key === "Escape" && cancelEditCategory()}
         >
-            <div class="admin-modal">
+            <div class="link-dialog admin-modal">
                 <h3>Kategória szerkesztése</h3>
                 <form
                     class="admin-form"
@@ -8984,13 +8988,13 @@
     {#if editingType}
         <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
         <div
-            class="admin-modal-overlay"
+            class="link-dialog-overlay"
             role="dialog"
             tabindex="-1"
             on:click|self={cancelEditType}
             on:keydown={(e) => e.key === "Escape" && cancelEditType()}
         >
-            <div class="admin-modal">
+            <div class="link-dialog admin-modal">
                 <h3>Típus szerkesztése</h3>
                 <form
                     class="admin-form"
@@ -9023,13 +9027,13 @@
     {#if editingTag}
         <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
         <div
-            class="admin-modal-overlay"
+            class="link-dialog-overlay"
             role="dialog"
             tabindex="-1"
             on:click|self={cancelEditTag}
             on:keydown={(e) => e.key === "Escape" && cancelEditTag()}
         >
-            <div class="admin-modal">
+            <div class="link-dialog admin-modal">
                 <h3>Címke szerkesztése</h3>
                 <form class="admin-form" on:submit|preventDefault={saveEditTag}>
                     <label for="etag_name">Címke neve</label>
@@ -9047,13 +9051,13 @@
     {#if editingAttraction}
         <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
         <div
-            class="admin-modal-overlay"
+            class="link-dialog-overlay"
             role="dialog"
             tabindex="-1"
             on:click|self={cancelEditAttraction}
             on:keydown={(e) => e.key === "Escape" && cancelEditAttraction()}
         >
-            <div class="admin-modal">
+            <div class="link-dialog admin-modal">
                 <h3>Látnivaló szerkesztése</h3>
                 <form
                     class="admin-form"
@@ -9096,42 +9100,30 @@
         </div>
     {/if}
 
-    <!-- Custom Dialog -->
-    {#if dialogVisible}
-        <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
-        <div
-            class="admin-dialog-overlay"
-            role="alertdialog"
-            tabindex="-1"
-            on:click|self={dialogCancel}
-        >
-            <div class="admin-dialog">
-                <p>{dialogMsg}</p>
-                <div class="admin-dialog-actions">
-                    {#if dialogType === "confirm"}
-                        <button class="btn-delete" on:click={dialogCancel}
-                            >Mégse</button
-                        >
-                    {/if}
-                    <button class="admin-submit-btn" on:click={dialogOk}
-                        >OK</button
-                    >
-                </div>
-            </div>
-        </div>
+    <!-- Network dialogs (UI_BASELINE "dlg-confirm", "dlg-notice"): showConfirm()
+         asks with Mégse next to Igen; showAlert() only informs, so it closes
+         with Bezárás ("dlg-close-label"). -->
+    <ConfirmDialog
+        open={dialogVisible && dialogType === "confirm"}
+        message={dialogMsg}
+        onYes={dialogOk}
+        onNo={dialogCancel}
+    />
+    {#if dialogVisible && dialogType === "alert"}
+        <NoticeDialog title="Üzenet" message={dialogMsg} onClose={dialogOk} />
     {/if}
 
     <!-- Edit Event Modal -->
     {#if editingEvent}
         <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
         <div
-            class="admin-modal-overlay"
+            class="link-dialog-overlay"
             role="dialog"
             tabindex="-1"
             on:click|self={cancelEditEvent}
             on:keydown={(e) => e.key === "Escape" && cancelEditEvent()}
         >
-            <div class="admin-modal">
+            <div class="link-dialog admin-modal">
                 <h3>Esemény szerkesztése</h3>
                 <p class="admin-form-hint">
                     A dátumok és időpontok (óra:perc) kötelezőek.
@@ -9588,14 +9580,14 @@
     {#if newOrganizerModalVisible}
         <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
         <div
-            class="admin-modal-overlay"
+            class="link-dialog-overlay"
             role="dialog"
             tabindex="-1"
             on:click|self={() => (newOrganizerModalVisible = false)}
             on:keydown={(e) =>
                 e.key === "Escape" && (newOrganizerModalVisible = false)}
         >
-            <div class="admin-modal">
+            <div class="link-dialog admin-modal">
                 <h3>Új Szervező Hozzáadása</h3>
                 <form class="admin-form" on:submit={submitNewOrganizer}>
                     <label for="org_loc">Település</label>
@@ -9655,27 +9647,6 @@
 <style>
     @import "../styles/admin.css";
 
-    .admin-modal-overlay {
-        position: fixed;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.6);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 1000;
-    }
-    .admin-modal {
-        background: var(--card-bg, #1e1e2e);
-        border: 1px solid var(--border-color, #444);
-        border-radius: 12px;
-        padding: 2rem;
-        width: min(1200px, 95vw);
-        max-height: 90vh;
-        overflow-y: auto;
-    }
-    .admin-modal h3 {
-        margin-top: 0;
-    }
     .badge {
         display: inline-block;
         padding: 0.15rem 0.5rem;
@@ -9683,35 +9654,6 @@
         background: var(--accent-bg, #2a2a3e);
         color: var(--muted, #aaa);
         border: 1px solid var(--border-color, #444);
-    }
-    .admin-dialog-overlay {
-        position: fixed;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.55);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 2000;
-    }
-    .admin-dialog {
-        background: var(--card-bg, #1e1e2e);
-        border: 1px solid var(--border-color, #444);
-        border-radius: 12px;
-        padding: 1.5rem 2rem;
-        width: min(420px, 90vw);
-        text-align: center;
-    }
-    .admin-dialog p {
-        margin: 0 0 1.25rem;
-        line-height: 1.5;
-    }
-    .admin-dialog-actions {
-        display: flex;
-        gap: 0.75rem;
-        justify-content: center;
-    }
-    .admin-dialog-actions button {
-        min-width: 80px;
     }
     .form-group-label {
         display: block;

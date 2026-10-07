@@ -2,7 +2,12 @@
     import { onMount } from "svelte";
     import { getApiBase } from "$lib/api.js";
 
-    let { clientId = "", onSignedIn = () => {} } = $props();
+    /**
+     * signIn: optional. Given a Google credential, sign in with this app's own
+     * API (an app may need extra headers, e.g. Játszótér's anonymous id). Left
+     * out, the component POSTs to /api/auth/google itself.
+     */
+    let { clientId = "", onSignedIn = () => {}, signIn = null } = $props();
 
     let host = $state(null);
     let error = $state("");
@@ -72,6 +77,11 @@
         loading = true;
         error = "";
         try {
+            if (signIn) {
+                await signIn(response.credential);
+                await onSignedIn();
+                return;
+            }
             const res = await fetch(`${getApiBase()}/api/auth/google`, {
                 method: "POST",
                 credentials: "include",
@@ -79,12 +89,14 @@
                 body: JSON.stringify({ credential: response.credential }),
             });
             if (!res.ok) {
-                const t = await res.text();
-                throw new Error(t || "Belépés sikertelen");
+                // The server's reason is for the log, not the visitor: it can
+                // be an English "invalid google token" (UI_BASELINE "si-errors").
+                console.warn("google sign-in refused:", res.status, await res.text());
+                throw new Error("refused");
             }
             await onSignedIn();
         } catch (e) {
-            error = e.message || "Belépés sikertelen";
+            error = "Belépés sikertelen.";
         } finally {
             loading = false;
         }
@@ -124,7 +136,8 @@
     }
     .login-error {
         margin: 0;
-        color: #b00020;
+        color: var(--szekely-red);
+        font-size: var(--text-sm);
         text-align: center;
     }
 </style>

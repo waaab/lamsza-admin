@@ -9,6 +9,21 @@ adds a line under `[Unreleased]` in the same commit.
 
 ## [Unreleased]
 
+### Added
+- The network's error page (`+error.svelte` renders the shared `ErrorPage`): the lantern, "Hoppácska!", the code and a Hungarian explanation, noindex.
+- A back-to-top button, as on the other apps; it follows the scroll of the admin's main column.
+- Basic small-screen rules for the admin shell: a narrower icon rail, the header buttons above the title, tighter spacing, full-width edit windows.
+
+### Changed
+- Sign-in follows the network gate (lamsza UI_BASELINE "adm-gate"): a card with "Az admin felülethez lépj be." and the shared `SignInDialog`, which opens by itself; a signed-in non-admin is sent on to Lámsza. The full-page login box is gone.
+- Confirmations use the shared `ConfirmDialog` (Mégse, then Igen) and messages the shared `NoticeDialog` (closed with "Bezárás"), instead of the inline dialog with "OK"; the one native `confirm()` (deleting an attraction) goes through the same dialog.
+- The edit windows sit on the network's content-dialog shell (`.link-dialog`); a wide table inside scrolls sideways.
+- English labels are Hungarian: "Vezérlőpult", "Jóváhagyás", "Elutasítás", "Felhasználó tiltása", "Lámsza megnyitása új lapon", and "Lámsza admin" in the app switcher.
+- Synced from lamsza: `ConfirmDialog`, `NoticeDialog`, `SignInDialog`, `ErrorPage`, `ErrorLantern`, the updated `AppIcon` (the Játszótér cross), `GoogleSignIn` ("Belépés sikertelen."), `global.css` and the drift test; the header's logout icon comes from `AppIcon`. The Cursor UI rule is synced too.
+
+### Fixed
+- Text fields in the admin forms no longer run past their box (`box-sizing: border-box`).
+
 ---
 
 ## [0.1.0] - 2026-10-07

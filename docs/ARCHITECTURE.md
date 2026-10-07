@@ -144,10 +144,12 @@ same retention note in `lamsza/backend/migrations/admin_audit_log.sql`. Nothing 
 
 ## Shared frontend modules
 
-17 frontend files are identical to `lamsza`'s. **`lamsza` owns them**; this repo carries a
-generated copy under `frontend/src/lib`, plus `frontend/shared-frontend-modules.json`.
-Never edit one here — edit it in `lamsza`, run `lamsza/scripts/sync-shared-frontend.sh`, and
-commit both repos. `frontend/tests/sharedFrontendModules.test.js` hashes the copies against
+The frontend files listed in `frontend/shared-frontend-modules.json` are identical to
+`lamsza`'s: helpers, the shared dialogs (`ConfirmDialog`, `NoticeDialog`, `SignInDialog`),
+the icons (`AppIcon`, `ErrorLantern`), the error page (`ErrorPage`) and the three base
+stylesheets. **`lamsza` owns them**; this repo carries a generated copy under
+`frontend/src`. Never edit one here: edit it in `lamsza`, run
+`lamsza/scripts/sync-shared-frontend.sh`, and commit lamsza and every app that changed. `frontend/tests/sharedFrontendModules.test.js` hashes the copies against
 the manifest on every `npm test`, so an edit made here goes red. The rule and the rejected
 alternatives are in `lamsza/docs/network/SHARED_FRONTEND_MODULES.md`.
 

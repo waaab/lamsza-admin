@@ -1,7 +1,7 @@
 @import "./typography.css";
 @import "./component-typography.css";
 
-/* Székely Gugel Global Styles */
+/* Lámsza Global Styles */
 :root {
   /* Brand Colors */
   --szekely-brown: #7a3c10;
@@ -10,6 +10,8 @@
   --szekely-pink: #ffebf4;
   --szekely-blue: #0059b3;
   --warning-orange: #d96600;
+  /* Warm lamplight: the error page's lantern glow (UI_BASELINE "err-page"). */
+  --warm-light: #e39b2d;
 
   /* Search Engine Colors */
   --google-green: #008000;
@@ -87,6 +89,7 @@
   --szekely-red: #c8102e;
   --szekely-blue: #66b2ff;
   --warning-orange: #ff9933;
+  --warm-light: #f2b44f;
 
   /* Theme tokens - Dark */
   --bg-body: #111111;
@@ -158,6 +161,7 @@
     --szekely-red: #c8102e;
     --szekely-blue: #66b2ff;
     --warning-orange: #ff9933;
+    --warm-light: #f2b44f;
 
     /* Theme tokens - Dark */
     --bg-body: #111111;
@@ -2718,6 +2722,9 @@ footer {
   -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
   -webkit-user-drag: none;
+  /* A double click on a button must not select its label (UI_BASELINE "css-btn"). */
+  -webkit-user-select: none;
+  user-select: none;
   box-sizing: border-box;
 }
 

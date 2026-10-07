@@ -350,6 +350,8 @@
 .admin-form input,
 .admin-form select,
 .admin-form textarea {
+    /* Padding and border inside the width, so a full-width field stays in its box. */
+    box-sizing: border-box;
     padding: 0.8rem;
     border: 1px solid var(--border-color);
     border-radius: 4px;
@@ -807,4 +809,62 @@
 .admin-thumb-empty {
     color: var(--text-muted);
     font-size: var(--text-sm);
+}
+/* Edit windows sit on the network's content-dialog shell, .link-dialog in
+   global.css (UI_BASELINE "dlg-content"). A wide table inside one scrolls
+   sideways instead of being cut off by the shell's overflow-x: hidden. */
+.link-dialog.admin-modal {
+    overflow-x: auto;
+}
+
+/* Small screens: basic rules for admin's own shell (UI_BASELINE
+   "tb-responsive"; admin has no network toolbar). A narrower icon rail, the
+   header buttons above the title, tighter spacing, and edit windows that use
+   the screen's width instead of the shell's 70vw. */
+@media (max-width: 768px) {
+    .admin-sidebar {
+        width: 52px;
+        flex-basis: 52px;
+    }
+
+    .admin-sidebar-btn {
+        padding: 7px;
+    }
+
+    /* AppIcon sizes its wrapper inline (size={28}), so only !important can
+       shrink it here. */
+    .admin-sidebar-btn .app-icon-wrap,
+    .admin-sidebar-btn svg {
+        width: 22px !important;
+        height: 22px !important;
+    }
+
+    .admin-sidebar-sep {
+        width: 32px;
+    }
+
+    .admin-main {
+        padding: 0.75rem;
+    }
+
+    .admin-header {
+        flex-direction: column-reverse;
+        gap: 0.75rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .admin-header-actions {
+        align-self: flex-end;
+    }
+
+    .admin-welcome-grid {
+        grid-template-columns: repeat(auto-fill, minmax(8rem, 1fr));
+        gap: 0.75rem;
+    }
+
+    .link-dialog.admin-modal {
+        width: calc(100vw - 1rem);
+        max-width: calc(100vw - 1rem);
+        padding: 1.25rem 1rem;
+    }
 }
