@@ -1,21 +1,17 @@
 <script>
 	import { page } from '$app/stores';
-	import ErrorPage from '$lib/components/ErrorPage.svelte';
+	import ErrorShell from '$lib/components/ErrorShell.svelte';
+
+	const lamszaOrigin = import.meta.env.VITE_LAMSZA_ORIGIN || 'http://localhost:5174';
 </script>
 
-<!-- The network's shared error page (lamsza UI_BASELINE "err-page"). Admin's
-     shell (icon rail and header) lives inside its one page, so an unknown
-     address shows the error on its own, like Lámsza's root error page.
-     ErrorPage is synced from lamsza: edit it there, never here. -->
-<main class="container admin-error">
-	<ErrorPage status={$page.status} appName="Lámsza admin" />
-</main>
-
-<style>
-	.admin-error {
-		min-height: 100vh;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
-</style>
+<!-- The network's shared minimal error shell (lamsza UI_BASELINE "err-page"):
+     the Lámsza and Admin buttons, no icon rail or header, nothing fetched.
+     Admin's own shell lives inside its one page, so the error page never gets
+     it. ErrorShell is synced from lamsza: edit it there, never here. -->
+<ErrorShell
+	status={$page.status}
+	appName="Lámsza admin"
+	lamszaHref={lamszaOrigin}
+	app={{ label: 'Admin', icon: 'dashboard' }}
+/>

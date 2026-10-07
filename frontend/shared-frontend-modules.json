@@ -29,6 +29,7 @@
     "src/styles/typography.css": "sha256:08537311b6fee3690ce6b246a0d4449a4243d1e192369b0efc2704d99e5f4113",
     "src/styles/component-typography.css": "sha256:7e37fec71de7dcd1ff6cdd043f8b7428acb719c4458e70b93a1917c1f7806bee",
     "src/lib/icons/ErrorLantern.svelte": "sha256:79a4741e5c51b7aac56a985628e4b2767a1965cb1adae71bec0bafe194de661f",
-    "src/lib/components/ErrorPage.svelte": "sha256:061719d190be3ce1aba85d47eff1999380d938b2b0f7d92c9f3e9f7d64f7eafd"
+    "src/lib/components/ErrorPage.svelte": "sha256:061719d190be3ce1aba85d47eff1999380d938b2b0f7d92c9f3e9f7d64f7eafd",
+    "src/lib/components/ErrorShell.svelte": "sha256:9bd9917055880c1d91214294cd954486abc2fb0c39b0667590c99d3a9b38b748"
   }
 }

@@ -10,7 +10,7 @@ adds a line under `[Unreleased]` in the same commit.
 ## [Unreleased]
 
 ### Added
-- The network's error page (`+error.svelte` renders the shared `ErrorPage`): the lantern, "Hoppácska!", the code and a Hungarian explanation, noindex.
+- The network's error page through the shared minimal `ErrorShell`: the Lámsza and Admin buttons, the lantern, "Hoppácska!", the code and a Hungarian explanation; noindex, nothing fetched.
 - A back-to-top button, as on the other apps; it follows the scroll of the admin's main column.
 - Basic small-screen rules for the admin shell: a narrower icon rail, the header buttons above the title, tighter spacing, full-width edit windows.
 
