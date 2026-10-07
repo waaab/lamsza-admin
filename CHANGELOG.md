@@ -18,6 +18,7 @@ adds a line under `[Unreleased]` in the same commit.
 - Basic small-screen rules for the admin shell: a narrower icon rail, the header buttons above the title, tighter spacing, full-width edit windows.
 
 ### Changed
+- `/dictionary` Mondások has everything the main admin's Mondások page has: search by text, meaning, ID or date, 10 rows a page, "Mai nap" in the new and edit forms, the "ma" badge and highlighted row, the explanatory text, and the warning when today has no mondás, in the tab and on Vezérlőpult Szótár (with Megnyitás). "Today" is Szótár's Bucharest day (R19). Szótár's proverbs are the network's only mondás store now (owner's decision).
 - `/dictionary`: Javaslatok is "Szójavaslatok", right under Szavak, with the new shared `word-suggestions` icon and a description that says these are users' suggested changes to words (new words, new meanings, forms). The shared `words` and `word-suggestions` icons are synced from lamsza.
 - The date defaults in `/dictionary` (a new mondás) and `/games` (a new Szókereső puzzle) are Szótár's and Játszótér's Bucharest `today` (lamsza WAYS_OF_WORKING R19), not the browser's date; `localISODate` is gone from `sectionApi.js`.
 - The Mondások icon is the new shared one (Google's filled `format_quote`, centered, synced from lamsza); the `svg.app-icon-quote` rules for the old `<text>` glyph are gone from `admin.css`.

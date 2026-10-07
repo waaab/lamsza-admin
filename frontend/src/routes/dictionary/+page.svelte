@@ -58,17 +58,21 @@
     let counts = $state(null);
     /** @type {any} */
     let daily = $state(null);
+    /** Today's mondás from Szótár (null when none), for the warning below. */
+    let mondasToday = $state(/** @type {{ today: string, proverb: any } | null} */ (null));
     let statsError = $state("");
 
     const head = $derived(COPY[active] || COPY.welcome);
 
     async function loadStats() {
         try {
-            const [stats, day, choices] = await Promise.all([
+            const [stats, day, choices, mondas] = await Promise.all([
                 sectionFetch("dictionary", "stats"),
                 sectionFetch("dictionary", "daily"),
                 sectionFetch("dictionary", "daily/choices"),
+                sectionFetch("dictionary", "proverbs/today"),
             ]);
+            mondasToday = mondas;
             counts = {
                 napi: (choices?.words || []).length,
                 szavak: stats.words,
@@ -126,6 +130,16 @@
                         {/if}
                     </p>
                     <p><button type="button" class="btn btn-sm" onclick={() => shell?.select("napi")}>Megnyitás</button></p>
+                </div>
+            {/if}
+            {#if mondasToday && !mondasToday.proverb}
+                <!-- The main admin's "no mondás today" warning, moved here with the Mondások (R19 day). -->
+                <div class="info-box warning" role="status">
+                    <p>
+                        Ma ({formatHuDate(mondasToday.today)}) nincs beütemezett mondás, ezért a kezdőlapokon a
+                        mondás-blokk rejtve marad.
+                    </p>
+                    <p><button type="button" class="btn btn-sm" onclick={() => shell?.select("mondasok")}>Megnyitás</button></p>
                 </div>
             {/if}
             {#if counts}
