@@ -115,19 +115,6 @@
     stroke-linejoin: round;
 }
 
-/* Quote icon (mondasok): single „ uses <text>, not stroke */
-.admin-sidebar-btn svg.app-icon-quote,
-.admin-welcome-card svg.app-icon-quote {
-    stroke: none;
-    fill: none;
-}
-
-.admin-sidebar-btn svg.app-icon-quote text,
-.admin-welcome-card svg.app-icon-quote text {
-    fill: currentColor;
-    stroke: none;
-}
-
 /* Venue icon: filled dot (same as original sidebar markup) */
 .admin-sidebar-btn svg circle[fill="currentColor"],
 .admin-welcome-card svg circle[fill="currentColor"] {

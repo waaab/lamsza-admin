@@ -56,17 +56,11 @@
             <path d="M2.3 14.2 3.8 19.4 5.3 16.2 6.8 19.4 8.3 14.2"></path>
         </svg>
     {:else if name === "mondasok"}
-        <!-- Hungarian „ - scaled to match visual weight of 24×24 stroke icons -->
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" overflow="visible" class="app-icon-quote">
-            <g transform="translate(12 17.5) scale(1.62) translate(-12 -17.5)">
-                <text
-                    x="12"
-                    y="18"
-                    text-anchor="middle"
-                    font-size="24"
-                    font-weight="800"
-                    font-family="Georgia, 'Times New Roman', Times, serif">„</text>
-            </g>
+        <!-- Google Material Symbols "format_quote", filled (the outlined one has holes).
+             The viewBox crops it 1.25x so it spans 2-22 like the stroke icons, centered.
+             fill/stroke sit on the path so app CSS that strokes every svg leaves it alone. -->
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="96 -864 768 768" class="app-icon-quote">
+            <path fill="currentColor" stroke="none" d="m228-240 92-160q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 23-5.5 42.5T458-480L320-240h-92Zm360 0 92-160q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 23-5.5 42.5T818-480L680-240h-92Z"></path>
         </svg>
     {:else if name === "quicklinks"}
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
@@ -306,6 +300,20 @@
             <rect x="3" y="3" width="18" height="18" rx="2"></rect>
             <path d="M9 3v18M15 3v18M3 9h18M3 15h18" opacity="0.45"></path>
             <path d="M6 6l12 12"></path>
+        </svg>
+    {:else if name === "words"}
+        <!-- Words: the rovás letter G (𐲍, U+10C8D). Its strokes are the centrelines
+             of the --font-rovas glyph (Noto Sans Old Hungarian), traced, not drawn. -->
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4.75 20.25 L12 3 L19.25 20.5"></path>
+            <path d="M15 10.75 L9.75 21"></path>
+        </svg>
+    {:else if name === "word-suggestions"}
+        <!-- Word suggestions from users: the words sign, smaller, with a checkmark -->
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 15 L7.5 2 L13 15"></path>
+            <path d="M9.75 8 L5.75 15.5"></path>
+            <path d="M13 18 L16 21 L22 15"></path>
         </svg>
     {:else if name === "page_faq"}
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
