@@ -71,8 +71,6 @@ func newMux() *http.ServeMux {
 	mux.HandleFunc("/api/auth/google", middleware.ApplyCORS(auth.HandleGoogleLogin))
 	mux.HandleFunc("/api/auth/me", middleware.ApplyCORS(auth.HandleMe))
 	mux.HandleFunc("/api/auth/logout", middleware.ApplyCORS(auth.HandleLogout))
-	// Its own narrow CORS (the network's sites, GET only): see the handler.
-	mux.HandleFunc("/api/auth/admin-status", auth.HandleAdminStatus)
 
 	admin("/api/admin/listing-queue", account.HandleListingQueue)
 	admin("/api/admin/listing-queue/publish", account.HandleListingQueuePublish)
