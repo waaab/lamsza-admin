@@ -1478,8 +1478,7 @@
                 quick_links_version: data.quick_links_version ?? "1",
                 weather_icon_style: data.weather_icon_style ?? "emoji",
                 weather_active_users_estimate: data.weather_active_users_estimate ?? "10000",
-                weather_provider_default: data.weather_provider_default ?? "open_meteo",
-                weather_provider_open_meteo_enabled: data.weather_provider_open_meteo_enabled ?? "true",
+                weather_provider_metno_enabled: data.weather_provider_metno_enabled ?? "true",
                 weather_provider_weatherapi_enabled: data.weather_provider_weatherapi_enabled ?? "true",
                 weather_provider_openweathermap_enabled: data.weather_provider_openweathermap_enabled ?? "true",
                 my_location_slug: data.my_location_slug ?? "csikszereda",
@@ -4397,10 +4396,11 @@
                             bind:value={newLocation.post_code}
                         />
 
-                        <label for="loc_coords">Koordináták</label>
+                        <label for="loc_coords">Koordináták (szélesség, hosszúság)</label>
                         <input
                             id="loc_coords"
                             type="text"
+                            placeholder="46.3593, 25.8017"
                             bind:value={newLocation.coordinates}
                         />
 
@@ -6607,19 +6607,12 @@
                     <section class="admin-form-section">
                         <h3>Időjárás (Weather)</h3>
                         <div class="admin-form">
-                            <label for="weather_provider_default">Alapértelmezett szolgáltató</label>
-                            <select id="weather_provider_default" name="weather_provider_default" bind:value={siteSettings.weather_provider_default}>
-<option value="">Válassz...</option>
-                                <option value="open_meteo">Open-Meteo</option>
-                                <option value="weatherapi_com">WeatherAPI.com</option>
-                                <option value="openweathermap">OpenWeatherMap</option>
-                            </select>
-
-                            <span class="form-group-label">Szolgáltatók engedélyezése</span>
+                            <span class="form-group-label">Szolgáltatók</span>
+                            <p class="admin-form-hint">Fix sorrend: a MET Norway a fő forrás (kb. 9 nap, az archívum is ebből készül); a WeatherAPI.com és az OpenWeatherMap csak akkor kell, ha a MET órák óta nem válaszol. Csak üzleti használatra is ingyenes források; az Open-Meteo ezért került ki.</p>
                             <div class="flex gap-lg flex-wrap mb-lg">
                                 <label class="flex items-center gap-xs font-normal">
-                                    <input id="weather_provider_open_meteo_enabled" name="weather_provider_open_meteo_enabled" type="checkbox" checked={siteSettings.weather_provider_open_meteo_enabled === 'true'} on:change={(e) => siteSettings.weather_provider_open_meteo_enabled = e.target.checked ? 'true' : 'false'} class="w-auto" />
-                                    Open-Meteo
+                                    <input id="weather_provider_metno_enabled" name="weather_provider_metno_enabled" type="checkbox" checked={siteSettings.weather_provider_metno_enabled !== 'false'} on:change={(e) => siteSettings.weather_provider_metno_enabled = e.target.checked ? 'true' : 'false'} class="w-auto" />
+                                    MET Norway
                                 </label>
                                 <label class="flex items-center gap-xs font-normal">
                                     <input id="weather_provider_weatherapi_enabled" name="weather_provider_weatherapi_enabled" type="checkbox" checked={siteSettings.weather_provider_weatherapi_enabled === 'true'} on:change={(e) => siteSettings.weather_provider_weatherapi_enabled = e.target.checked ? 'true' : 'false'} class="w-auto" />
@@ -6694,8 +6687,8 @@
                         <details class="admin-create-panel">
                             <summary class="admin-create-summary"><span>Új fordítás</span><AppIcon name="plus" size={18} /></summary>
                         <form class="admin-form admin-create-form" on:submit={saveWeatherTranslation} style="max-width: 28rem;">
-                            <label for="wt_src">Eredeti szöveg (pl. overcast, partly cloudy)</label>
-                            <input id="wt_src" name="source_text" type="text" bind:value={newWeatherTrans.source_text} required placeholder="pl. overcast" />
+                            <label for="wt_src">Időjárás-kód (MET Norway, pl. partlycloudy, lightrainshowers)</label>
+                            <input id="wt_src" name="source_text" type="text" bind:value={newWeatherTrans.source_text} required placeholder="pl. partlycloudy" />
                             <label for="wt_lang">Nyelv</label>
                             <select id="wt_lang" name="lang" bind:value={newWeatherTrans.lang}>
 <option value="">Válassz...</option>
@@ -8097,10 +8090,11 @@
                         bind:value={editingLocation.post_code}
                     />
 
-                    <label for="eloc_coords">Koordináták</label>
+                    <label for="eloc_coords">Koordináták (szélesség, hosszúság)</label>
                     <input
                         id="eloc_coords"
                         type="text"
+                        placeholder="46.3593, 25.8017"
                         bind:value={editingLocation.coordinates}
                     />
 

@@ -14,9 +14,11 @@ package main
 
 import (
 	"bytes"
+	"database/sql"
 	"fmt"
 	"mime/multipart"
 	"net/http"
+	"net/http/httptest"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -291,6 +293,65 @@ func TestAdminLocationsCRUD(t *testing.T) {
 		"DELETE a settlement")
 	if findInAdminList(t, "/api/admin/locations", settlementID) != nil {
 		t.Errorf("settlement %d is still listed after DELETE", settlementID)
+	}
+}
+
+// TestAdminSettlementCoordinates: the public weather is fetched for a
+// settlement's coordinates, so editing them must save them. PUT used to drop
+// the field: a settlement's coordinates could be set only when it was created.
+func TestAdminSettlementCoordinates(t *testing.T) {
+	requireDB(t)
+
+	countyName := testName("coords-county")
+	_, _ = createTestCounty(t, countyName)
+	id := createTestSettlement(t, countyName, "coords")
+	t.Cleanup(func() {
+		db.DB.Exec(`DELETE FROM geo_locations WHERE id IN (SELECT location_id FROM settlements WHERE id = $1)`, id)
+	})
+	put := func(extra map[string]interface{}) *httptest.ResponseRecorder {
+		body := map[string]interface{}{"id": id, "name": testName("coords"), "county": countyName, "type": "község"}
+		for k, v := range extra {
+			body[k] = v
+		}
+		return asAdmin(t, http.MethodPut, "/api/admin/locations", body)
+	}
+	locationOf := func() (sql.NullInt64, float64, float64) {
+		var loc sql.NullInt64
+		var lat, lon sql.NullFloat64
+		db.DB.QueryRow(`SELECT s.location_id, gl.latitude, gl.longitude FROM settlements s
+			LEFT JOIN geo_locations gl ON gl.id = s.location_id WHERE s.id = $1`, id).Scan(&loc, &lat, &lon)
+		return loc, lat.Float64, lon.Float64
+	}
+
+	mustOK(t, put(map[string]interface{}{"coordinates": "46.3593, 25.8017"}), "PUT coordinates")
+	loc, lat, lon := locationOf()
+	if !loc.Valid || lat != 46.3593 || lon != 25.8017 {
+		t.Fatalf("after PUT: location %v at %v, %v", loc, lat, lon)
+	}
+	if got := fmt.Sprint(findInAdminList(t, "/api/admin/locations", id)["coordinates"]); got != "46.3593, 25.8017" {
+		t.Errorf("GET coordinates = %q", got)
+	}
+
+	mustOK(t, put(map[string]interface{}{"coordinates": "46.36,25.80"}), "PUT new coordinates")
+	loc2, lat, _ := locationOf()
+	if loc2.Int64 != loc.Int64 || lat != 46.36 {
+		t.Fatalf("moving the coordinates made location %v (was %v), lat %v", loc2, loc, lat)
+	}
+
+	mustOK(t, put(nil), "PUT without the coordinates field")
+	if loc3, _, _ := locationOf(); loc3.Int64 != loc.Int64 {
+		t.Fatal("a PUT without coordinates unlinked the location")
+	}
+
+	for _, bad := range []string{"46.36", "abc, def", "25.8, 246.3", "1,2,3"} {
+		if rr := put(map[string]interface{}{"coordinates": bad}); rr.Code != http.StatusBadRequest {
+			t.Errorf("coordinates %q: got %d, want 400", bad, rr.Code)
+		}
+	}
+
+	mustOK(t, put(map[string]interface{}{"coordinates": ""}), "PUT cleared coordinates")
+	if loc4, _, _ := locationOf(); loc4.Valid {
+		t.Fatal("clearing the coordinates kept the location")
 	}
 }
 

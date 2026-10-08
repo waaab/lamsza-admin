@@ -10,6 +10,10 @@ adds a line under `[Unreleased]` in the same commit.
 ## [Unreleased]
 
 ### Added
+- Settlement coordinates can be edited: `PUT /api/admin/locations` saves "latitude, longitude" to the settlement's `geo_locations` row (or creates and links one, or unlinks it when cleared); it used to drop the field, so coordinates could only be set on create. Garbled or out-of-range pairs are refused with 400. lamsza's weather is fetched for these coordinates. Test `TestAdminSettlementCoordinates`.
+
+### Changed
+- Weather settings follow lamsza's move to MET Norway: switches for MET Norway, WeatherAPI.com and OpenWeatherMap in a fixed order (`weather_provider_metno_enabled`); the Open-Meteo switch and the default-provider dropdown are gone, because lamsza no longer reads them. Weather translations are keyed by MET symbol code (e.g. `partlycloudy`). Unused copies of the old provider code removed from `internal/weather`.
 - Synced from lamsza: `AccountMenu` without the photo (unused here), `global.css` (menu item highlight inside the panel, Lámsza's home-page hero styles) and `typography.css` (`--text-hero` up to 7rem; the admin app does not use it).
 - Synced from lamsza: the shared theme and auth stores (signed out, or a session the server no longer knows, clears the saved theme: the device's theme applies), the account menu and Fiók components (`AccountMenu`, `AccountPage`, `AccountDetails`, `ThemeSettings`, `accountDetails.js` and its test; unused in the admin app), and `global.css` (their styles, the launcher's hover colour, the dark `--thin-grey` from lamsza 36c3f64).
 - Synced from lamsza: the shared `apps` and `plus` icons, the apps launcher (`AppsLauncher.svelte`, `networkApps.js`, `networkOrigins.js`, its `.apps-launcher` CSS and test). The admin app does not use the launcher (UI_BASELINE "tb-apps-launcher").
