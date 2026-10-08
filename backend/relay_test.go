@@ -152,3 +152,38 @@ func TestRelayReportsAnUnreachableApp(t *testing.T) {
 		t.Fatalf("reply = %q", rr.Body.String())
 	}
 }
+
+func TestRelayCarriesTajszorejtvenyBackgroundActionsAndAuditsThem(t *testing.T) {
+	// Tájszórejtvény's slow actions (regenerate, block, generate a week) answer
+	// 202 with the background task, since this relay waits only 10 s; the admin
+	// screen then polls tasks. The 202 and its body pass through unchanged, and
+	// the nested path is audited like any other relayed write.
+	requireDB(t)
+	task := `{"key":"puzzle:d-2026-10-12-3","kind":"block","running":true}`
+	srv, got := fakeApp(t, http.StatusAccepted, task)
+	pointRelays(t, srv.URL, relayToken)
+
+	rr := asAdmin(t, http.MethodPost, "/api/admin/games/tajszorejtveny/puzzles/d-2026-10-12-3/block", map[string]any{"word": 4})
+	mustStatus(t, rr, http.StatusAccepted, "relayed background action")
+	if strings.TrimSpace(rr.Body.String()) != task {
+		t.Fatalf("reply = %q, want the task unchanged", rr.Body.String())
+	}
+	if s := got(); s.method != http.MethodPost || s.path != "/internal/admin/tajszorejtveny/puzzles/d-2026-10-12-3/block" || !strings.Contains(s.body, `"word":4`) {
+		t.Fatalf("forwarded %+v", s)
+	}
+	var resource, resourceID string
+	if err := db.DB.QueryRow(`SELECT resource, resource_id FROM admin_audit_log WHERE route = $1 ORDER BY id DESC LIMIT 1`,
+		"/api/admin/games/tajszorejtveny/puzzles/d-2026-10-12-3/block").Scan(&resource, &resourceID); err != nil {
+		t.Fatalf("no audit record for the block: %v", err)
+	}
+	if resource != "jatszoter" || resourceID != "tajszorejtveny/puzzles/d-2026-10-12-3/block" {
+		t.Fatalf("audit record: resource %q, id %q", resource, resourceID)
+	}
+
+	// The word-metadata editor's PUT keeps its snake_case body.
+	rr = asAdmin(t, http.MethodPut, "/api/admin/games/tajszorejtveny/words", map[string]any{"szotar_id": "42", "headword": "bidon", "familiarity": 1, "example_reviewed": true})
+	mustStatus(t, rr, http.StatusAccepted, "relayed PUT (the fake app answers 202 to everything)")
+	if s := got(); s.method != http.MethodPut || s.path != "/internal/admin/tajszorejtveny/words" || !strings.Contains(s.body, `"example_reviewed":true`) {
+		t.Fatalf("forwarded %+v", s)
+	}
+}

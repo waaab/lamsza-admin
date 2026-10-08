@@ -3,8 +3,11 @@ import { readFileSync, readdirSync } from "node:fs";
 import test from "node:test";
 
 const read = (/** @type {string} */ path) => readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
+/** Every file under path, subfolders included (e.g. components/games/tajszorejtveny). */
 const dir = (/** @type {string} */ path) =>
-    readdirSync(new URL(`../${path}`, import.meta.url)).map((name) => `${path}/${name}`);
+    readdirSync(new URL(`../${path}`, import.meta.url), { recursive: true, withFileTypes: true })
+        .filter((d) => d.isFile())
+        .map((d) => `${path}${d.parentPath.split(path)[1] ?? ""}/${d.name}`);
 
 const pages = ["src/routes/+page.svelte", "src/routes/dictionary/+page.svelte", "src/routes/games/+page.svelte"];
 const sectionFiles = [
@@ -12,6 +15,7 @@ const sectionFiles = [
     "src/routes/games/+page.svelte",
     ...dir("src/lib/components/dictionary"),
     ...dir("src/lib/components/games"),
+    "src/lib/tajszorejtvenyAdmin.js",
 ];
 
 test("every sidebar and card icon is one of the shared AppIcon icons", () => {

@@ -9,8 +9,10 @@
     import ConfirmHost from "$lib/components/admin/ConfirmHost.svelte";
     import RovasfejtoTab from "$lib/components/games/RovasfejtoTab.svelte";
     import SzokeresoTab from "$lib/components/games/SzokeresoTab.svelte";
+    import TajszorejtvenyTab from "$lib/components/games/TajszorejtvenyTab.svelte";
     import { APP_ORIGINS } from "$lib/adminApps.js";
     import { errorText, sectionFetch } from "$lib/sectionApi.js";
+    import { dashboardLines } from "$lib/tajszorejtvenyAdmin.js";
 
     const jatszoterOrigin = APP_ORIGINS.jatszoter;
 
@@ -20,6 +22,7 @@
         { sep: true },
         { id: "rovasfejto", title: "Rovásfejtő", icon: "rovasfejto", countTitle: "Aktív feladványok" },
         { id: "szokereso", title: "Szókereső", icon: "szokereso", countTitle: "Közzétett feladványok és piszkozatok" },
+        { id: "tajszorejtveny", title: "Tájszórejtvény", icon: "tajszorejtveny", countTitle: "Jövő hét: jóváhagyott / elkészült rejtvények" },
     ];
     const CARDS = /** @type {{ id: string, title: string, icon: string, countTitle?: string }[]} */ (
         NAV.filter((n) => n.id && n.id !== "welcome")
@@ -34,6 +37,10 @@
         },
         rovasfejto: { title: "Rovásfejtő", greeting: "Közmondások és más feladványok rovásírással." },
         szokereso: { title: "Szókereső", greeting: "A napi szókereső rácsok összeállítása." },
+        tajszorejtveny: {
+            title: "Tájszórejtvény",
+            greeting: "A heti rejtvények átnézése és jóváhagyása, a játékosok hibajelzései és a játék szavai.",
+        },
     };
 
     /** @type {AdminShell | null} */
@@ -44,11 +51,15 @@
     let statsError = $state("");
 
     const head = $derived(COPY[active] || COPY.welcome);
+    const tajLines = $derived(dashboardLines(stats?.tajszorejtveny));
     const counts = $derived(
         stats
             ? {
                   rovasfejto: stats.rovasfejto.active,
                   szokereso: stats.szokereso.published + stats.szokereso.drafts,
+                  tajszorejtveny: stats.tajszorejtveny
+                      ? `${stats.tajszorejtveny.next_approved}/${stats.tajszorejtveny.next_total}`
+                      : null,
               }
             : null,
     );
@@ -107,6 +118,9 @@
                         Szókereső: {stats.szokereso.published} közzétett, {stats.szokereso.drafts} piszkozat.
                     </p>
                 </div>
+                {#each tajLines as line (line.text)}
+                    <div class="info-box {line.level}" role="status"><p>{line.text}</p></div>
+                {/each}
             {/if}
         </section>
         <AdminWelcomeGrid items={CARDS} {counts} onSelect={(id) => shell?.select(id)} />
@@ -114,6 +128,8 @@
         <RovasfejtoTab onChanged={loadStats} />
     {:else if active === "szokereso"}
         <SzokeresoTab onChanged={loadStats} />
+    {:else if active === "tajszorejtveny"}
+        <TajszorejtvenyTab stats={stats?.tajszorejtveny ?? null} onChanged={loadStats} />
     {/if}
 
     {#snippet overlays()}
