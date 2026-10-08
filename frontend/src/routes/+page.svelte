@@ -25,6 +25,7 @@
     import AdminWelcomeGrid from "$lib/components/admin/AdminWelcomeGrid.svelte";
     import { APP_ORIGINS } from "$lib/adminApps.js";
     import { canonicalDomain } from "$lib/websiteDomain.js";
+    import { SETTINGS_SECTIONS, settingsPayload } from "$lib/settingsSections.js";
 
     const lamszaOrigin = APP_ORIGINS.lamsza;
 
@@ -394,7 +395,8 @@
 
     // Site settings (weather providers, cache)
     let siteSettings = {};
-    let settingsSaving = false;
+    /** The Beállítások section being saved ("social" | "location" | "weather"), or "". */
+    let settingsSaving = "";
     let settingsCacheClearing = false;
 
     // Weather description translations (multi-language)
@@ -1477,7 +1479,6 @@
                 weather_cache_version: data.weather_cache_version ?? "1",
                 quick_links_version: data.quick_links_version ?? "1",
                 weather_icon_style: data.weather_icon_style ?? "emoji",
-                weather_active_users_estimate: data.weather_active_users_estimate ?? "10000",
                 weather_provider_metno_enabled: data.weather_provider_metno_enabled ?? "true",
                 weather_provider_weatherapi_enabled: data.weather_provider_weatherapi_enabled ?? "true",
                 weather_provider_openweathermap_enabled: data.weather_provider_openweathermap_enabled ?? "true",
@@ -1497,24 +1498,26 @@
         }
     }
 
-    async function saveSettings() {
-        settingsSaving = true;
+    /**
+     * Saves one section of the Beállítások tab: only its own keys
+     * (lib/settingsSections.js), so one section's Mentés never rewrites another.
+     * @param {keyof typeof SETTINGS_SECTIONS} section
+     */
+    async function saveSettings(section) {
+        settingsSaving = section;
         try {
-            const payload = Object.fromEntries(
-                Object.entries(siteSettings).map(([k, v]) => [k, v != null ? String(v) : ""])
-            );
             const res = await apiCall(`/api/admin/settings`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload),
+                body: JSON.stringify(settingsPayload(siteSettings, section)),
             });
             if (res.ok) {
-                noteAdminAction("settings", "Beállítások mentve.");
+                noteAdminAction("settings", `${SETTINGS_SECTIONS[section].label}: mentve.`);
             } else await noteAdminFailure("settings", res);
         } catch (e) {
             await noteAdminFailure("settings", e.message);
         } finally {
-            settingsSaving = false;
+            settingsSaving = "";
         }
     }
 
@@ -6559,7 +6562,7 @@
                     {:else}
                         <p class="admin-info">
                             Oldalszintű beállítások: alapértelmezett település vendégeknek és azoknak, akik nem választottak saját települést (kezdőlap időjárás, eseményszűrés),
-                            időjárás-szolgáltatók engedélyezése, ikon stílus, cache TTL és látogató-becslés.
+                            időjárás-szolgáltatók engedélyezése, ikon stílus és a böngésző-cache ideje. Minden szakasz Mentés gombja csak a saját szakaszát menti.
                             A <strong>cache törlése</strong> új verziószámot ad - a látogatók frissebb időjárást kapnak.
                         </p>
                     {/if}
@@ -6578,8 +6581,8 @@
                             <input id="social_instagram_url" name="social_instagram_url" type="url" bind:value={siteSettings.social_instagram_url} placeholder="https://www.instagram.com/…" />
 
                             <div class="flex gap-md mt-md">
-                                <button type="button" class="admin-submit-btn" on:click={saveSettings} disabled={settingsSaving}>
-                                    {settingsSaving ? 'Mentés…' : 'Mentés'}
+                                <button type="button" class="admin-submit-btn" on:click={() => saveSettings("social")} disabled={settingsSaving !== ""}>
+                                    {settingsSaving === "social" ? 'Mentés…' : 'Mentés'}
                                 </button>
                             </div>
                         </div>
@@ -6597,8 +6600,8 @@
                                 {/each}
                             </select>
                             <div class="flex gap-md mt-md">
-                                <button type="button" class="admin-submit-btn" on:click={saveSettings} disabled={settingsSaving}>
-                                    {settingsSaving ? 'Mentés…' : 'Mentés'}
+                                <button type="button" class="admin-submit-btn" on:click={() => saveSettings("location")} disabled={settingsSaving !== ""}>
+                                    {settingsSaving === "location" ? 'Mentés…' : 'Mentés'}
                                 </button>
                             </div>
                         </div>
@@ -6626,20 +6629,17 @@
 
                             <label for="weather_icon_style">Időjárás ikon stílus</label>
                             <select id="weather_icon_style" name="weather_icon_style" bind:value={siteSettings.weather_icon_style}>
-<option value="">Válassz...</option>
+                                <option value="svg">Animált ikonok</option>
                                 <option value="emoji">Emoji</option>
-                                <option value="svg">SVG (saját ikonok)</option>
                             </select>
+                            <p class="admin-form-hint">A kezdőlap, a település- és a megyeoldal időjárás-dobozára vonatkozik; az Időjárás oldalak mindig az animált ikonokat mutatják. Az összes ikon: <a href="{lamszaOrigin}/idojaras/ikonok" target="_blank" rel="noopener noreferrer">Lámsza › Időjárás-ikonok</a>.</p>
 
-                            <label for="weather_cache_ttl">Időjárás cache TTL (perc)</label>
+                            <label for="weather_cache_ttl">Böngésző-cache (perc)</label>
                             <input id="weather_cache_ttl" name="weather_cache_ttl_minutes" type="number" min="1" max="1440" bind:value={siteSettings.weather_cache_ttl_minutes} />
 
-                            <label for="weather_active_users">Aktív felhasználók becslése</label>
-                            <input id="weather_active_users" name="weather_active_users_estimate" type="number" min="1" bind:value={siteSettings.weather_active_users_estimate} />
-
                             <div class="flex gap-md mt-md flex-wrap">
-                                <button type="button" class="admin-submit-btn" on:click={saveSettings} disabled={settingsSaving}>
-                                    {settingsSaving ? 'Mentés…' : 'Mentés'}
+                                <button type="button" class="admin-submit-btn" on:click={() => saveSettings("weather")} disabled={settingsSaving !== ""}>
+                                    {settingsSaving === "weather" ? 'Mentés…' : 'Mentés'}
                                 </button>
                                 <button type="button" class="btn-update" on:click={clearWeatherCache} disabled={settingsCacheClearing}>
                                     {settingsCacheClearing ? '…' : 'Időjárás cache törlése'}
