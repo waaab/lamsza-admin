@@ -37,6 +37,26 @@ export function applyThemeLocal(newTheme) {
     }
 }
 
+/**
+ * Back to the device's theme (prefers-color-scheme): a signed-out visitor
+ * cannot choose one (UI_BASELINE "set-theme-store"). Called on sign-out and
+ * when /api/auth/me says nobody is signed in, so theme-init.js finds nothing
+ * saved on the next page load.
+ */
+export function clearAccountTheme() {
+    if (typeof document !== "undefined") {
+        document.documentElement.removeAttribute("data-theme");
+    }
+    theme.set("system");
+    if (typeof localStorage !== "undefined") {
+        try {
+            localStorage.removeItem("theme");
+        } catch {
+            /* storage blocked: data-theme is already gone */
+        }
+    }
+}
+
 export function applyTheme(newTheme) {
     applyThemeLocal(newTheme);
     persistThemeToAccount(newTheme);

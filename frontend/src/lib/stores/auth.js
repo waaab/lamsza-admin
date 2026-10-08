@@ -3,7 +3,7 @@ import { getApiBase } from "$lib/api.js";
 import { buildImportPayload, meToAuthState } from "$lib/accountPrefs.js";
 import { readHistory } from "$lib/entryHistory.js";
 import { readSlotCount } from "$lib/quickLinksDisplay.js";
-import { applyThemeLocal } from "$lib/stores/theme.js";
+import { applyThemeLocal, clearAccountTheme } from "$lib/stores/theme.js";
 
 const empty = {
     loggedIn: false,
@@ -124,6 +124,8 @@ function createAuthStore() {
                 });
                 if (!res.ok) {
                     clearSessionCache();
+                    // Signed out for sure (not a server error): the device's theme.
+                    if (res.status === 401) clearAccountTheme();
                     set(empty);
                     return empty;
                 }
@@ -197,6 +199,7 @@ function createAuthStore() {
                 /* still clear locally */
             }
             clearSessionCache();
+            clearAccountTheme();
             set(empty);
         },
     };

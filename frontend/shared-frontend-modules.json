@@ -17,15 +17,15 @@
     "src/lib/eventImage.js": "sha256:2aded3cdf6553045e2dd3cf7cc0884d2d23ffc3d07a729c6de437793de4cf329",
     "src/lib/quickLinksDisplay.js": "sha256:510e3d38d8c1d356fc21c3e23d377d75d672bba91bc67563b04e76b91f34cf10",
     "src/lib/scheduleActivityTypes.js": "sha256:59c8be8972dcf333fb7d627f9038d66759b6a6c5a76eae77f4d141727c76aa2f",
-    "src/lib/stores/auth.js": "sha256:a596a7287c055a6588fce333e44f989373efa0fdeaedd056a2fea4992bfd6f56",
-    "src/lib/stores/theme.js": "sha256:dba66ba2464d77c79e98df6d1f3864c3753a157517019c69957101ef622c0936",
+    "src/lib/stores/auth.js": "sha256:cdc559841389238f8875750dd36806d6cb3c87147c7240f872b4f9f9229b7d8d",
+    "src/lib/stores/theme.js": "sha256:86d3c12a37af02c7c87344caeac2360c151fd9d88056b509ec5aed8360ea5f56",
     "src/lib/websiteDomain.js": "sha256:90336a31a01fec10ed811da112c90680cc94cea96236da03d722dfd7d2f5844a",
     "tests/sharedFrontendModules.test.js": "sha256:49658146677c7d5e198f35d3064aa32000d85f79664f4be90568e67ed0b0daf7",
     "src/lib/icons/AppIcon.svelte": "sha256:fbd7a0b0f48649466224b752ca0a3b41fa5a885a548badb23e8c4bc4dc3cf310",
     "src/lib/components/ConfirmDialog.svelte": "sha256:b8f88b5406d552bf3d1e8028d0bc9fb72f8dc6e878f6a4c850b9eb6310ffee46",
     "src/lib/components/NoticeDialog.svelte": "sha256:926daefc0e3e027dcbf58fce50ace8b09bf33a05eda16d6e6e45cf9fb43e2a6e",
     "src/lib/components/SignInDialog.svelte": "sha256:aeebd68cd9ca5b1f8b362deae68275dc7f6e8e9a5318def3f9f2c24b0aaa6d33",
-    "src/styles/global.css": "sha256:8c2d9f82a156b4bc502f74e7e39a19e6f91e16886dced8a7e875a45cf7123dd2",
+    "src/styles/global.css": "sha256:cdc5b73bce6d629f2675ec75a3338563e0b6dea7b5be9ee08a662b03043c2cef",
     "src/styles/typography.css": "sha256:08537311b6fee3690ce6b246a0d4449a4243d1e192369b0efc2704d99e5f4113",
     "src/styles/component-typography.css": "sha256:8f88b3227ae4e3c0b43423a96e2fce8ecc519bb2f58dab23ee1e33da4f44baef",
     "src/lib/icons/ErrorLantern.svelte": "sha256:79a4741e5c51b7aac56a985628e4b2767a1965cb1adae71bec0bafe194de661f",
@@ -35,6 +35,12 @@
     "src/lib/networkOrigins.js": "sha256:796f9a1813ea43d4b98b0f208d6cfe59a86dcc5d85c57c30ecbadaa9a3c06e54",
     "src/lib/networkApps.js": "sha256:848112dfca5e69249021844384d943e9c8e678510c2ebc10970fc03950707094",
     "src/lib/components/AppsLauncher.svelte": "sha256:99e9be4718337171a9ab5c5536246b6ebd8d2432c64045125340386a8764395b",
-    "tests/networkApps.test.js": "sha256:965e5ba5c26d4d09a50ef483309be4e41b82a4da397e9c97ebcd9e0b0394ff4a"
+    "tests/networkApps.test.js": "sha256:965e5ba5c26d4d09a50ef483309be4e41b82a4da397e9c97ebcd9e0b0394ff4a",
+    "src/lib/accountDetails.js": "sha256:66b97eaaaba436b81504d00d88b8c12df67eb53e1d0f4e33866ecf7669cc2741",
+    "src/lib/components/AccountDetails.svelte": "sha256:9b9ccfd48a6c4dad5fb893e05deb73a95c3e68c3bf0b0445dc3c0b21a246bd4c",
+    "src/lib/components/AccountPage.svelte": "sha256:cedb9cae79905543999ce1ebd331a43d18f065a8e3c7046176c00465144871f5",
+    "src/lib/components/AccountMenu.svelte": "sha256:3192887ef2123ded4381553b9485bd3ca68b7b509e137f52e56e11dd10f6f4bb",
+    "tests/accountDetails.test.js": "sha256:fbf528ef1bcf4a13fe535f65fe6fdb54ff2db6cb2258c1f8f3eb47c9292a91ea",
+    "src/lib/components/ThemeSettings.svelte": "sha256:b89af2d56662e6aa5b671d3e15148f2dc0b860ca7516dc095992a30e42acd31b"
   }
 }
