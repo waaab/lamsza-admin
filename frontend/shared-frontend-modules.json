@@ -25,8 +25,8 @@
     "src/lib/components/ConfirmDialog.svelte": "sha256:b8f88b5406d552bf3d1e8028d0bc9fb72f8dc6e878f6a4c850b9eb6310ffee46",
     "src/lib/components/NoticeDialog.svelte": "sha256:926daefc0e3e027dcbf58fce50ace8b09bf33a05eda16d6e6e45cf9fb43e2a6e",
     "src/lib/components/SignInDialog.svelte": "sha256:aeebd68cd9ca5b1f8b362deae68275dc7f6e8e9a5318def3f9f2c24b0aaa6d33",
-    "src/styles/global.css": "sha256:cdc5b73bce6d629f2675ec75a3338563e0b6dea7b5be9ee08a662b03043c2cef",
-    "src/styles/typography.css": "sha256:08537311b6fee3690ce6b246a0d4449a4243d1e192369b0efc2704d99e5f4113",
+    "src/styles/global.css": "sha256:e823a00941647b4915dab9f099c2809b6adea65fe7e869dfb7cdb9b65357641b",
+    "src/styles/typography.css": "sha256:b3310ac2a09042e655da4b1b8c50885d0e1d606d7de049799a2819ed8ac761b4",
     "src/styles/component-typography.css": "sha256:8f88b3227ae4e3c0b43423a96e2fce8ecc519bb2f58dab23ee1e33da4f44baef",
     "src/lib/icons/ErrorLantern.svelte": "sha256:79a4741e5c51b7aac56a985628e4b2767a1965cb1adae71bec0bafe194de661f",
     "src/lib/components/ErrorPage.svelte": "sha256:061719d190be3ce1aba85d47eff1999380d938b2b0f7d92c9f3e9f7d64f7eafd",
@@ -39,7 +39,7 @@
     "src/lib/accountDetails.js": "sha256:66b97eaaaba436b81504d00d88b8c12df67eb53e1d0f4e33866ecf7669cc2741",
     "src/lib/components/AccountDetails.svelte": "sha256:9b9ccfd48a6c4dad5fb893e05deb73a95c3e68c3bf0b0445dc3c0b21a246bd4c",
     "src/lib/components/AccountPage.svelte": "sha256:cedb9cae79905543999ce1ebd331a43d18f065a8e3c7046176c00465144871f5",
-    "src/lib/components/AccountMenu.svelte": "sha256:3192887ef2123ded4381553b9485bd3ca68b7b509e137f52e56e11dd10f6f4bb",
+    "src/lib/components/AccountMenu.svelte": "sha256:7dc000204f428c57a5cd7d7c2517b669ef7c9d80c2810034099a82807757998e",
     "tests/accountDetails.test.js": "sha256:fbf528ef1bcf4a13fe535f65fe6fdb54ff2db6cb2258c1f8f3eb47c9292a91ea",
     "src/lib/components/ThemeSettings.svelte": "sha256:b89af2d56662e6aa5b671d3e15148f2dc0b860ca7516dc095992a30e42acd31b"
   }

@@ -2,8 +2,9 @@
     /**
      * The account button at the right of every public app's toolbar, before
      * the apps launcher (UI_BASELINE "tb-account-menu"). Signed out: Belépés.
-     * Signed in: the user's photo (or the profile icon), opening a menu with
-     * Fiók, Beállítások and Kijelentkezés. Shared from lamsza by
+     * Signed in: the profile icon (never a photo: the button looks the same
+     * in every app and for every user), opening a menu with Fiók,
+     * Beállítások and Kijelentkezés. Shared from lamsza by
      * scripts/sync-shared-frontend.sh.
      *
      * Keyboard and pointer behave as in AppsLauncher: Enter or Space opens it
@@ -19,7 +20,7 @@
 
     /**
      * @type {{
-     *   account: Partial<import("$lib/accountDetails.js").Account> | null,
+     *   account: { name?: string, displayName?: string, email?: string } | null,
      *   onLogin: () => void,
      *   onLogout: () => void | Promise<void>,
      *   accountHref?: string,
@@ -33,17 +34,10 @@
     const shownName = $derived(account ? accountShownName(account) : "");
 
     let open = $state(false);
-    let photoFailed = $state(false);
     /** @type {HTMLDivElement | undefined} */
     let root = $state();
     /** @type {HTMLButtonElement | undefined} */
     let button = $state();
-
-    $effect(() => {
-        // A new photo gets a fresh try.
-        void account?.picture;
-        photoFailed = false;
-    });
 
     /** @param {MouseEvent} event */
     async function toggle(event) {
@@ -100,23 +94,12 @@
             type="button"
             class="btn nav-btn account-menu-button"
             class:active={open || active}
-            class:account-menu-button--photo={!!account.picture && !photoFailed}
             title={shownName ? `Fiók: ${shownName}` : "Fiók"}
             aria-expanded={open}
             aria-controls={menuId}
             onclick={toggle}
         >
-            {#if account.picture && !photoFailed}
-                <img
-                    class="account-menu-photo"
-                    src={account.picture}
-                    alt=""
-                    referrerpolicy="no-referrer"
-                    onerror={() => (photoFailed = true)}
-                />
-            {:else}
-                <AppIcon name="profile" size={16} />
-            {/if}
+            <AppIcon name="profile" size={16} />
             <span class="sr-only">Fiók menü</span>
         </button>
         {#if open}
