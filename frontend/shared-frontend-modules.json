@@ -25,7 +25,7 @@
     "src/lib/components/ConfirmDialog.svelte": "sha256:b8f88b5406d552bf3d1e8028d0bc9fb72f8dc6e878f6a4c850b9eb6310ffee46",
     "src/lib/components/NoticeDialog.svelte": "sha256:926daefc0e3e027dcbf58fce50ace8b09bf33a05eda16d6e6e45cf9fb43e2a6e",
     "src/lib/components/SignInDialog.svelte": "sha256:aeebd68cd9ca5b1f8b362deae68275dc7f6e8e9a5318def3f9f2c24b0aaa6d33",
-    "src/styles/global.css": "sha256:e823a00941647b4915dab9f099c2809b6adea65fe7e869dfb7cdb9b65357641b",
+    "src/styles/global.css": "sha256:3613030259d7541a456baa7d099dbf4ac7eb723ceaf7b71eff28318dc74c0465",
     "src/styles/typography.css": "sha256:b3310ac2a09042e655da4b1b8c50885d0e1d606d7de049799a2819ed8ac761b4",
     "src/styles/component-typography.css": "sha256:8f88b3227ae4e3c0b43423a96e2fce8ecc519bb2f58dab23ee1e33da4f44baef",
     "src/lib/icons/ErrorLantern.svelte": "sha256:79a4741e5c51b7aac56a985628e4b2767a1965cb1adae71bec0bafe194de661f",

@@ -729,6 +729,8 @@ section.page-section{
 
 .weather-right {
   margin-top: -2rem;
+  /* the icon rises into the heading row: keep it under the Előrejelzés link */
+  z-index: -1;
   grid-area: right;
   display: flex;
   flex-direction: column;
