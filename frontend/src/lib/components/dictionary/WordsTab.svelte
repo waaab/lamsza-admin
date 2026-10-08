@@ -10,7 +10,7 @@
 
     import { onMount } from "svelte";
     import AdminPaginationBar from "$lib/components/admin/AdminPaginationBar.svelte";
-    import AdminPlusIcon from "$lib/components/admin/AdminPlusIcon.svelte";
+    import AppIcon from "$lib/icons/AppIcon.svelte";
     import { adminPageSlice } from "$lib/adminPageSlice.js";
     import WordForm from "$lib/components/dictionary/WordForm.svelte";
     import { confirmDialog } from "$lib/confirm.svelte.js";
@@ -96,7 +96,7 @@
 </script>
 
 <details class="admin-create-panel" bind:open={createOpen}>
-    <summary class="admin-create-summary"><span>Új szó hozzáadása</span><AdminPlusIcon /></summary>
+    <summary class="admin-create-summary"><span>Új szó hozzáadása</span><AppIcon name="plus" size={18} /></summary>
     {#if createOpen}
         <div class="admin-create-form-wrap">
             <WordForm idPrefix="new-word" onSaved={(w) => saved(w, true)} />

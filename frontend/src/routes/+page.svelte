@@ -1,7 +1,7 @@
 <script>
     import { onMount } from "svelte";
     import AdminNavIcon from "$lib/components/admin/AdminNavIcon.svelte";
-    import AdminPlusIcon from "$lib/components/admin/AdminPlusIcon.svelte";
+    import AppIcon from "$lib/icons/AppIcon.svelte";
     import AdminPaginationBar from "$lib/components/admin/AdminPaginationBar.svelte";
     import { ADMIN_PAGE_SIZE, adminPageSlice } from "$lib/adminPageSlice.js";
     import { auth } from "$lib/stores/auth";
@@ -4030,7 +4030,7 @@
                     {/if}
                     <details class="admin-create-panel">
                         <summary class="admin-create-summary"
-                            ><span>Új gyorslink hozzáadása</span><AdminPlusIcon /></summary
+                            ><span>Új gyorslink hozzáadása</span><AppIcon name="plus" size={18} /></summary
                         >
                         <form class="admin-form admin-create-form" on:submit={submitLink}>
                             <label for="link_title">Cím</label>
@@ -4179,7 +4179,7 @@
                     {/if}
                     <details class="admin-create-panel">
                         <summary class="admin-create-summary"
-                            ><span>Új RSS hírfolyam hozzáadása</span><AdminPlusIcon /></summary
+                            ><span>Új RSS hírfolyam hozzáadása</span><AppIcon name="plus" size={18} /></summary
                         >
                         <form class="admin-form admin-create-form" on:submit={submitNews}>
                             <label for="news_title">Hírportál neve</label>
@@ -4349,7 +4349,7 @@
                         </p>
                     {/if}
                     <details class="admin-create-panel">
-                        <summary class="admin-create-summary"><span>Új település</span><AdminPlusIcon /></summary>
+                        <summary class="admin-create-summary"><span>Új település</span><AppIcon name="plus" size={18} /></summary>
                         <form class="admin-form admin-create-form" on:submit={submitLocation}>
                         <label for="loc_name">Település neve (HU)</label>
                         <input
@@ -4573,7 +4573,7 @@
                     </p>
                     <details class="admin-create-panel">
                         <summary class="admin-create-summary"
-                            ><span>Új településtípus</span><AdminPlusIcon /></summary
+                            ><span>Új településtípus</span><AppIcon name="plus" size={18} /></summary
                         >
                         <form
                             class="admin-form admin-create-form"
@@ -4710,7 +4710,7 @@
                     <h3 class="admin-subsection-title">Helyszínek</h3>
                     <details class="admin-create-panel">
                         <summary class="admin-create-summary"
-                            ><span>Új helyszín hozzáadása</span><AdminPlusIcon /></summary
+                            ><span>Új helyszín hozzáadása</span><AppIcon name="plus" size={18} /></summary
                         >
                     <form
                         class="admin-form admin-venues-form admin-create-form"
@@ -4854,7 +4854,7 @@
                     <h3 class="admin-subsection-title">Helyszíntípusok</h3>
                     <details class="admin-create-panel">
                         <summary class="admin-create-summary"
-                            ><span>Új helyszíntípus</span><AdminPlusIcon /></summary
+                            ><span>Új helyszíntípus</span><AppIcon name="plus" size={18} /></summary
                         >
                         <form
                             class="admin-form admin-create-form"
@@ -5136,7 +5136,7 @@
                         </p>
                     {/if}
                     <details class="admin-create-panel">
-                        <summary class="admin-create-summary"><span>Új esemény</span><AdminPlusIcon /></summary>
+                        <summary class="admin-create-summary"><span>Új esemény</span><AppIcon name="plus" size={18} /></summary>
                         <p class="admin-form-hint">
                             A <strong>kezdő és befejező dátum</strong> és a hozzájuk tartozó
                             <strong>időpontok (óra:perc)</strong> mind kötelezőek - a mentés nélkülük nem lehetséges.
@@ -5565,7 +5565,7 @@
                         mutat.
                     </p>
                     <details class="admin-create-panel">
-                        <summary class="admin-create-summary"><span>Új eseménytípus</span><AdminPlusIcon /></summary>
+                        <summary class="admin-create-summary"><span>Új eseménytípus</span><AppIcon name="plus" size={18} /></summary>
                         <form
                             class="admin-form admin-create-form"
                             on:submit|preventDefault={submitCatalogEventType}
@@ -5723,7 +5723,7 @@
 
                     <h3 class="admin-subsection-title">Esemény altípusok</h3>
                     <details class="admin-create-panel">
-                        <summary class="admin-create-summary"><span>Új altípus</span><AdminPlusIcon /></summary>
+                        <summary class="admin-create-summary"><span>Új altípus</span><AppIcon name="plus" size={18} /></summary>
                         <form
                             class="admin-form admin-create-form"
                             on:submit|preventDefault={submitCatalogEventSubtype}
@@ -5915,7 +5915,7 @@
                         </p>
                     {/if}
                     <details class="admin-create-panel">
-                        <summary class="admin-create-summary"><span>Új kategória</span><AdminPlusIcon /></summary>
+                        <summary class="admin-create-summary"><span>Új kategória</span><AppIcon name="plus" size={18} /></summary>
                         <form class="admin-form admin-create-form" on:submit={submitEntryCategory}>
                             <label for="cat_name">Kategória neve</label>
                             <input
@@ -6179,7 +6179,7 @@
                         </p>
                     {/if}
                     <details class="admin-create-panel">
-                        <summary class="admin-create-summary"><span>Új bejegyzés</span><AdminPlusIcon /></summary>
+                        <summary class="admin-create-summary"><span>Új bejegyzés</span><AppIcon name="plus" size={18} /></summary>
                     <form class="admin-form admin-create-form" on:submit={submitEntry}>
                         <label for="serv_type">Típus</label>
                         <select id="serv_type" bind:value={newEntry.type}>
@@ -6692,7 +6692,7 @@
                         </details>
                     {:else}
                         <details class="admin-create-panel">
-                            <summary class="admin-create-summary"><span>Új fordítás</span><AdminPlusIcon /></summary>
+                            <summary class="admin-create-summary"><span>Új fordítás</span><AppIcon name="plus" size={18} /></summary>
                         <form class="admin-form admin-create-form" on:submit={saveWeatherTranslation} style="max-width: 28rem;">
                             <label for="wt_src">Eredeti szöveg (pl. overcast, partly cloudy)</label>
                             <input id="wt_src" name="source_text" type="text" bind:value={newWeatherTrans.source_text} required placeholder="pl. overcast" />
@@ -7154,7 +7154,7 @@
                         </p>
                     {/if}
                     <details class="admin-create-panel">
-                        <summary class="admin-create-summary"><span>Új címke</span><AdminPlusIcon /></summary>
+                        <summary class="admin-create-summary"><span>Új címke</span><AppIcon name="plus" size={18} /></summary>
                         <form class="admin-form admin-create-form" on:submit={submitTag}>
                             <label for="tag_name">Címke neve</label>
                             <input
@@ -7270,7 +7270,7 @@
                         </div>
                     {/if}
                     <details class="admin-create-panel">
-                        <summary class="admin-create-summary"><span>Új látnivaló</span><AdminPlusIcon /></summary>
+                        <summary class="admin-create-summary"><span>Új látnivaló</span><AppIcon name="plus" size={18} /></summary>
                     <form class="admin-form admin-create-form mb-lg" on:submit|preventDefault={submitNewAttraction}>
                         <div class="form-row">
                             <label for="att_county">Megye</label>

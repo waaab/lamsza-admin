@@ -8,7 +8,7 @@
     let { onChanged = () => {} } = $props();
 
     import { onMount } from "svelte";
-    import AdminPlusIcon from "$lib/components/admin/AdminPlusIcon.svelte";
+    import AppIcon from "$lib/icons/AppIcon.svelte";
     import RovasfejtoForm from "$lib/components/games/RovasfejtoForm.svelte";
     import { confirmDialog } from "$lib/confirm.svelte.js";
     import { errorText, sectionFetch } from "$lib/sectionApi.js";
@@ -74,7 +74,7 @@
 
 {#if loaded && categories.length}
     <details class="admin-create-panel" bind:open={createOpen}>
-        <summary class="admin-create-summary"><span>Új feladvány hozzáadása</span><AdminPlusIcon /></summary>
+        <summary class="admin-create-summary"><span>Új feladvány hozzáadása</span><AppIcon name="plus" size={18} /></summary>
         <div class="create-wrap">
             <RovasfejtoForm {categories} {difficulties} idPrefix="rovas-new" onSaved={saved} />
         </div>

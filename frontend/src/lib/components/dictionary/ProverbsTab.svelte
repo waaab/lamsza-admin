@@ -13,7 +13,7 @@
 
     import { onMount } from "svelte";
     import AdminPaginationBar from "$lib/components/admin/AdminPaginationBar.svelte";
-    import AdminPlusIcon from "$lib/components/admin/AdminPlusIcon.svelte";
+    import AppIcon from "$lib/icons/AppIcon.svelte";
     import { adminPageSlice } from "$lib/adminPageSlice.js";
     import HuDateInput from "$lib/components/HuDateInput.svelte";
     import { confirmDialog } from "$lib/confirm.svelte.js";
@@ -138,7 +138,7 @@
 {/if}
 
 <details class="admin-create-panel" bind:open={createOpen}>
-    <summary class="admin-create-summary"><span>Új mondás hozzáadása</span><AdminPlusIcon /></summary>
+    <summary class="admin-create-summary"><span>Új mondás hozzáadása</span><AppIcon name="plus" size={18} /></summary>
     <form class="admin-form admin-create-form" onsubmit={create}>
         <label for="dict-proverb-text">Mondás</label>
         <textarea id="dict-proverb-text" name="text" bind:value={draft.text} required rows="3"></textarea>

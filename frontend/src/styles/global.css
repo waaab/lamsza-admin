@@ -2642,6 +2642,61 @@ footer {
   color: var(--text-muted);
 }
 
+/* Apps launcher (UI_BASELINE "tb-apps-launcher"; AppsLauncher.svelte).
+   The panel looks like the settings dropdown. */
+.apps-launcher {
+  position: relative;
+}
+
+.apps-launcher-panel {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  width: 300px;
+  max-width: calc(100vw - 2rem);
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px var(--shadow-xl);
+  padding: 0.5rem;
+  z-index: 1100;
+  animation: dropdownIn 0.2s ease-out;
+}
+
+.apps-launcher-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.25rem;
+}
+
+.apps-launcher-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.75rem 0.25rem;
+  border-radius: 12px;
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  text-align: center;
+  text-decoration: none;
+}
+
+.apps-launcher-item:hover,
+.apps-launcher-item:focus-visible,
+.apps-launcher-item.current {
+  background: var(--bg-light);
+  color: var(--szekely-red);
+  text-decoration: none;
+}
+
+.apps-launcher-item.current {
+  font-weight: 600;
+}
+
 /* Back to Top Button */
 .back-to-top {
   position: fixed;

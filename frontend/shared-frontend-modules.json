@@ -21,16 +21,20 @@
     "src/lib/stores/theme.js": "sha256:dba66ba2464d77c79e98df6d1f3864c3753a157517019c69957101ef622c0936",
     "src/lib/websiteDomain.js": "sha256:90336a31a01fec10ed811da112c90680cc94cea96236da03d722dfd7d2f5844a",
     "tests/sharedFrontendModules.test.js": "sha256:49658146677c7d5e198f35d3064aa32000d85f79664f4be90568e67ed0b0daf7",
-    "src/lib/icons/AppIcon.svelte": "sha256:03b08e7e2ddfd9b61d851fffe6cfe440fd5cf1dcc2b65d0980a73e5848d0d859",
+    "src/lib/icons/AppIcon.svelte": "sha256:fbd7a0b0f48649466224b752ca0a3b41fa5a885a548badb23e8c4bc4dc3cf310",
     "src/lib/components/ConfirmDialog.svelte": "sha256:b8f88b5406d552bf3d1e8028d0bc9fb72f8dc6e878f6a4c850b9eb6310ffee46",
     "src/lib/components/NoticeDialog.svelte": "sha256:926daefc0e3e027dcbf58fce50ace8b09bf33a05eda16d6e6e45cf9fb43e2a6e",
     "src/lib/components/SignInDialog.svelte": "sha256:aeebd68cd9ca5b1f8b362deae68275dc7f6e8e9a5318def3f9f2c24b0aaa6d33",
-    "src/styles/global.css": "sha256:e3af3add81e3f72086720df8b6d0b13bcd30bd806bb367645523343ba1329507",
+    "src/styles/global.css": "sha256:8c2d9f82a156b4bc502f74e7e39a19e6f91e16886dced8a7e875a45cf7123dd2",
     "src/styles/typography.css": "sha256:08537311b6fee3690ce6b246a0d4449a4243d1e192369b0efc2704d99e5f4113",
     "src/styles/component-typography.css": "sha256:8f88b3227ae4e3c0b43423a96e2fce8ecc519bb2f58dab23ee1e33da4f44baef",
     "src/lib/icons/ErrorLantern.svelte": "sha256:79a4741e5c51b7aac56a985628e4b2767a1965cb1adae71bec0bafe194de661f",
     "src/lib/components/ErrorPage.svelte": "sha256:061719d190be3ce1aba85d47eff1999380d938b2b0f7d92c9f3e9f7d64f7eafd",
     "src/lib/components/ErrorShell.svelte": "sha256:9bd9917055880c1d91214294cd954486abc2fb0c39b0667590c99d3a9b38b748",
-    "tests/noEmdash.test.js": "sha256:4900a75bce61aeb87ee26c1884d18bbf91d2d1668a3c72240914715d8bebf98c"
+    "tests/noEmdash.test.js": "sha256:4900a75bce61aeb87ee26c1884d18bbf91d2d1668a3c72240914715d8bebf98c",
+    "src/lib/networkOrigins.js": "sha256:796f9a1813ea43d4b98b0f208d6cfe59a86dcc5d85c57c30ecbadaa9a3c06e54",
+    "src/lib/networkApps.js": "sha256:848112dfca5e69249021844384d943e9c8e678510c2ebc10970fc03950707094",
+    "src/lib/components/AppsLauncher.svelte": "sha256:99e9be4718337171a9ab5c5536246b6ebd8d2432c64045125340386a8764395b",
+    "tests/networkApps.test.js": "sha256:965e5ba5c26d4d09a50ef483309be4e41b82a4da397e9c97ebcd9e0b0394ff4a"
   }
 }

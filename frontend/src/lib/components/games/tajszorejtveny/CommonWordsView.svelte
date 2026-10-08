@@ -7,7 +7,7 @@
      */
     import { onMount } from "svelte";
     import AdminPaginationBar from "$lib/components/admin/AdminPaginationBar.svelte";
-    import AdminPlusIcon from "$lib/components/admin/AdminPlusIcon.svelte";
+    import AppIcon from "$lib/icons/AppIcon.svelte";
     import { adminPageSlice } from "$lib/adminPageSlice.js";
     import { errorText, sectionFetch } from "$lib/sectionApi.js";
 
@@ -93,7 +93,7 @@
 <p class="admin-info">{enabledCount} bekapcsolt töltelékszó ({words.length} összesen). A 7-8 betűs szavak segítik a legjobban a rácsot.</p>
 
 <details class="admin-create-panel" bind:open={createOpen}>
-    <summary class="admin-create-summary"><span>Új töltelékszó</span><AdminPlusIcon /></summary>
+    <summary class="admin-create-summary"><span>Új töltelékszó</span><AppIcon name="plus" size={18} /></summary>
     <form
         class="taj-add-form"
         onsubmit={(e) => {
