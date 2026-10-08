@@ -16,7 +16,6 @@
   --text-display-sm: 1.8rem;
   --text-display: 3rem;
   --text-display-xl: 5rem;
-  --text-hero: clamp(2rem, 8vw, 7rem);
   --text-page-title-narrow: clamp(1.35rem, 5vw, 1.75rem);
 
   --leading-tight: 1.25;
