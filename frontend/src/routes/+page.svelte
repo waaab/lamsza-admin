@@ -11,6 +11,7 @@
     } from "$lib/scheduleActivityTypes.js";
     import { absoluteMediaUrl } from "$lib/eventImage.js";
     import { getApiBase, apiCall } from "$lib/api.js";
+    import FeaturedCategoriesPanel from "$lib/components/FeaturedCategoriesPanel.svelte";
     import { emptyWeekHours, normalizeHours, withDefaultWeekHours } from "$lib/entryHours.js";
     import { offersDelivery } from "$lib/entryPublicExtras.js";
     import { emptyPhotos, normalizePhotos } from "$lib/entryPhotos.js";
@@ -168,6 +169,7 @@
     let editingCounty = null;
     let editingHistoricalSeat = null;
     let entries = [];
+    /** @type {Array<{ id: number, name: string, parent_id?: number | null }>} */
     let entryCategories = [];
     let entryTypes = [];
     let tags = [];
@@ -5943,6 +5945,8 @@
                             >
                         </form>
                     </details>
+
+                    <FeaturedCategoriesPanel categories={entryCategories} />
 
                     {@render adminNotice("entry_categories")}
                     <div class="admin-table-toolbar">

@@ -79,6 +79,7 @@ func newMux() *http.ServeMux {
 	admin("/api/admin/websites", account.HandleAdminWebsite)
 	admin("/api/admin/entries", handlers.HandleAdminEntries)
 	admin("/api/admin/entry_categories", handlers.HandleAdminEntryCategories)
+	admin("/api/admin/entry_categories/featured", handlers.HandleAdminFeaturedCategories)
 	admin("/api/admin/entry_types", handlers.HandleAdminEntryTypes)
 	admin("/api/admin/tags", handlers.HandleAdminTags)
 	admin("/api/admin/locations", handlers.HandleAdminLocations)

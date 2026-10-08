@@ -10,6 +10,7 @@ adds a line under `[Unreleased]` in the same commit.
 ## [Unreleased]
 
 ### Added
+- Bejegyzés kategóriák: "Kiemelt kategóriák a kezdőlapon" chooses the Lámsza home page's category chips (at most six, subcategories too, in order; one save replaces the list). New route `GET/PUT /api/admin/entry_categories/featured` (`{"ids": [...]}`), audited as `featured_categories`; it writes lamsza's `entry_categories.featured_order`.
 - Settlement coordinates can be edited: `PUT /api/admin/locations` saves "latitude, longitude" to the settlement's `geo_locations` row (or creates and links one, or unlinks it when cleared); it used to drop the field, so coordinates could only be set on create. Garbled or out-of-range pairs are refused with 400. lamsza's weather is fetched for these coordinates. Test `TestAdminSettlementCoordinates`.
 - Synced from lamsza: `AccountMenu` without the photo (unused here), `global.css` (menu item highlight inside the panel, Lámsza's home-page hero styles) and `typography.css` (`--text-hero` up to 7rem; the admin app does not use it).
 - Synced from lamsza: the shared theme and auth stores (signed out, or a session the server no longer knows, clears the saved theme: the device's theme applies), the account menu and Fiók components (`AccountMenu`, `AccountPage`, `AccountDetails`, `ThemeSettings`, `accountDetails.js` and its test; unused in the admin app), and `global.css` (their styles, the launcher's hover colour, the dark `--thin-grey` from lamsza 36c3f64).

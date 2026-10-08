@@ -71,8 +71,11 @@ var resources = map[string]Resource{
 	// The directory itself.
 	"/api/admin/entries":          {Name: "entry", Tables: []string{"entries"}},
 	"/api/admin/entry_categories": {Name: "entry_category", Tables: []string{"entry_categories"}},
-	"/api/admin/entry_types":      {Name: "entry_type", Tables: []string{"entry_types"}},
-	"/api/admin/tags":             {Name: "tag", Tables: []string{"tags"}},
+	// The home page's category chips: the whole ordered list at once, so the
+	// record keeps the request body, not a single row's snapshot.
+	"/api/admin/entry_categories/featured": {Name: "featured_categories"},
+	"/api/admin/entry_types":               {Name: "entry_type", Tables: []string{"entry_types"}},
+	"/api/admin/tags":                      {Name: "tag", Tables: []string{"tags"}},
 
 	// Geography. `locations` writes counties or settlements depending on the
 	// body's `type`, so both are snapshotted and the record shows which one

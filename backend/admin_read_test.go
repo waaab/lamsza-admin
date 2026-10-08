@@ -247,6 +247,7 @@ var adminHappyPath = map[string][]string{
 	// The rest share the round trip in TestAdminCatalogCRUD's table, one case
 	// each, plus the read sweep above.
 	"/api/admin/entry_categories":          {"TestAdminReadsAnswerTheirShape", "TestAdminCatalogCRUD"},
+	"/api/admin/entry_categories/featured": {"TestAdminFeaturedCategories"},
 	"/api/admin/tags":                      {"TestAdminReadsAnswerTheirShape", "TestAdminCatalogCRUD"},
 	"/api/admin/settlement_location_types": {"TestAdminReadsAnswerTheirShape", "TestAdminCatalogCRUD"},
 	"/api/admin/attractions":               {"TestAdminReadsAnswerTheirShape", "TestAdminCatalogCRUD"},
