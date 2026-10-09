@@ -27,6 +27,7 @@ adds a line under `[Unreleased]` in the same commit.
 - Basic small-screen rules for the admin shell: a narrower icon rail, the header buttons above the title, tighter spacing, full-width edit windows.
 
 ### Changed
+- The `site_settings` contract is tested: `TestSiteSettingsKeysAreReadByLamsza` checks every key the Beállítások tab writes is read by lamsza's backend (needs the lamsza repo; CI checks it out).
 - CI runs the backend's database tests: the backend job gets a `postgres:16` service, checks out the public lamsza repo for its schema and runs `scripts/test-backend.sh`, the same path as `npm run test:backend`. With `ADMIN_TEST_DB_REQUIRED=1` (set in CI) a missing database fails a DB test instead of skipping it.
 - The API server has read, write and idle timeouts (read 60s for 8 MB uploads, write 90s) instead of a bare `http.ListenAndServe`.
 - `@types/node` (24.13.6, a devDependency) for the test files' `node:` imports: svelte-check 787 to 731 errors.
