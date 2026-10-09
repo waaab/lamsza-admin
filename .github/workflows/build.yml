@@ -50,13 +50,48 @@ jobs:
     defaults:
       run:
         working-directory: backend
+    # Admin owns no schema: lamsza does (backend/schema/). So the job checks out
+    # the public lamsza repo next to this one and builds the scratch database
+    # with lamsza's own db-bootstrap.sh, through scripts/test-backend.sh: the
+    # same path a developer's `npm run test:backend` takes. Postgres 16 and
+    # port 5433 match local dev and lamsza's CI.
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: lamsza_user
+          POSTGRES_PASSWORD: lamsza_password
+          POSTGRES_DB: lamsza
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd "pg_isready -U lamsza_user -d lamsza"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      # The suites read only TEST_DATABASE_URL (backend/internal/db/testguard.go).
+      TEST_DATABASE_URL: postgres://lamsza_user:lamsza_password@localhost:5433/lamsza_admin_test?sslmode=disable
+      # The database is promised here, so a DB-backed test fails rather than
+      # skips when it is missing (testsupport_test.go requireDB).
+      ADMIN_TEST_DB_REQUIRED: "1"
     steps:
       - uses: actions/checkout@v7
+      - name: Check out lamsza for the schema
+        uses: actions/checkout@v7
+        with:
+          repository: waaab/lamsza
+          ref: main
+          path: lamsza
       - uses: actions/setup-go@v7
         with:
           go-version-file: backend/go.mod
           cache-dependency-path: backend/go.sum
-      - run: go test -count=1 ./...
+      # Every package against the scratch database (BOG-53 in lamsza).
+      - name: Test Go backend
+        run: |
+          command -v psql >/dev/null || sudo apt-get install -y --no-install-recommends postgresql-client
+          LAMSZA_REPO="$GITHUB_WORKSPACE/lamsza" ../scripts/test-backend.sh
       - run: go build -o /tmp/lamsza-admin .
 
   # The receiver. A red CI is only a gate if it reaches a person, and nothing on

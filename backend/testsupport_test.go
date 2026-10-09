@@ -171,9 +171,14 @@ func openTestDB() error {
 }
 
 // requireDB skips a test that needs the scratch database, saying how to get
-// one so the message is actionable.
+// one so the message is actionable. Where a database is promised
+// (ADMIN_TEST_DB_REQUIRED=1, set by CI), a missing one fails instead: a
+// skipped test looks green.
 func requireDB(t *testing.T) {
 	t.Helper()
+	if dbErr != nil && os.Getenv("ADMIN_TEST_DB_REQUIRED") != "" {
+		t.Fatalf("scratch test database unavailable, and ADMIN_TEST_DB_REQUIRED is set: %v", dbErr)
+	}
 	if dbErr != nil {
 		t.Skipf("scratch test database unavailable: %v\n"+
 			"Run `npm run test:backend` from the repo root: it builds lamsza_admin_test from lamsza/backend/schema/ and sets TEST_DATABASE_URL.", dbErr)

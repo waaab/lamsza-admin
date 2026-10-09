@@ -27,6 +27,9 @@ adds a line under `[Unreleased]` in the same commit.
 - Basic small-screen rules for the admin shell: a narrower icon rail, the header buttons above the title, tighter spacing, full-width edit windows.
 
 ### Changed
+- CI runs the backend's database tests: the backend job gets a `postgres:16` service, checks out the public lamsza repo for its schema and runs `scripts/test-backend.sh`, the same path as `npm run test:backend`. With `ADMIN_TEST_DB_REQUIRED=1` (set in CI) a missing database fails a DB test instead of skipping it.
+- The API server has read, write and idle timeouts (read 60s for 8 MB uploads, write 90s) instead of a bare `http.ListenAndServe`.
+- `@types/node` (24.13.6, a devDependency) for the test files' `node:` imports: svelte-check 787 to 731 errors.
 - Synced from lamsza: `global.css` (the hero's joined accent; unused in admin).
 - Synced from lamsza: `global.css` (hero accent, search slot and descender rule; unused in admin).
 - Beállítások: each section's Mentés saves only that section's keys (`lib/settingsSections.js`, tested). It used to send every setting on the page, so saving the social links also rewrote the weather settings and the default settlement, and put back a stale `weather_cache_version` and `quick_links_version`, undoing a cache clear made since the page loaded. The icon style reads "Animált ikonok" / "Emoji", says where it applies and links to Lámsza's icon page; the unused "Aktív felhasználók becslése" field is gone; the TTL is labelled as the browser cache it is.
