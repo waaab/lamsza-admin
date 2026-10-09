@@ -26,6 +26,13 @@ adds a line under `[Unreleased]` in the same commit.
 - A back-to-top button, as on the other apps; it follows the scroll of the admin's main column.
 - Basic small-screen rules for the admin shell: a narrower icon rail, the header buttons above the title, tighter spacing, full-width edit windows.
 
+- Szójavaslatok review screen (`SuggestionReview.svelte`; workspace `docs/PLAN_01_SUGGESTION_REVIEW.md`). Each suggestion opens in a view with:
+  - a per-field diff against the word as it is now, where a new word shows every field and unchanged fields can be shown on demand (`src/lib/suggestionDiff.js`, test `suggestionDiff`);
+  - warnings for a headword that already exists (with links to the entry and its editor), a stale edit and a deleted word;
+  - Elfogad ("Elfogadom így is" for a stale edit), and Elutasít with an optional reason that the user sees.
+
+  A Függőben / Elbírált filter lists the newest decisions with who decided, when and why. `formatHuDateTime` in `sectionApi.js` shows times in Bucharest. This needs lamsza-szotar's `GET suggestions/{id}` and `?status=decided` (the same change there).
+
 ### Changed
 - "Új jelentés", "Új feladvány", "Új nap" and the featured categories' "Hozzáadás" show the shared plus icon before their text (lamsza UI_BASELINE `btn-create-plus`); the create panels already had it.
 - The `site_settings` contract is tested: `TestSiteSettingsKeysAreReadByLamsza` checks every key the Beállítások tab writes is read by lamsza's backend (needs the lamsza repo; CI checks it out).
@@ -53,6 +60,9 @@ adds a line under `[Unreleased]` in the same commit.
 - The edit windows sit on the network's content-dialog shell (`.link-dialog`); a wide table inside scrolls sideways.
 - English labels are Hungarian: "Vezérlőpult", "Jóváhagyás", "Elutasítás", "Felhasználó tiltása", "Lámsza megnyitása új lapon", and "Lámsza admin" in the app switcher.
 - Synced from lamsza: `ConfirmDialog`, `NoticeDialog`, `SignInDialog`, `ErrorPage`, `ErrorLantern`, the updated `AppIcon` (the Játszótér cross), `GoogleSignIn` ("Belépés sikertelen."), `global.css` and the drift test; the header's logout icon comes from `AppIcon`. The Cursor UI rule is synced too.
+
+- Szójavaslatok no longer accepts or rejects from the table in one click: a decision is made only on the review screen.
+- Deleting a dictionary word now says its suggestions are kept, because Szótár keeps them. The `WordsTab` header comment names the real sources of the `#szavak/<id>` link: the admin's Tájszórejtvény views and the duplicate warning.
 
 ### Fixed
 - Text fields in the admin forms no longer run past their box (`box-sizing: border-box`).

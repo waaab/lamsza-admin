@@ -2,7 +2,8 @@
     /**
      * Szótár words: search, letter filter, create, live edit, delete (moved
      * from Szótár's /admin/szavak). `openId` opens that word's editor, for the
-     * `#szavak/<id>` deep link from Szótár's entry page.
+     * `#szavak/<id>` deep link from the admin's own screens (the Tájszórejtvény
+     * views and the Szójavaslatok duplicate warning).
      *
      * @type {{ szotarOrigin: string, openId?: number | null, onChanged?: () => void }}
      */
@@ -66,7 +67,7 @@
 
     async function remove(/** @type {{ id: number, headword: string }} */ word) {
         const ok = await confirmDialog(
-            `Biztosan törlöd a(z) „${word.headword}” szót? A hozzá érkezett javaslatok is törlődnek.`,
+            `Biztosan törlöd a(z) „${word.headword}” szót? A hozzá érkezett javaslatok megmaradnak az elbírált javaslatok között.`,
             { yesLabel: "Törlés", destructive: true },
         );
         if (!ok) return;

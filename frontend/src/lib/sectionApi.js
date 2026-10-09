@@ -53,6 +53,24 @@ export function errorText(/** @type {unknown} */ err, /** @type {string} */ fall
 }
 
 /** "2026. október 7." from "2026-10-07" (Szótár's date wording). */
+/**
+ * A timestamp as a Hungarian date and time in Bucharest (lamsza WAYS_OF_WORKING
+ * R19), e.g. "2026. október 9. 14:05". Empty for a missing or bad value.
+ */
+export function formatHuDateTime(/** @type {string | null | undefined} */ iso) {
+    if (!iso) return "";
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return "";
+    return d.toLocaleString("hu-HU", {
+        timeZone: "Europe/Bucharest",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+    });
+}
+
 export function formatHuDate(/** @type {string | null | undefined} */ iso) {
     const [year, month, day] = String(iso ?? "").slice(0, 10).split("-").map(Number);
     if (!year || !month || !day) return "";
