@@ -3789,12 +3789,9 @@
                                         {:else if msg.action === "open" && msg.tab}
                                             <button type="button" class="btn btn-sm" on:click={() => goToAdminTab(msg.tab)}>Megnyitás</button>
                                         {:else if msg.action === "cache-refresh"}
-                                            <button
-                                                type="button"
-                                                class="btn btn-sm"
-                                                disabled
-                                                title="A böngésző-mentés törlése és újratöltése később lesz bekötve."
-                                            >Frissítés</button>
+                                            <span class="btn-tip" title="A böngésző-mentés törlése és újratöltése később lesz bekötve.">
+                                                <button type="button" class="btn btn-sm" disabled>Frissítés</button>
+                                            </span>
                                         {:else if msg.action === "website"}
                                             <CategoryMultiSelect
                                                 parents={entryCategoryParents}

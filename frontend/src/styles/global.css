@@ -1589,6 +1589,24 @@ footer {
   margin: 0;
 }
 
+/* A disabled button has no hover effect, in every app (owner, 2026-10-09): it
+   takes no pointer events, so no :hover rule anywhere can apply to it. A
+   disabled button whose title says why keeps that tooltip on a wrapper,
+   <span class="btn-tip" title="…">, which also shows the not-allowed cursor. */
+button:disabled,
+.btn:disabled,
+.btn[aria-disabled='true'] {
+  pointer-events: none;
+}
+
+.btn-tip {
+  display: inline-flex;
+}
+
+.btn-tip:has(> :disabled) {
+  cursor: not-allowed;
+}
+
 .index-tag-cloud__count {
   flex-shrink: 0;
   font-size: var(--text-sm);
