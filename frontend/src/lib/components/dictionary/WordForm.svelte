@@ -1,4 +1,5 @@
 <script>
+    import AppIcon from "$lib/icons/AppIcon.svelte";
     /**
      * Szótár word editor, live mode (moved from Szótár's WordForm; Szótár keeps
      * its suggest-mode form, and both go through the same backend Validate).
@@ -228,7 +229,7 @@
 
         <div>
             <button type="button" class="btn btn-sm" onclick={() => (definitions = [...definitions, blankDef()])}
-                >Új jelentés</button
+                ><AppIcon name="plus" size={14} />Új jelentés</button
             >
         </div>
         {#if error}

@@ -1,4 +1,5 @@
 <script>
+    import AppIcon from "$lib/icons/AppIcon.svelte";
     /**
      * The Szókereső puzzle editor, moved here from Játszótér's
      * /admin/szokereso (lamsza WAYS_OF_WORKING R18): seven words from the
@@ -485,7 +486,7 @@
                 Közzététel
             </button>
             {#if editingId}
-                <button type="button" class="btn-update" onclick={resetForm} disabled={saving}>Új feladvány</button>
+                <button type="button" class="btn-update btn-with-icon" onclick={resetForm} disabled={saving}><AppIcon name="plus" size={16} />Új feladvány</button>
             {/if}
         </div>
 

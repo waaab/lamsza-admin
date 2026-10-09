@@ -871,3 +871,11 @@
     justify-content: flex-start;
     gap: 0.5rem;
 }
+
+/* A create button with the plus icon before its text (lamsza UI_BASELINE
+   "btn-create-plus"): .btn already lines them up; .btn-update needs this. */
+.btn-update.btn-with-icon {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}

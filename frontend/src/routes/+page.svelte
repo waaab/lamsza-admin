@@ -8793,9 +8793,9 @@
                             >
                             <button
                                 type="button"
-                                class="btn-update"
+                                class="btn-update btn-with-icon"
                                 on:click|preventDefault={addScheduleDayRow}
-                                >Új nap</button
+                                ><AppIcon name="plus" size={16} />Új nap</button
                             >
                         </div>
 

@@ -1,4 +1,5 @@
 <script>
+    import AppIcon from "$lib/icons/AppIcon.svelte";
     import { apiFetch } from "$lib/api.js";
 
     /**
@@ -131,7 +132,7 @@
                 <option value={o.id}>{o.label}</option>
             {/each}
         </select>
-        <button type="button" class="btn" onclick={add} disabled={!pick || ids.length >= max}>Hozzáadás</button>
+        <button type="button" class="btn" onclick={add} disabled={!pick || ids.length >= max}><AppIcon name="plus" size={16} />Hozzáadás</button>
     </div>
 
     <div class="featured-cats__actions">
