@@ -10,6 +10,7 @@ adds a line under `[Unreleased]` in the same commit.
 ## [Unreleased]
 
 ### Added
+- Attraction facts for Lámsza's attraction page: Magasság (m), Felszín (km²), Mélység (m) in the create and edit forms (a decimal comma is fine; empty = not shown). `/api/admin/attractions` reads and writes `elevation_m`, `area_km2`, `depth_m` and refuses a negative area or depth (400). Tests: `TestAdminAttractionFacts`, `optionalNumber`.
 - Bejegyzés kategóriák: "Kiemelt kategóriák a kezdőlapon" chooses the Lámsza home page's category chips (at most six, subcategories too, in order; one save replaces the list). New route `GET/PUT /api/admin/entry_categories/featured` (`{"ids": [...]}`), audited as `featured_categories`; it writes lamsza's `entry_categories.featured_order`.
 - Settlement coordinates can be edited: `PUT /api/admin/locations` saves "latitude, longitude" to the settlement's `geo_locations` row (or creates and links one, or unlinks it when cleared); it used to drop the field, so coordinates could only be set on create. Garbled or out-of-range pairs are refused with 400. lamsza's weather is fetched for these coordinates. Test `TestAdminSettlementCoordinates`.
 - Synced from lamsza: `AccountMenu` without the photo (unused here), `global.css` (menu item highlight inside the panel, Lámsza's home-page hero styles) and `typography.css` (`--text-hero` up to 7rem; the admin app does not use it).

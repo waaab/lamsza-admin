@@ -12,6 +12,7 @@
     import { absoluteMediaUrl } from "$lib/eventImage.js";
     import { getApiBase, apiCall } from "$lib/api.js";
     import FeaturedCategoriesPanel from "$lib/components/FeaturedCategoriesPanel.svelte";
+    import { optionalNumber } from "$lib/optionalNumber.js";
     import { emptyWeekHours, normalizeHours, withDefaultWeekHours } from "$lib/entryHours.js";
     import { offersDelivery } from "$lib/entryPublicExtras.js";
     import { emptyPhotos, normalizePhotos } from "$lib/entryPhotos.js";
@@ -352,6 +353,9 @@
         content: "",
         activities: "",
         prohibitions: "",
+        elevation_m: "",
+        area_km2: "",
+        depth_m: "",
         images: "",
         image_copyrights: "",
     };
@@ -3594,6 +3598,9 @@
                 content: newAttraction.content || "",
                 activities: activityLines(newAttraction.activities),
                 prohibitions: activityLines(newAttraction.prohibitions),
+                elevation_m: optionalNumber(newAttraction.elevation_m),
+                area_km2: optionalNumber(newAttraction.area_km2),
+                depth_m: optionalNumber(newAttraction.depth_m),
                 images: imgs,
             },
             fetchAttractions,
@@ -3612,6 +3619,9 @@
                     content: "",
                     activities: "",
                     prohibitions: "",
+                    elevation_m: "",
+                    area_km2: "",
+                    depth_m: "",
                     images: "",
                     image_copyrights: "",
                 }),
@@ -3670,9 +3680,16 @@
             content: att.content || "",
             activities: Array.isArray(att.activities) ? att.activities.join("\n") : "",
             prohibitions: Array.isArray(att.prohibitions) ? att.prohibitions.join("\n") : "",
+            elevation_m: factText(att.elevation_m),
+            area_km2: factText(att.area_km2),
+            depth_m: factText(att.depth_m),
             images: lines.images,
             image_copyrights: lines.image_copyrights,
         };
+    }
+    /** An attraction fact for its text field: empty when not set, decimal comma. */
+    function factText(/** @type {number | null | undefined} */ v) {
+        return v == null ? "" : String(v).replace(".", ",");
     }
     function cancelEditAttraction() {
         editingAttraction = null;
@@ -3701,6 +3718,9 @@
                 content: editingAttraction.content || "",
                 activities: activityLines(editingAttraction.activities),
                 prohibitions: activityLines(editingAttraction.prohibitions),
+                elevation_m: optionalNumber(editingAttraction.elevation_m),
+                area_km2: optionalNumber(editingAttraction.area_km2),
+                depth_m: optionalNumber(editingAttraction.depth_m),
                 images: imgs,
             },
             fetchAttractions,
@@ -7292,6 +7312,18 @@
                             <input id="att_lon" name="longitude" type="text" bind:value={newAttraction.longitude} placeholder="25.8876" style="width:6rem" />
                         </div>
                         <div class="form-row">
+                            <label for="att_elevation">Magasság (m)</label>
+                            <input id="att_elevation" name="elevation_m" type="text" pattern="-?[0-9 ]*([.,][0-9]+)?" inputmode="decimal" bind:value={newAttraction.elevation_m} placeholder="946" style="width:6rem" />
+                        </div>
+                        <div class="form-row">
+                            <label for="att_area">Felszín (km²)</label>
+                            <input id="att_area" name="area_km2" type="text" pattern="-?[0-9 ]*([.,][0-9]+)?" inputmode="decimal" bind:value={newAttraction.area_km2} placeholder="0,22" style="width:6rem" />
+                        </div>
+                        <div class="form-row">
+                            <label for="att_depth">Mélység (m)</label>
+                            <input id="att_depth" name="depth_m" type="text" pattern="-?[0-9 ]*([.,][0-9]+)?" inputmode="decimal" bind:value={newAttraction.depth_m} placeholder="7" style="width:6rem" />
+                        </div>
+                        <div class="form-row">
                             <label for="att_featured">Kiemelt kép URL</label>
                             <input id="att_featured" name="featured_image" type="url" bind:value={newAttraction.featured_image} placeholder="https://..." />
                         </div>
@@ -8424,6 +8456,12 @@
                     <label for="eatt_coords">Koordináták (lat, lon)</label>
                     <input id="eatt_coords" name="latitude" type="text" bind:value={editingAttraction.latitude} placeholder="46.1265" style="width:6rem" />
                     <input id="eatt_lon" name="longitude" type="text" bind:value={editingAttraction.longitude} placeholder="25.8876" style="width:6rem" />
+                    <label for="eatt_elevation">Magasság (m)</label>
+                    <input id="eatt_elevation" name="elevation_m" type="text" pattern="-?[0-9 ]*([.,][0-9]+)?" inputmode="decimal" bind:value={editingAttraction.elevation_m} placeholder="946" style="width:6rem" />
+                    <label for="eatt_area">Felszín (km²)</label>
+                    <input id="eatt_area" name="area_km2" type="text" pattern="-?[0-9 ]*([.,][0-9]+)?" inputmode="decimal" bind:value={editingAttraction.area_km2} placeholder="0,22" style="width:6rem" />
+                    <label for="eatt_depth">Mélység (m)</label>
+                    <input id="eatt_depth" name="depth_m" type="text" pattern="-?[0-9 ]*([.,][0-9]+)?" inputmode="decimal" bind:value={editingAttraction.depth_m} placeholder="7" style="width:6rem" />
                     <label for="eatt_featured">Kiemelt kép URL</label>
                     <input id="eatt_featured" name="featured_image" type="url" bind:value={editingAttraction.featured_image} />
                     <label for="eatt_featured_copyright">Szerzői jog (kiemelt kép)</label>

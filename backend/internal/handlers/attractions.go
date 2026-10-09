@@ -33,6 +33,9 @@ type Attraction struct {
 	Content                string                  `json:"content,omitempty"`
 	Activities             []string                `json:"activities,omitempty"`
 	Prohibitions           []string                `json:"prohibitions,omitempty"`
+	ElevationM             *float64                `json:"elevation_m"`
+	AreaKm2                *float64                `json:"area_km2"`
+	DepthM                 *float64                `json:"depth_m"`
 	Images                 []AttractionImage       `json:"images,omitempty"`
 	SuggestionPending      bool                    `json:"suggestion_pending"`
 	Contributors           []AttractionContributor `json:"contributors"`
@@ -223,6 +226,19 @@ func HandleCounties(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(list)
 }
 
+// attractionFactsError: the attraction's area and depth cannot be negative
+// (the column checks in lamsza's schema say the same). Elevation can be, for
+// a hollow below sea level. Null means "not set" and is always fine.
+func attractionFactsError(areaKm2, depthM *float64) string {
+	if areaKm2 != nil && *areaKm2 < 0 {
+		return "A felszín nem lehet negatív."
+	}
+	if depthM != nil && *depthM < 0 {
+		return "A mélység nem lehet negatív."
+	}
+	return ""
+}
+
 // HandleAdminAttractions: GET list, POST create, PUT update, DELETE
 func HandleAdminAttractions(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
@@ -233,7 +249,7 @@ func HandleAdminAttractions(w http.ResponseWriter, r *http.Request) {
 			SELECT a.id, a.county_id, c.slug, c.name, a.name, COALESCE(a.name_ro,''), COALESCE(a.name_de,''),
 				a.slug, COALESCE(a.description,''), COALESCE(a.featured_image,''), COALESCE(a.featured_image_copyright,''),
 				COALESCE(a.content,''), COALESCE(a.activities,''), COALESCE(a.prohibitions,''),
-				gl.latitude, gl.longitude
+				gl.latitude, gl.longitude, a.elevation_m, a.area_km2, a.depth_m
 			FROM attractions a
 			JOIN counties c ON a.county_id = c.id
 			LEFT JOIN geo_locations gl ON a.location_id = gl.id
@@ -263,7 +279,8 @@ func HandleAdminAttractions(w http.ResponseWriter, r *http.Request) {
 			// TestAdminAttractionsListIncludesOneWithoutCoordinates.
 			var lat, lon sql.NullFloat64
 			if err := rows.Scan(&a.ID, &a.CountyID, &a.CountySlug, &a.CountyName, &a.Name, &a.NameRo, &a.NameDe,
-				&a.Slug, &a.Description, &a.FeaturedImage, &a.FeaturedImageCopyright, &a.Content, &activitiesText, &prohibitionsText, &lat, &lon); err != nil {
+				&a.Slug, &a.Description, &a.FeaturedImage, &a.FeaturedImageCopyright, &a.Content, &activitiesText, &prohibitionsText, &lat, &lon,
+				&a.ElevationM, &a.AreaKm2, &a.DepthM); err != nil {
 				log.Printf("admin attractions scan: %v", err)
 				continue
 			}
@@ -294,10 +311,17 @@ func HandleAdminAttractions(w http.ResponseWriter, r *http.Request) {
 			Content                string          `json:"content"`
 			Activities             []string        `json:"activities"`
 			Prohibitions           []string        `json:"prohibitions"`
+			ElevationM             *float64        `json:"elevation_m"`
+			AreaKm2                *float64        `json:"area_km2"`
+			DepthM                 *float64        `json:"depth_m"`
 			Images                 json.RawMessage `json:"images"`
 		}
 		if err := json.NewDecoder(r.Body).Decode(&a); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		if msg := attractionFactsError(a.AreaKm2, a.DepthM); msg != "" {
+			http.Error(w, msg, http.StatusBadRequest)
 			return
 		}
 		slug := utils.Slugify(a.Name)
@@ -318,9 +342,9 @@ func HandleAdminAttractions(w http.ResponseWriter, r *http.Request) {
 		}
 		var attID int
 		err := db.DB.QueryRow(`
-			INSERT INTO attractions (county_id, name, name_ro, name_de, slug, description, location_id, featured_image, featured_image_copyright, content, activities, prohibitions)
-			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING id
-		`, countyID, a.Name, a.NameRo, a.NameDe, slug, a.Description, glID, a.FeaturedImage, strings.TrimSpace(a.FeaturedImageCopyright), a.Content, joinActivities(a.Activities), joinActivities(a.Prohibitions)).Scan(&attID)
+			INSERT INTO attractions (county_id, name, name_ro, name_de, slug, description, location_id, featured_image, featured_image_copyright, content, activities, prohibitions, elevation_m, area_km2, depth_m)
+			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING id
+		`, countyID, a.Name, a.NameRo, a.NameDe, slug, a.Description, glID, a.FeaturedImage, strings.TrimSpace(a.FeaturedImageCopyright), a.Content, joinActivities(a.Activities), joinActivities(a.Prohibitions), a.ElevationM, a.AreaKm2, a.DepthM).Scan(&attID)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -349,10 +373,17 @@ func HandleAdminAttractions(w http.ResponseWriter, r *http.Request) {
 			Content                string          `json:"content"`
 			Activities             []string        `json:"activities"`
 			Prohibitions           []string        `json:"prohibitions"`
+			ElevationM             *float64        `json:"elevation_m"`
+			AreaKm2                *float64        `json:"area_km2"`
+			DepthM                 *float64        `json:"depth_m"`
 			Images                 json.RawMessage `json:"images"`
 		}
 		if err := json.NewDecoder(r.Body).Decode(&a); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		if msg := attractionFactsError(a.AreaKm2, a.DepthM); msg != "" {
+			http.Error(w, msg, http.StatusBadRequest)
 			return
 		}
 		slug := utils.Slugify(a.Name)
@@ -379,9 +410,11 @@ func HandleAdminAttractions(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 		_, err := db.DB.Exec(`
-			UPDATE attractions SET county_id=$1, name=$2, name_ro=$3, name_de=$4, slug=$5, description=$6, location_id=$7, featured_image=$8, featured_image_copyright=$9, content=$10, activities=$11, prohibitions=$12
+			UPDATE attractions SET county_id=$1, name=$2, name_ro=$3, name_de=$4, slug=$5, description=$6, location_id=$7, featured_image=$8, featured_image_copyright=$9, content=$10, activities=$11, prohibitions=$12,
+				elevation_m=$14, area_km2=$15, depth_m=$16
 			WHERE id=$13
-		`, countyID, a.Name, a.NameRo, a.NameDe, slug, a.Description, glID, a.FeaturedImage, strings.TrimSpace(a.FeaturedImageCopyright), a.Content, joinActivities(a.Activities), joinActivities(a.Prohibitions), a.ID)
+		`, countyID, a.Name, a.NameRo, a.NameDe, slug, a.Description, glID, a.FeaturedImage, strings.TrimSpace(a.FeaturedImageCopyright), a.Content, joinActivities(a.Activities), joinActivities(a.Prohibitions), a.ID,
+			a.ElevationM, a.AreaKm2, a.DepthM)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
