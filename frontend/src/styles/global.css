@@ -369,6 +369,11 @@ section.page-section{
   color: var(--szekely-red);
 }
 
+/* The accent ends the same word ("Játszótér"): no gap to give back. */
+.hero .hero-accent--joined {
+  margin-left: 0;
+}
+
 .hero-search {
   width: min(680px, 100%);
   margin-top: 1.5rem;
