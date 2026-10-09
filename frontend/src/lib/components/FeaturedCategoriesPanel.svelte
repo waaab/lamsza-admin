@@ -111,9 +111,11 @@
             {#each ids as id, i (id)}
                 <li class="featured-cats__row">
                     <span class="featured-cats__name">{nameOf(id)}</span>
-                    <button type="button" class="btn" onclick={() => move(i, -1)} disabled={i === 0} aria-label="Feljebb">↑</button>
-                    <button type="button" class="btn" onclick={() => move(i, 1)} disabled={i === ids.length - 1} aria-label="Lejjebb">↓</button>
-                    <button type="button" class="btn-delete" onclick={() => remove(i)}>Eltávolítás</button>
+                    <span class="featured-cats__buttons">
+                        <button type="button" class="btn" onclick={() => move(i, -1)} disabled={i === 0} aria-label="Feljebb">↑</button>
+                        <button type="button" class="btn" onclick={() => move(i, 1)} disabled={i === ids.length - 1} aria-label="Lejjebb">↓</button>
+                        <button type="button" class="btn-delete" onclick={() => remove(i)}>Eltávolítás</button>
+                    </span>
                 </li>
             {/each}
         </ol>
@@ -144,6 +146,8 @@
 <style>
     .featured-cats {
         display: grid;
+        /* A long category name in the select must not widen the panel. */
+        grid-template-columns: minmax(0, 1fr);
         gap: 0.75rem;
         margin-block: 1rem 1.5rem;
         padding: 1rem;
@@ -171,6 +175,25 @@
     .featured-cats__name {
         flex: 1 1 12rem;
         min-width: 0;
+    }
+    .featured-cats__buttons {
+        display: flex;
+        gap: 0.5rem;
+        flex: none;
+    }
+    /* The admin form field look (admin.css .admin-form select). */
+    .featured-cats__add select {
+        flex: 1 1 14rem;
+        min-width: 0;
+        max-width: 24rem;
+        box-sizing: border-box;
+        padding: 0.6rem 0.8rem;
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        font-size: var(--text-base);
+        font-family: inherit;
+        background: var(--card-bg);
+        color: var(--text-primary);
     }
     .featured-cats__empty {
         margin: 0;
