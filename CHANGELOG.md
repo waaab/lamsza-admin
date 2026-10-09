@@ -34,6 +34,7 @@ adds a line under `[Unreleased]` in the same commit.
   A Függőben / Elbírált filter lists the newest decisions with who decided, when and why. `formatHuDateTime` in `sectionApi.js` shows times in Bucharest. This needs lamsza-szotar's `GET suggestions/{id}` and `?status=decided` (the same change there).
 
 ### Changed
+- Synced from lamsza: `global.css` with `.aside_heading`, the network's one sidebar heading (lamsza UI_BASELINE `css-sidebar-heading`). The admin app has no sidebar headings, so nothing here looks different.
 - "Új jelentés", "Új feladvány", "Új nap" and the featured categories' "Hozzáadás" show the shared plus icon before their text (lamsza UI_BASELINE `btn-create-plus`); the create panels already had it.
 - The `site_settings` contract is tested: `TestSiteSettingsKeysAreReadByLamsza` checks every key the Beállítások tab writes is read by lamsza's backend (needs the lamsza repo; CI checks it out).
 - CI runs the backend's database tests: the backend job gets a `postgres:16` service, checks out the public lamsza repo for its schema and runs `scripts/test-backend.sh`, the same path as `npm run test:backend`. With `ADMIN_TEST_DB_REQUIRED=1` (set in CI) a missing database fails a DB test instead of skipping it.

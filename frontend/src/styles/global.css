@@ -1572,6 +1572,23 @@ footer {
   width: 260px;
 }
 
+/* Every sidebar heading in the network, on every level of a sidebar: box
+   titles and the headings inside a box alike (owner, 2026-10-09; UI_BASELINE
+   css-sidebar-heading). Small, semi-bold, uppercase, muted. */
+.aside_heading {
+  margin: 0 0 0.5rem;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+/* In a header row, beside a toggle or the year nav. */
+.sidebar-header .aside_heading {
+  margin: 0;
+}
+
 .index-tag-cloud__count {
   flex-shrink: 0;
   font-size: var(--text-sm);
