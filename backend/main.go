@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"time"
 
 	"backend/internal/account"
 	"backend/internal/audit"
@@ -33,7 +34,7 @@ func main() {
 	port := config.AppConfig.Port
 	log.Printf("Lamsza Admin API active on port %s\n", port)
 	// LimitBody caps every request body; the image uploads get a larger cap.
-	if err := http.ListenAndServe(":"+port, middleware.LimitBody(mux)); err != nil {
+	if err := newServer(":"+port, middleware.LimitBody(mux)).ListenAndServe(); err != nil {
 		log.Fatal(err)
 	}
 }
@@ -147,4 +148,26 @@ func newMux() *http.ServeMux {
 	}))
 
 	return mux
+}
+
+// newServer builds the API server with its timeouts.
+//
+// A bare http.ListenAndServe has no timeouts at all, so a half-open or slow
+// connection is never dropped and a few hundred of them hold the server
+// forever (slowloris). Same shape as lamsza's (BOG-18).
+//
+// Longer than the other apps': an 8 MB image upload on a slow line takes
+// well over 15s to read, and WriteTimeout (which starts when the headers are
+// read) has to outlast that read plus the slowest handler, the relay to
+// Szótár and Játszótér (10s client timeout).
+func newServer(addr string, handler http.Handler) *http.Server {
+	return &http.Server{
+		Addr:              addr,
+		Handler:           handler,
+		ReadHeaderTimeout: 10 * time.Second,
+		ReadTimeout:       60 * time.Second,
+		WriteTimeout:      90 * time.Second,
+		IdleTimeout:       60 * time.Second,
+		MaxHeaderBytes:    1 << 20,
+	}
 }
